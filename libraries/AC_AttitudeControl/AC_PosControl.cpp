@@ -1248,8 +1248,8 @@ bool AC_PosControl::calculate_yaw_and_rate_yaw()
 {
     // Calculate the turn rate
     float turn_rate = 0.0f;
-    const Vector2f vel_desired_xy(_vel_desired.x, _vel_desired.y);
-    const Vector2f accel_desired_xy(_accel_desired.x, _accel_desired.y);
+    const Vector2f vel_desired_xy(_vel_desired.x, _vel_desired.y);      //构造函数，将_vel_desired.x,_vel_desired.y赋值到vel_desired_xy中
+    const Vector2f accel_desired_xy(_accel_desired.x, _accel_desired.y);    //同上
     const float vel_desired_xy_len = vel_desired_xy.length();
     if (is_positive(vel_desired_xy_len)) {
         const float accel_forward = (accel_desired_xy.x * vel_desired_xy.x + accel_desired_xy.y * vel_desired_xy.y)/vel_desired_xy_len;
