@@ -921,7 +921,7 @@ AP_InertialSensor::detect_backends(void)
 
     uint8_t probe_count = 0;
     uint8_t enable_mask = uint8_t(_enable_mask.get());
-    uint8_t found_mask = 0;
+    uint8_t found_mask = 0;                                     //found_mask找到一个二三个IMU分别取值0000 0001 ； 0000 0011； 0000 0111；
 
     /*
       use ADD_BACKEND() macro to allow for INS_ENABLE_MASK for enabling/disabling INS backends
