@@ -177,6 +177,7 @@ void AP_MotorsMatrix::output_to_motors()
     // convert output to PWM and send to each motor
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
+            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "_actuator[%d]: %f", i,_actuator[i]);
             rc_write(i, output_to_pwm(_actuator[i]));
         }
     }
@@ -266,6 +267,7 @@ void AP_MotorsMatrix::output_armed_stabilizing()
 
     // calculate amount of yaw we can fit into the throttle range
     // this is always equal to or less than the requested yaw from the pilot or rate controller
+    /* 这里是映射机架类型的地方 */
     float rp_low = 1.0f;    // lowest thrust value
     float rp_high = -1.0f;  // highest thrust value
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
@@ -540,7 +542,7 @@ void AP_MotorsMatrix::add_motor(int8_t motor_num, float roll_factor_in_degrees, 
 {
     add_motor_raw(
         motor_num,
-        cosf(radians(roll_factor_in_degrees + 90)),
+        cosf(radians(roll_factor_in_degrees + 90)),         //这里加90是什么含义    //cos转化成sin
         cosf(radians(pitch_factor_in_degrees)),
         yaw_factor,
         testing_order);
@@ -584,6 +586,7 @@ void AP_MotorsMatrix::setup_motors(motor_frame_class frame_class, motor_frame_ty
                     break;
                 case MOTOR_FRAME_TYPE_X:
                     _frame_type_string = "X";
+                    /* AP_MOTORS_MOT_x是电机序号;最后面的是测试序号 */
                     add_motor(AP_MOTORS_MOT_1,   45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
                     add_motor(AP_MOTORS_MOT_2, -135, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 3);
                     add_motor(AP_MOTORS_MOT_3,  -45, AP_MOTORS_MATRIX_YAW_FACTOR_CW,  4);
@@ -947,8 +950,9 @@ void AP_MotorsMatrix::setup_motors(motor_frame_class frame_class, motor_frame_ty
                     add_motor(AP_MOTORS_MOT_11,  -60, AP_MOTORS_MATRIX_YAW_FACTOR_CW,  11); // forward-left-top
                     add_motor(AP_MOTORS_MOT_12,  -60, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 12); // forward-left-bottom
                     break;
-                case MOTOR_FRAME_TYPE_X:
+                case MOTOR_FRAME_TYPE_X:                                                    //飞碟用的就是这个类型
                     _frame_type_string = "X";
+                    /* AP_MOTORS_MOT_x是电机序号;最后面的是测试序号 */
                     add_motor(AP_MOTORS_MOT_1,    30, AP_MOTORS_MATRIX_YAW_FACTOR_CCW,  1); // forward-right-top
                     add_motor(AP_MOTORS_MOT_2,    30, AP_MOTORS_MATRIX_YAW_FACTOR_CW,   2); // forward-right-bottom
                     add_motor(AP_MOTORS_MOT_3,    90, AP_MOTORS_MATRIX_YAW_FACTOR_CW,   3); // right-top

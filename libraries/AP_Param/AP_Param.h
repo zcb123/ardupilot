@@ -107,6 +107,7 @@
 #define AP_GROUPINFO_FLAGS_FRAME(name, idx, clazz, element, def, flags, frame_flags) AP_GROUPINFO_FLAGS(name, idx, clazz, element, def, flags|((frame_flags)<<AP_PARAM_FRAME_TYPE_SHIFT) )
 
 // declare a group var_info line
+/* name是地面站上显示的名称;idx是索引号;clazz是参数所在的类;element是类中的成员变量;def是数值 */
 #define AP_GROUPINFO(name, idx, clazz, element, def) AP_GROUPINFO_FLAGS(name, idx, clazz, element, def, 0)
 
 // declare a nested group entry in a group var_info

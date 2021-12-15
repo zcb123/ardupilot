@@ -138,6 +138,7 @@ void AP_Vehicle::setup()
 #endif
 
     // init_ardupilot is where the vehicle does most of its initialisation.
+    /* 具体实现在system.cpp文件中*/
     init_ardupilot();
 
 #if !APM_BUILD_TYPE(APM_BUILD_Replay)

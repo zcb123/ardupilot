@@ -41,7 +41,7 @@ class SRV_Channels;
 */
 class SRV_Channel {
 public:
-    friend class SRV_Channels;
+    friend class SRV_Channels;      //SRV_Channels中所有的成员函数都可以访问SRV_Channel类中所有成员(包括私有成员)
 
     // constructor
     SRV_Channel(void);
@@ -314,7 +314,7 @@ private:
     // used by DO_SET_SERVO commands
     bool ign_small_rcin_changes;
 
-    // if true we should ignore all imputs on this channel
+    // if true we should ignore all inputs on this channel
     bool override_active;
 
     void set_override(bool b) {override_active = b;};

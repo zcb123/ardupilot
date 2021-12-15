@@ -25,7 +25,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-SRV_Channel::servo_mask_t SRV_Channel::have_pwm_mask;
+SRV_Channel::servo_mask_t SRV_Channel::have_pwm_mask;           //一共16位,每一位代表一个通道;   1:输出,0:不输出;
 
 const AP_Param::GroupInfo SRV_Channel::var_info[] = {
     // @Param: MIN
@@ -80,7 +80,7 @@ SRV_Channel::SRV_Channel(void)
 {
     AP_Param::setup_object_defaults(this, var_info);
     // start with all pwm at zero
-    have_pwm_mask = ~uint16_t(0);
+    have_pwm_mask = ~uint16_t(0);       //have_pwm_mask = 0取反;  0取反为65535,所以have_pwm_mask = 65535;
 }
 
 // convert a 0..range_max to a pwm

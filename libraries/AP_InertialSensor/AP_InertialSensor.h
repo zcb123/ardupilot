@@ -68,7 +68,7 @@ class AP_Logger;
  */
 class AP_InertialSensor : AP_AccelCal_Client
 {
-    friend class AP_InertialSensor_Backend;
+    friend class AP_InertialSensor_Backend;                     //AP_InertialSensoe_Backend中所有成员可以访问AP_InertialSensor类中所有成员(包括私有)
 
 public:
     AP_InertialSensor();

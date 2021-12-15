@@ -239,6 +239,7 @@ void AP_MotorsMulticopter::output()
     output_logic();
 
     // calculate thrust
+    /* 根据机架类型分配动力 */
     output_armed_stabilizing();
 
     // apply any thrust compensation for the frame
