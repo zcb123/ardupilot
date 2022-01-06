@@ -292,13 +292,14 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
 
         _imu._new_gyro_data[instance] = true;
     }
-
-    if (!_imu.batchsampler.doing_post_filter_logging()) {
-        log_gyro_raw(instance, sample_us, gyro);
-    }
-    else {
-        log_gyro_raw(instance, sample_us, _imu._gyro_filtered[instance]);
-    }
+    
+    Write_GYR_Raw_Filted(instance, sample_us, gyro,_imu._gyro_filtered[instance]);
+    // if (!_imu.batchsampler.doing_post_filter_logging()) {
+    //     log_gyro_raw(instance, sample_us, gyro);
+    // }
+    // else {
+    //     log_gyro_raw(instance, sample_us, _imu._gyro_filtered[instance]);
+    // }
 }
 
 void AP_InertialSensor_Backend::log_gyro_raw(uint8_t instance, const uint64_t sample_us, const Vector3f &gyro)
@@ -417,11 +418,13 @@ void AP_InertialSensor_Backend::_notify_new_accel_raw_sample(uint8_t instance,
         _imu._new_accel_data[instance] = true;
     }
 
-    if (!_imu.batchsampler.doing_post_filter_logging()) {
-        log_accel_raw(instance, sample_us, accel);
-    } else {
-        log_accel_raw(instance, sample_us, _imu._accel_filtered[instance]);
-    }
+    Write_ACC_Raw_Filted(instance, sample_us, accel,_imu._accel_filtered[instance]);
+    
+    // if (!_imu.batchsampler.doing_post_filter_logging()) {
+    //     log_accel_raw(instance, sample_us, accel);
+    // } else {
+    //     log_accel_raw(instance, sample_us, _imu._accel_filtered[instance]);
+    // }
 }
 
 void AP_InertialSensor_Backend::_notify_new_accel_sensor_rate_sample(uint8_t instance, const Vector3f &accel)
