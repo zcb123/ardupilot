@@ -50,7 +50,7 @@ void AP_InertialSensor_Backend::Write_GYR(const uint8_t instance, const uint64_t
         };
         AP::logger().WriteBlock(&pkt, sizeof(pkt));
 }
-void AP_InertialSensor_Backend::Write_GYR_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &gyro,const Vector3f &gyro_ftd) const
+void AP_InertialSensor_Backend::Write_GYR_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &gyro,const Vector3f &gyro_ftd,const Vector3d &gyro_ftd_n) const
 {
     const uint64_t now = AP_HAL::micros64();
     const struct log_GYR pkt{
@@ -63,7 +63,10 @@ void AP_InertialSensor_Backend::Write_GYR_Raw_Filted(const uint8_t instance, con
         GyrZ      : gyro.z,
         GyrX_ftd  : gyro_ftd.x,
         GyrY_ftd  : gyro_ftd.y,
-        GyrZ_ftd  : gyro_ftd.z
+        GyrZ_ftd  : gyro_ftd.z,
+        GyrX_ftd_n: gyro_ftd_n.x,
+        GyrY_ftd_n: gyro_ftd_n.y,
+        GyrZ_ftd_n: gyro_ftd_n.z
     };
     AP::logger().WriteBlock(&pkt, sizeof(pkt));
 

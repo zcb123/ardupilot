@@ -268,6 +268,10 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
 #endif
         Vector3f gyro_filtered = gyro;
 
+        _imu._gyro_filtered_d[instance].x =(double)gyro_filtered.x;
+        _imu._gyro_filtered_d[instance].y =(double)gyro_filtered.y;
+        _imu._gyro_filtered_d[instance].z =(double)gyro_filtered.z;
+
         // apply the notch filter
         if (_gyro_notch_enabled()) {
             gyro_filtered = _imu._gyro_notch_filter[instance].apply(gyro_filtered);
@@ -281,6 +285,9 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
         // apply the low pass filter last to attentuate any notch induced noise
         gyro_filtered = _imu._gyro_filter[instance].apply(gyro_filtered);
 
+        _imu._gyro_filtered_d[instance] = _imu._gyro_filter_d[instance].apply(_imu._gyro_filtered_d[instance]);
+
+    
         // if the filtering failed in any way then reset the filters and keep the old value
         if (gyro_filtered.is_nan() || gyro_filtered.is_inf()) {
             _imu._gyro_filter[instance].reset();
@@ -293,7 +300,7 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
         _imu._new_gyro_data[instance] = true;
     }
     
-    Write_GYR_Raw_Filted(instance, sample_us, gyro,_imu._gyro_filtered[instance]);
+    Write_GYR_Raw_Filted(instance, sample_us, gyro,_imu._gyro_filtered[instance],_imu._gyro_filtered_d[instance]);
     // if (!_imu.batchsampler.doing_post_filter_logging()) {
     //     log_gyro_raw(instance, sample_us, gyro);
     // }

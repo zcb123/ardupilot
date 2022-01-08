@@ -1,5 +1,5 @@
 #include "LowPassFilter6n.h"
-
+//#include <GCS_MAVLink/GCS.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // DigitalSixOrderFilter
@@ -32,6 +32,8 @@ T DigitalSixOrderFilter<T>::apply(const T &sample, const struct sixorder_params 
     }
     
     yBuf[0] = yBuf[0] + xBuf[0]*params.b[0];
+
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "filter! %.15lf ", (double)params.b[0]);
 
     return yBuf[0];
     
@@ -76,6 +78,7 @@ void DigitalSixOrderFilter<T>::compute_params(float sample_freq, float cutoff_fr
 template <class T>
 LowPassFilter6n<T>::LowPassFilter6n() { 
     memset(&_params, 0, sizeof(_params) ); 
+    set_cutoff_frequency(20, 30);
 }
 
 // constructor
@@ -131,3 +134,4 @@ template class LowPassFilter6n<long>;
 template class LowPassFilter6n<float>;
 template class LowPassFilter6n<Vector2f>;
 template class LowPassFilter6n<Vector3f>;
+template class LowPassFilter6n<Vector3d>;

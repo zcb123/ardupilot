@@ -348,5 +348,5 @@ private:
 
     //logging added by zcb 2022.01.06 15:21
     void Write_ACC_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &accel,const Vector3f &accel_ftd) const; 
-    void Write_GYR_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &gyro,const Vector3f &gyro_ftd) const;
+    void Write_GYR_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &gyro,const Vector3f &gyro_ftd,const Vector3d &gyro_ftd_n) const;
 };

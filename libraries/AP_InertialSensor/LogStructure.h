@@ -42,6 +42,7 @@ struct PACKED log_GYR {
     uint64_t sample_us;
     float GyrX, GyrY, GyrZ;
     float GyrX_ftd,GyrY_ftd,GyrZ_ftd;
+    double GyrX_ftd_n,GyrY_ftd_n,GyrZ_ftd_n;
 };
 
 // @LoggerMessage: IMU
@@ -115,9 +116,9 @@ struct PACKED log_Vibe {
 
 #define LOG_STRUCTURE_FROM_INERTIALSENSOR        \
     { LOG_ACC_MSG, sizeof(log_ACC), \
-      "ACC", "QBQffffff",        "TimeUS,I,SampleUS,AccX,AccY,AccZ,AccX_ftd,AccY_ftd,AccZ_ftd", "s#soooooo", "F-F000000" }, \
+      "ACC", "QBQffffff","TimeUS,I,SampleUS,AccX,AccY,AccZ,AccX_ftd,AccY_ftd,AccZ_ftd", "s#soooooo", "F-F000000" }, \
     { LOG_GYR_MSG, sizeof(log_GYR), \
-      "GYR", "QBQffffff",        "TimeUS,I,SampleUS,GyrX,GyrY,GyrZ,GyrX_ftd,GyrY_ftd,GyrZ_ftd", "s#sEEEEEE", "F-F000000" }, \
+      "GYR", "QBQffffffddd", "TimeUS,I,SampleUS,GyrX,GyrY,GyrZ,GyrX_ftd,GyrY_ftd,GyrZ_ftd,GyrX_ftd_n,GyrY_ftd_n,GyrZ_ftd_n", "s#sEEEEEEEEE", "F-F000000000" }, \
     { LOG_IMU_MSG, sizeof(log_IMU), \
       "IMU",  "QBffffffIIfBBHH", "TimeUS,I,GyrX,GyrY,GyrZ,AccX,AccY,AccZ,EG,EA,T,GH,AH,GHz,AHz", "s#EEEooo--O--zz", "F-000000-----00" }, \
     { LOG_VIBE_MSG, sizeof(log_Vibe), \

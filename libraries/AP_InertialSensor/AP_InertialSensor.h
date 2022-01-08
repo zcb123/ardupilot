@@ -43,6 +43,7 @@
 #include <AP_HAL/utility/RingBuffer.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
+#include <Filter/LowPassFilter6n.h>
 #include <Filter/LowPassFilter2p.h>
 #include <Filter/LowPassFilter.h>
 #include <Filter/NotchFilter.h>
@@ -485,8 +486,12 @@ private:
     // Low Pass filters for gyro and accel
     LowPassFilter2pVector3f _accel_filter[INS_MAX_INSTANCES];
     LowPassFilter2pVector3f _gyro_filter[INS_MAX_INSTANCES];
+
+    LowPassFilter6nVector3d _gyro_filter_d[INS_MAX_INSTANCES];      //added by zcb 2022.01.08 11:37
+
     Vector3f _accel_filtered[INS_MAX_INSTANCES];
     Vector3f _gyro_filtered[INS_MAX_INSTANCES];
+    Vector3d _gyro_filtered_d[INS_MAX_INSTANCES]; 
 #if HAL_WITH_DSP
     // Thread-safe public version of _last_raw_gyro
     Vector3f _gyro_raw[INS_MAX_INSTANCES];
