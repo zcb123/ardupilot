@@ -118,7 +118,7 @@ struct PACKED log_Vibe {
     { LOG_ACC_MSG, sizeof(log_ACC), \
       "ACC", "QBQffffff","TimeUS,I,SampleUS,AccX,AccY,AccZ,AccX_ftd,AccY_ftd,AccZ_ftd", "s#soooooo", "F-F000000" }, \
     { LOG_GYR_MSG, sizeof(log_GYR), \
-      "GYR", "QBQffffffddd", "TimeUS,I,SampleUS,GyrX,GyrY,GyrZ,GyrX_ftd,GyrY_ftd,GyrZ_ftd,GyrX_ftd_n,GyrY_ftd_n,GyrZ_ftd_n", "s#sEEEEEEEEE", "F-F000000000" }, \
+      "GYR", "QBQffffffddd", "T,I,Ts,X,Y,Z,X_ftd,Y_ftd,Z_ftd,X_ftd_n,Y_ftd_n,Z_ftd_n", "s#sEEEEEEEEE", "F-F000000000" }, \
     { LOG_IMU_MSG, sizeof(log_IMU), \
       "IMU",  "QBffffffIIfBBHH", "TimeUS,I,GyrX,GyrY,GyrZ,AccX,AccY,AccZ,EG,EA,T,GH,AH,GHz,AHz", "s#EEEooo--O--zz", "F-000000-----00" }, \
     { LOG_VIBE_MSG, sizeof(log_Vibe), \
