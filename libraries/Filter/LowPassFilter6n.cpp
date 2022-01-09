@@ -7,7 +7,7 @@
 
 template <class T>
 DigitalSixOrderFilter<T>::DigitalSixOrderFilter() {
-    for(int i = 0 ;i<7;i++){
+    for(int i = 0 ;i<FILTER_ORDER;i++){
         xBuf[i] = T();
         yBuf[i] = T();
     }
@@ -16,7 +16,7 @@ DigitalSixOrderFilter<T>::DigitalSixOrderFilter() {
 template <class T>
 T DigitalSixOrderFilter<T>::apply(const T &sample, const struct sixorder_params &params) {
     
-    for(int i = 6; i>0; i--)
+    for(int i = FILTER_ORDER - 1; i>0; i--)
     {
         yBuf[i] = yBuf[i-1];
         xBuf[i] = xBuf[i-1];
@@ -25,7 +25,7 @@ T DigitalSixOrderFilter<T>::apply(const T &sample, const struct sixorder_params 
     xBuf[0] = sample;
     yBuf[0] = T();
 
-    for(int i=1;i<7;i++)
+    for(int i=1;i<FILTER_ORDER;i++)
     {
         yBuf[0] = yBuf[0] + xBuf[i]*params.b[i];
         yBuf[0] = yBuf[0] - yBuf[i]*params.a[i];
@@ -42,7 +42,7 @@ T DigitalSixOrderFilter<T>::apply(const T &sample, const struct sixorder_params 
 template <class T>
 void DigitalSixOrderFilter<T>::reset() { 
     
-    for(int i = 0 ;i<7;i++){
+    for(int i = 0 ;i<FILTER_ORDER;i++){
         xBuf[i] = T();
         yBuf[i] = T();
     }
@@ -60,11 +60,10 @@ void DigitalSixOrderFilter<T>::compute_params(float sample_freq, float cutoff_fr
     ret.cutoff_freq = cutoff_freq;              //暂时没用
     ret.sample_freq = sample_freq;              //暂时没用
     
-    double temp_a[7] = {1,-5.81793057376491,14.1061535298373,-18.2443651768826,13.2755158076669,-5.1528964847001,0.833522907852272};
-    double temp_b[7] = {0.000000000156389596618205,0.000000000938337579709231,0.00000000234584394927308,0.0000000031277919323641,0.00000000234584394927308,
-        0.000000000938337579709231,0.000000000156389596618205};
+    double temp_a[FILTER_ORDER] = {1,-2.95936119553685,2.91954395361978,-0.96017453612764};
+    double temp_b[FILTER_ORDER] = {0.00000102774441178284,0.00000308323323534852,0.00000308323323534852,0.00000102774441178284};
     
-    for(int i = 0;i<7;i++){
+    for(int i = 0;i<FILTER_ORDER;i++){
         ret.a[i] = temp_a[i];
         ret.b[i] = temp_b[i];
     }

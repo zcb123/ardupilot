@@ -18,7 +18,7 @@
 #include <cmath>
 #include <inttypes.h>
 
-
+#define FILTER_ORDER 4
 /// @file   LowPassFilter6n.h
 /// @brief  A class to implement a sixth order low pass filter
 /// @authors: zhangchenbin <zcb2048@163.com>, template implmentation: zhangchenbin <zcb2048@163.com>
@@ -28,8 +28,8 @@ public:
     struct sixorder_params {
         float cutoff_freq;
         float sample_freq;
-        double a[7];  
-        double b[7];  
+        double a[FILTER_ORDER];  
+        double b[FILTER_ORDER];  
     };
 
     CLASS_NO_COPY(DigitalSixOrderFilter);
@@ -42,8 +42,8 @@ public:
     static void compute_params(float sample_freq, float cutoff_freq, sixorder_params &ret);
     
 private:
-    T xBuf[7];
-    T yBuf[7];
+    T xBuf[FILTER_ORDER];
+    T yBuf[FILTER_ORDER];
     bool initialised;
 };
 

@@ -7,7 +7,7 @@
 #include <AP_Module/AP_Module.h>
 #include <stdio.h>
 #endif
-
+#include <GCS_MAVLink/GCS.h>
 #define SENSOR_RATE_DEBUG 0
 
 const extern AP_HAL::HAL& hal;
@@ -287,7 +287,8 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
 
         _imu._gyro_filtered_d[instance] = _imu._gyro_filter_d[instance].apply(_imu._gyro_filtered_d[instance]);
 
-    
+        //gcs().send_text(MAV_SEVERITY_CRITICAL, "gyro filted! %.15f %.15f %.15f", _imu._gyro_filtered_d[instance].x,_imu._gyro_filtered_d[instance].y,_imu._gyro_filtered_d[instance].z);
+        
         // if the filtering failed in any way then reset the filters and keep the old value
         if (gyro_filtered.is_nan() || gyro_filtered.is_inf()) {
             _imu._gyro_filter[instance].reset();
