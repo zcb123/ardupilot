@@ -492,6 +492,9 @@ private:
     Vector3f _accel_filtered[INS_MAX_INSTANCES];
     Vector3f _gyro_filtered[INS_MAX_INSTANCES];
     Vector3d _gyro_filtered_d[INS_MAX_INSTANCES]; 
+
+    Vector3f _gyro_filtered_d_f[INS_MAX_INSTANCES];                 //added by zcb 2022.01.10 10:21
+    
 #if HAL_WITH_DSP
     // Thread-safe public version of _last_raw_gyro
     Vector3f _gyro_raw[INS_MAX_INSTANCES];

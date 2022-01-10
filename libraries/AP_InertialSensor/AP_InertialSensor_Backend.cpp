@@ -283,9 +283,16 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
         }
 
         // apply the low pass filter last to attentuate any notch induced noise
+        //gyro_filtered = _imu._gyro_filter[instance].apply(gyro_filtered);
+
         gyro_filtered = _imu._gyro_filter[instance].apply(gyro_filtered);
 
         _imu._gyro_filtered_d[instance] = _imu._gyro_filter_d[instance].apply(_imu._gyro_filtered_d[instance]);
+
+        
+        gyro_filtered.x = (float)_imu._gyro_filtered_d[instance].x;
+        gyro_filtered.y = (float)_imu._gyro_filtered_d[instance].y;
+        gyro_filtered.z = (float)_imu._gyro_filtered_d[instance].z;
 
         //gcs().send_text(MAV_SEVERITY_CRITICAL, "gyro filted! %.15f %.15f %.15f", _imu._gyro_filtered_d[instance].x,_imu._gyro_filtered_d[instance].y,_imu._gyro_filtered_d[instance].z);
         
@@ -301,7 +308,13 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
         _imu._new_gyro_data[instance] = true;
     }
     
+    // _imu._gyro_filtered_d_f[instance].x = (float)_imu._gyro_filtered_d[instance].x;
+    // _imu._gyro_filtered_d_f[instance].y = (float)_imu._gyro_filtered_d[instance].y;
+    // _imu._gyro_filtered_d_f[instance].z = (float)_imu._gyro_filtered_d[instance].z;
+
+
     Write_GYR_Raw_Filted(instance, sample_us, gyro,_imu._gyro_filtered[instance],_imu._gyro_filtered_d[instance]);
+    //Write_GYR_Raw_Filted(instance, sample_us, _imu._gyro_filtered[instance],_imu._gyro_filtered_d_f[instance],_imu._gyro_filtered_d[instance]);
     // if (!_imu.batchsampler.doing_post_filter_logging()) {
     //     log_gyro_raw(instance, sample_us, gyro);
     // }
