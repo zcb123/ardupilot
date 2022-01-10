@@ -60,8 +60,8 @@ void DigitalSixOrderFilter<T>::compute_params(float sample_freq, float cutoff_fr
     ret.cutoff_freq = cutoff_freq;              //暂时没用
     ret.sample_freq = sample_freq;              //暂时没用
     
-    double temp_a[FILTER_ORDER] = {1,-2.95936119553685,2.91954395361978,-0.96017453612764};
-    double temp_b[FILTER_ORDER] = {0.00000102774441178284,0.00000308323323534852,0.00000308323323534852,0.00000102774441178284};
+    double temp_a[FILTER_ORDER] = {1,-3.86136593138863,5.5936267261477,-3.60277647416349,0.870523079460308};
+    double temp_b[FILTER_ORDER] = {0.000000462503492786289,0.00000185001397114516,0.00000277502095671773,0.00000185001397114516,0.000000462503492786289};
     
     for(int i = 0;i<FILTER_ORDER;i++){
         ret.a[i] = temp_a[i];

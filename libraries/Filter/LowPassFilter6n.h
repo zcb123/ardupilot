@@ -18,7 +18,7 @@
 #include <cmath>
 #include <inttypes.h>
 
-#define FILTER_ORDER 4
+#define FILTER_ORDER 5
 /// @file   LowPassFilter6n.h
 /// @brief  A class to implement a sixth order low pass filter
 /// @authors: zhangchenbin <zcb2048@163.com>, template implmentation: zhangchenbin <zcb2048@163.com>
