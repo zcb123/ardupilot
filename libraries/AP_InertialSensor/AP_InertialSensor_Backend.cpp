@@ -289,10 +289,10 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
 
         _imu._gyro_filtered_d[instance] = _imu._gyro_filter_d[instance].apply(_imu._gyro_filtered_d[instance]);
 
-        
-        gyro_filtered.x = (float)_imu._gyro_filtered_d[instance].x;
-        gyro_filtered.y = (float)_imu._gyro_filtered_d[instance].y;
-        gyro_filtered.z = (float)_imu._gyro_filtered_d[instance].z;
+        gyro_filtered = _imu._gyro_filtered_d->tofloat();        
+        // gyro_filtered.x = (float)_imu._gyro_filtered_d[instance].x;
+        // gyro_filtered.y = (float)_imu._gyro_filtered_d[instance].y;
+        // gyro_filtered.z = (float)_imu._gyro_filtered_d[instance].z;
 
         //gcs().send_text(MAV_SEVERITY_CRITICAL, "gyro filted! %.15f %.15f %.15f", _imu._gyro_filtered_d[instance].x,_imu._gyro_filtered_d[instance].y,_imu._gyro_filtered_d[instance].z);
         
