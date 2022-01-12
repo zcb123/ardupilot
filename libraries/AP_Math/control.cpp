@@ -224,6 +224,17 @@ void shape_vel_accel_xy(const Vector2f &vel_input1, const Vector2f& accel_input,
  The function alters the variable accel to follow a jerk limited kinematic path to pos_input, vel_input and accel_input
  The vel_max, vel_correction_max, and accel_max limits can be removed by setting the desired limit to zero.
 */
+/*
+* shape_pos_vel_accel 计算从当前位置、速度和加速度到输入位置和速度的加加速度限制路径
+* 该函数获取当前位置、速度和加速度，并计算下一次 dt 所需的加速度限制调整
+*
+*
+*
+* 时间常数定义了系统接近恒定加速度时运动路径中的加速度误差衰减
+* 时间常数还定义了达到最大加速度所需的时间
+*
+* 该函数更改变量 accel 以遵循 pos_input、vel_input 和 accel_input 的 jerk 受限运动路径
+*/
 void shape_pos_vel_accel(postype_t pos_input, float vel_input, float accel_input,
                          postype_t pos, float vel, float& accel,
                          float vel_min, float vel_max,
@@ -293,6 +304,7 @@ void shape_pos_vel_accel_xy(const Vector2p& pos_input, const Vector2f& vel_input
 }
 
 // proportional controller with piecewise sqrt sections to constrain second derivative
+// 具有分段开方(sqrt)部分的比例控制器以约束二阶导数
 float sqrt_controller(float error, float p, float second_ord_lim, float dt)
 {
     float correction_rate;
