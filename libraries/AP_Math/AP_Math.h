@@ -58,6 +58,7 @@ inline bool is_zero(const T fVal1) {
 
 /* 
  * @brief: Check whether a float is greater than zero
+ * >=0返回true,<0返回false
  */
 template <typename T>
 inline bool is_positive(const T fVal1) {

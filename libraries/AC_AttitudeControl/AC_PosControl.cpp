@@ -342,6 +342,7 @@ void AC_PosControl::input_pos_xyz(const Vector3p& pos, float pos_offset_z, float
     const float offset_z_scaler = pos_offset_z_scaler(pos_offset_z, pos_offset_z_buffer);
 
     // remove terrain offsets for flat earth assumption
+    // z axis towards down
     _pos_target.z -= _pos_offset_z;
     _vel_desired.z -= _vel_offset_z;
     _accel_desired.z -= _accel_offset_z;
@@ -541,10 +542,15 @@ void AC_PosControl::input_accel_xy(const Vector3f& accel)
 }
 
 /// input_vel_accel_xy - calculate a jerk limited path from the current position, velocity and acceleration to an input velocity and acceleration.
+/// input_vel_accel_xy - 计算一条从当前位置，速度，加速度到输入速度，加速度的有奇异值限制的路径
 ///     The vel is projected forwards in time based on a time step of dt and acceleration accel.
+///     基于时间步长dt和加速度accel提前计算速度vel
 ///     The function takes the current position, velocity, and acceleration and calculates the required jerk limited adjustment to the acceleration for the next time dt.
+///     该函数获取当前位置、速度和加速度，并计算下一次 dt 所需的加速度限制调整
 ///     The kinematic path is constrained by the maximum acceleration and jerk set using the function set_max_speed_accel_xy.
+///     运动路径受到最大加速度和用set_max_speed_accel_xy()函数设置的jerk所限制
 ///     The parameter limit_output specifies if the velocity and acceleration limits are applied to the sum of commanded and correction values or just correction.
+///     如果速度和加速度限制被应用到命令值和校正值之和或者仅仅是校正值上，参数limit_output会被指定
 void AC_PosControl::input_vel_accel_xy(Vector2f& vel, const Vector2f& accel, bool limit_output)
 {
     update_pos_vel_accel_xy(_pos_target.xy(), _vel_desired.xy(), _accel_desired.xy(), _dt, _limit_vector.xy());
@@ -627,7 +633,7 @@ void AC_PosControl::update_xy_controller()
 
     // Position Controller
 
-    const Vector3f &curr_pos = _inav.get_position();
+    const Vector3f &curr_pos = _inav.get_position();        //ekf位置估计
     Vector2f vel_target = _p_pos_xy.update_all(_pos_target.x, _pos_target.y, curr_pos, _limit.pos_xy);
 
     // add velocity feed-forward scaled to compensate for optical flow measurement induced EKF noise

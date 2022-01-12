@@ -613,7 +613,7 @@ void Copter::update_simple_mode(void)
     ap.new_radio_frame = false;
 
     if (simple_mode == SimpleMode::SIMPLE) {
-        // rotate roll, pitch input by -initial simple heading (i.e. north facing)
+        // rotate roll, pitch input by -initial simple heading (i.e. north facing)      逆时针旋转矩阵
         rollx = channel_roll->get_control_in()*simple_cos_yaw - channel_pitch->get_control_in()*simple_sin_yaw;
         pitchx = channel_roll->get_control_in()*simple_sin_yaw + channel_pitch->get_control_in()*simple_cos_yaw;
     }else{
@@ -622,7 +622,7 @@ void Copter::update_simple_mode(void)
         pitchx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
     }
 
-    // rotate roll, pitch input from north facing to vehicle's perspective
+    // rotate roll, pitch input from north facing to vehicle's perspective      顺时针旋转矩阵
     channel_roll->set_control_in(rollx*ahrs.cos_yaw() + pitchx*ahrs.sin_yaw());
     channel_pitch->set_control_in(-rollx*ahrs.sin_yaw() + pitchx*ahrs.cos_yaw());
 }
