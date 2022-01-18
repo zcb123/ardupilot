@@ -18,7 +18,7 @@ void AP_InertialSensor_Backend::Write_ACC(const uint8_t instance, const uint64_t
         };
         AP::logger().WriteBlock(&pkt, sizeof(pkt));
 }
-void AP_InertialSensor_Backend::Write_ACC_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &accel,const Vector3f &accel_ftd) const
+void AP_InertialSensor_Backend::Write_ACC_Raw_Filted(const uint8_t instance, const uint64_t sample_us, const Vector3f &accel,const Vector3f &accel_ftd,const Vector3d &accel_ftd_n) const
 {
         const uint64_t now = AP_HAL::micros64();
         const struct log_ACC pkt {
@@ -31,7 +31,10 @@ void AP_InertialSensor_Backend::Write_ACC_Raw_Filted(const uint8_t instance, con
             AccZ      : accel.z,
             AccX_ftd  : accel_ftd.x,
             AccY_ftd  : accel_ftd.y,
-            AccZ_ftd  : accel_ftd.z
+            AccZ_ftd  : accel_ftd.z,
+            AccX_ftd_n: accel_ftd_n.x,
+            AccY_ftd_n: accel_ftd_n.y,
+            AccZ_ftd_n: accel_ftd_n.z
         };
         AP::logger().WriteBlock(&pkt, sizeof(pkt));
 }

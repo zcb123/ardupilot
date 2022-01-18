@@ -25,6 +25,7 @@ struct PACKED log_ACC {
     uint64_t sample_us;
     float AccX, AccY, AccZ;
     float AccX_ftd, AccY_ftd, AccZ_ftd;
+    double AccX_ftd_n, AccY_ftd_n, AccZ_ftd_n; 
 };
 
 // @LoggerMessage: GYR
@@ -116,7 +117,7 @@ struct PACKED log_Vibe {
 
 #define LOG_STRUCTURE_FROM_INERTIALSENSOR        \
     { LOG_ACC_MSG, sizeof(log_ACC), \
-      "ACC", "QBQffffff","TimeUS,I,SampleUS,AccX,AccY,AccZ,AccX_ftd,AccY_ftd,AccZ_ftd", "s#soooooo", "F-F000000" }, \
+      "ACC", "QBQffffffddd","T,I,Ts,X,Y,Z,X_ftd,Y_ftd,Z_ftd,X_ftd_n,Y_ftd_n,Z_ftd_n", "s#sooooooooo", "F-F000000000" }, \
     { LOG_GYR_MSG, sizeof(log_GYR), \
       "GYR", "QBQffffffddd", "T,I,Ts,X,Y,Z,X_ftd,Y_ftd,Z_ftd,X_ftd_n,Y_ftd_n,Z_ftd_n", "s#sEEEEEEEEE", "F-F000000000" }, \
     { LOG_IMU_MSG, sizeof(log_IMU), \
