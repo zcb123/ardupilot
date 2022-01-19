@@ -144,12 +144,17 @@ AP_AHRS_DCM::matrix_update(float _G_Dt)
     // and including the P terms would give positive feedback into
     // the _P_gain() calculation, which can lead to a very large P
     // value
+    // 请注意，我们不包括 _omega 中的 P 项。
+    // 这是因为 spin_rate 是从 _omega.length() 计算出来的，
+    // 并且包含 P 项会给 _P_gain() 计算提供正反馈，这会导致 P 值非常大
     _omega.zero();
 
     // average across first two healthy gyros. This reduces noise on
     // systems with more than one gyro. We don't use the 3rd gyro
     // unless another is unhealthy as 3rd gyro on PH2 has a lot more
     // noise
+    // 前两个健康陀螺仪的平均值。这可以减少具有多个陀螺仪的系统的噪音。
+    // 我们不使用第三个陀螺，除非另一个不健康，因为 PH2(Pixhawk 2.4.8?) 上的第三个陀螺有更多的噪音。
     uint8_t healthy_count = 0;
     Vector3f delta_angle;
     const AP_InertialSensor &_ins = AP::ins();

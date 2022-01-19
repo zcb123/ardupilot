@@ -8,7 +8,6 @@
 #include <AP_Notify/AP_Notify.h>
 #include <AP_Vehicle/AP_Vehicle.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_AHRS/AP_AHRS.h>
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 
 #include "AP_InertialSensor.h"

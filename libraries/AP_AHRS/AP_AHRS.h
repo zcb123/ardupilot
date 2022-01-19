@@ -58,7 +58,7 @@ public:
         _cos_pitch(1.0f),
         _cos_yaw(1.0f)
     {
-        _singleton = this;
+        _singleton = this;                                                  //后面生成的AP_AHRS类会覆盖前面的_singleton？
 
         // load default values from var_info table
         AP_Param::setup_object_defaults(this, var_info);

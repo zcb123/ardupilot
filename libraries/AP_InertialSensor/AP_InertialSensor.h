@@ -52,7 +52,7 @@
 
 class AP_InertialSensor_Backend;
 class AuxiliaryBus;
-class AP_AHRS;
+
 
 /*
   forward declare AP_Logger class. We can't include logger.h

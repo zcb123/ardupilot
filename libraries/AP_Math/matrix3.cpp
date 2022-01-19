@@ -111,9 +111,11 @@ void Matrix3<T>::from_euler312(T roll, T pitch, T yaw)
 
 // apply an additional rotation from a body frame gyro vector
 // to a rotation matrix.
+// 将来自机体坐标系陀螺仪矢量的附加旋转应用于旋转矩阵
 template <typename T>
 void Matrix3<T>::rotate(const Vector3<T> &g)
 {
+    // 分别将旋转矩阵三行的变量与g叉乘
     (*this) += Matrix3<T>{
         a.y * g.z - a.z * g.y, a.z * g.x - a.x * g.z, a.x * g.y - a.y * g.x,
         b.y * g.z - b.z * g.y, b.z * g.x - b.x * g.z, b.x * g.y - b.y * g.x,
