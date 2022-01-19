@@ -430,6 +430,14 @@ void AP_InertialSensor_Backend::_notify_new_accel_raw_sample(uint8_t instance,
         _imu._delta_velocity_acc_dt[instance] += dt;
 
         _imu._accel_filtered[instance] = _imu._accel_filter[instance].apply(accel);
+
+        _imu._accel_filtered_d[instance].x = (double)accel.x;
+        _imu._accel_filtered_d[instance].y = (double)accel.y;
+        _imu._accel_filtered_d[instance].z = (double)accel.z;
+
+        _imu._accel_filtered_d[instance] = _imu._accel_filter_d[instance].apply(_imu._accel_filtered_d[instance]);        //added by zcb 2022.01.18
+
+
         if (_imu._accel_filtered[instance].is_nan() || _imu._accel_filtered[instance].is_inf()) {
             _imu._accel_filter[instance].reset();
         }
@@ -439,7 +447,7 @@ void AP_InertialSensor_Backend::_notify_new_accel_raw_sample(uint8_t instance,
         _imu._new_accel_data[instance] = true;
     }
 
-    Write_ACC_Raw_Filted(instance, sample_us, accel,_imu._accel_filtered[instance]);
+    Write_ACC_Raw_Filted(instance, sample_us, accel,_imu._accel_filtered[instance],_imu._accel_filtered_d[instance]);
     
     // if (!_imu.batchsampler.doing_post_filter_logging()) {
     //     log_accel_raw(instance, sample_us, accel);

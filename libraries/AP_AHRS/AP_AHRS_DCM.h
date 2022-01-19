@@ -146,6 +146,7 @@ private:
     void            backup_attitude(void);
 
     // primary representation of attitude of board used for all inertial calculations
+    // 用于所有惯性计算的板姿态的主要表示 飞控板的姿态和飞机的姿态不一致？
     Matrix3f _dcm_matrix;
 
     // primary representation of attitude of flight vehicle body
