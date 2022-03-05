@@ -34,7 +34,7 @@
 #else
 #define DEFAULT_FRAME_CLASS 0
 #endif
-
+//Copter类中静态成员变量var_info初始化
 const AP_Param::Info Copter::var_info[] = {
     // @Param: FORMAT_VERSION
     // @DisplayName: Eeprom format version number

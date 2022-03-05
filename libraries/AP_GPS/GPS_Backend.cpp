@@ -357,12 +357,16 @@ bool AP_GPS_Backend::calculate_moving_base_yaw(const float reported_heading_deg,
             float lag = 0.1;
             get_lag(lag);
 
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world! gps %5.3f", (double)3.142f);
             // get vehicle rotation, projected back in time using the gyro
             // this is not 100% accurate, but it is good enough for
             // this test. To do it completely accurately we'd need an
             // interface into DCM, EKF2 and EKF3 to ask for a
             // historical attitude. That is far too complex to justify
             // for this use case
+            // 获取飞行器旋转，随着时间的推移，使用陀螺仪预测这不是100％准确，但对此测试它已经足够了
+            // 为了完全准确地做到这一点，我们需要一个进入 DCM、EKF2 和 EKF3 的接口来询问历史态度。 
+            // 这太复杂了，无法证明这个用例的合理性
             const auto &ahrs = AP::ahrs();
             const Vector3f &gyro = ahrs.get_gyro();
             Matrix3f rot_body_to_ned = ahrs.get_rotation_body_to_ned();

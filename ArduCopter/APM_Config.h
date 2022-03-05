@@ -4,7 +4,7 @@
 // valid! You should switch to using a HAL_BOARD flag in your local config.mk.
 
 // uncomment the lines below to disable features (flash sizes listed are for APM2 boards and will underestimate savings on Pixhawk and other boards)
-//#define LOGGING_ENABLED       DISABLED            // disable logging to save 11K of flash space
+//#define LEOGGING_ENABLED       DISABLED            // disable logging to save 11K of flash space
 //#define MOUNT                 DISABLED            // disable the camera gimbal to save 8K of flash space
 //#define AUTOTUNE_ENABLED      DISABLED            // disable the auto tune functionality to save 7k of flash
 //#define AC_FENCE              DISABLED            // disable fence to save 2k of flash
@@ -21,7 +21,7 @@
 //#define PRECISION_LANDING     DISABLED            // disable precision landing using companion computer or IRLock sensor
 //#define BEACON_ENABLED        DISABLED            // disable beacon support
 //#define SPRAYER_ENABLED       DISABLED            // disable the crop sprayer feature (two ESC controlled pumps the speed of which depends upon the vehicle's horizontal velocity)
-//#define WINCH_ENABLED         DISABLED            // disable winch support
+//#define WINCH_ENABLED         DISABLD            // disable winch support
 //#define GRIPPER_ENABLED       DISABLED            // disable gripper support
 //#define RPM_ENABLED           DISABLED            // disable rotations per minute sensor support
 //#define STATS_ENABLED         DISABLED            // disable statistics support

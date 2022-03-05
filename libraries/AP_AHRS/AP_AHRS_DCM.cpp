@@ -154,7 +154,7 @@ AP_AHRS_DCM::matrix_update(float _G_Dt)
     // unless another is unhealthy as 3rd gyro on PH2 has a lot more
     // noise
     // 前两个健康陀螺仪的平均值。这可以减少具有多个陀螺仪的系统的噪音。
-    // 我们不使用第三个陀螺，除非另一个不健康，因为 PH2(Pixhawk 2.4.8?) 上的第三个陀螺有更多的噪音。
+    // 我们不使用第三个陀螺，除非前两个中有不正常的陀螺仪，因为 PH2(Pixhawk 2.4.8?) 上的第三个陀螺有更多的噪音。
     uint8_t healthy_count = 0;
     Vector3f delta_angle;
     const AP_InertialSensor &_ins = AP::ins();

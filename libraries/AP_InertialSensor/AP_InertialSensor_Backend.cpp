@@ -198,6 +198,11 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
       rate, so we use the provided sample_us to get the deltaT. The
       difference between the two is whether sample_us is provided.
      */
+    /*
+        我们有两类传感器。 基于 FIFO 的传感器以非常可预测的总体速率产生数据，但数据是成串的，因此我们使用提供的 deltaT 采样率。 
+        非 FIFO 传感器不会聚集样本，但实际速率也往往会有所不同，因此我们使用提供的 sample_us 来获取 deltaT。 
+        两者的区别在于是否提供了sample_us。
+    */
     if (sample_us != 0 && _imu._gyro_last_sample_us[instance] != 0) {
         dt = (sample_us - _imu._gyro_last_sample_us[instance]) * 1.0e-6f;
         _imu._gyro_last_sample_us[instance] = sample_us;

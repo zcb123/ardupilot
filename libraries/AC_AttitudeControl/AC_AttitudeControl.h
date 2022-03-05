@@ -71,7 +71,7 @@ public:
     AC_P& get_angle_roll_p() { return _p_angle_roll; }
     AC_P& get_angle_pitch_p() { return _p_angle_pitch; }
     AC_P& get_angle_yaw_p() { return _p_angle_yaw; }
-    virtual AC_PID& get_rate_roll_pid() = 0;
+    virtual AC_PID& get_rate_roll_pid() = 0;        // =0  告诉编译器这是 虚函数    
     virtual AC_PID& get_rate_pitch_pid() = 0;
     virtual AC_PID& get_rate_yaw_pid() = 0;
 
@@ -144,6 +144,7 @@ public:
     void inertial_frame_reset();
 
     // Command a Quaternion attitude with feedforward and smoothing
+    // 通过前馈和平滑控制四元数姿态
     virtual void input_quaternion(Quaternion attitude_desired_quat);
 
     // Command an euler roll and pitch angle and an euler yaw rate with angular velocity feedforward and smoothing

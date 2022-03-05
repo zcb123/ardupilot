@@ -907,10 +907,10 @@ struct PACKED log_PSCD {
 // @Field: tf: times buffer was full when a message was going to be sent
 
 // @LoggerMessage: MAVC
-// @Description: MAVLink command we have just executed
+// @Description: MAVLink command we have just executed 我们刚刚执行的 MAVLink 命令
 // @Field: TimeUS: Time since system startup
-// @Field: TS: target system for command
-// @Field: TC: target component for command
+// @Field: TS: target system for command  命令的目标系统
+// @Field: TC: target component for command 命令的目标组件
 // @Field: Fr: command frame
 // @Field: Cmd: mavlink command enum value
 // @Field: Cur: current flag from mavlink packet

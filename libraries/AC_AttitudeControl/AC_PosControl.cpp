@@ -336,9 +336,14 @@ AC_PosControl::AC_PosControl(AP_AHRS_View& ahrs, const AP_InertialNav& inav,
 ///     The jerk limit defines the acceleration error decay in the kinematic path as the system approaches constant acceleration.
 ///     The jerk limit also defines the time taken to achieve the maximum acceleration.
 ///     The function alters the input velocity to be the velocity that the system could reach zero acceleration in the minimum time.
+///  input_pos_xyz - 计算从当前位置、速度和加速度到输入位置的加加速度限制路径
+///     该函数获取当前位置、速度和加速度，并计算下一次 dt 所需的加速度限制调整。
+///     运动路径受最大 jerk 参数以及使用函数 set_max_speed_accel_xy 设置的速度和加速度限制的约束。
+
 void AC_PosControl::input_pos_xyz(const Vector3p& pos, float pos_offset_z, float pos_offset_z_buffer)
 {
     // Terrain following velocity scalar must be calculated before we remove the position offset
+    // 在我们移除位置偏移之前，必须计算地形跟随速度标量
     const float offset_z_scaler = pos_offset_z_scaler(pos_offset_z, pos_offset_z_buffer);
 
     // remove terrain offsets for flat earth assumption
@@ -400,6 +405,7 @@ void AC_PosControl::input_pos_xyz(const Vector3p& pos, float pos_offset_z, float
 
 
 /// pos_offset_z_scaler - calculates a multiplier used to reduce the horizontal velocity to allow the z position controller to stay within the provided buffer range
+/// 计算一个降低水平速度的乘数，这个乘数使得z位置控制器落在提供的缓冲范围内
 float AC_PosControl::pos_offset_z_scaler(float pos_offset_z, float pos_offset_z_buffer) const
 {
     if (is_zero(pos_offset_z_buffer)) {

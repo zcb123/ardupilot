@@ -119,7 +119,7 @@ AP_InertialSensor_Backend *AP_InertialSensor_Invensensev3::probe(AP_InertialSens
         return nullptr;
     }
 
-    return sensor;
+    return sensor;                                                          //这里强制类型转换
 }
 
 void AP_InertialSensor_Invensensev3::fifo_reset()

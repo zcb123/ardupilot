@@ -22,6 +22,7 @@
 #include <AP_InternalError/AP_InternalError.h>
 
 // return the rotation matrix equivalent for this quaternion
+// a,b,c represent columns; x,y,z represent rows;
 template <typename T>
 void QuaternionT<T>::rotation_matrix(Matrix3d &m) const
 {

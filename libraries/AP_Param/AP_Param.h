@@ -143,6 +143,10 @@ enum ap_var_type {
 ///
 /// Provides naming and lookup services for variables.
 ///
+/// 变量的基础类
+///
+/// 为变量提供命名和查找服务
+/// 
 class AP_Param
 {
 public:
@@ -739,6 +743,13 @@ namespace AP {
 /// were the value.
 ///
 /// @tparam T			The scalar type of the variable
+/// @tparam PT			The AP_PARAM_* type
+///
+/// 标量的类模板
+///
+/// 这种类型的对象有一个值，并且可以以多种方式处理，就好像它们是值一样
+///
+/// @tparam T       变量的标量类型
 /// @tparam PT			The AP_PARAM_* type
 ///
 template<typename T, ap_var_type PT>

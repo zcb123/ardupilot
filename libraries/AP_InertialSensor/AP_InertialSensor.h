@@ -69,7 +69,8 @@ class AP_Logger;
  */
 class AP_InertialSensor : AP_AccelCal_Client
 {
-    friend class AP_InertialSensor_Backend;
+
+    friend class AP_InertialSensor_Backend;                     //Backend 可以调用imu中所有的成员函数与变量
 
 public:
     AP_InertialSensor();
@@ -459,7 +460,7 @@ private:
     void Write_IMU_instance(const uint64_t time_us, const uint8_t imu_instance) const;
     
     // backend objects
-    AP_InertialSensor_Backend *_backends[INS_MAX_BACKENDS];
+    AP_InertialSensor_Backend *_backends[INS_MAX_BACKENDS];                                         //指针数组;私有成员变量，只能通过imu中的函数调用
 
     // number of gyros and accel drivers. Note that most backends
     // provide both accel and gyro data, so will increment both

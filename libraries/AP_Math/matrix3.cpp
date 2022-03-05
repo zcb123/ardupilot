@@ -139,6 +139,7 @@ void Matrix3<T>::normalize(void)
 }
 
 // multiplication by a vector
+// 右乘
 template <typename T>
 Vector3<T> Matrix3<T>::operator *(const Vector3<T> &v) const
 {
@@ -156,6 +157,7 @@ Vector2<T> Matrix3<T>::mulXY(const Vector3<T> &v) const
 }
 
 // multiplication of transpose by a vector
+// 右乘一个向量
 template <typename T>
 Vector3<T> Matrix3<T>::mul_transpose(const Vector3<T> &v) const
 {

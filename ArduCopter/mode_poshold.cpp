@@ -525,6 +525,8 @@ float ModePosHold::mix_controls(float mix_ratio, float first_control, float seco
 // update_brake_angle_from_velocity - updates the brake_angle based on the vehicle's velocity and brake_gain
 //  brake_angle is slewed with the wpnav.poshold_brake_rate and constrained by the wpnav.poshold_braking_angle_max
 //  velocity is assumed to be in the same direction as lean angle so for pitch you should provide the velocity backwards (i.e. -ve forward velocity)
+// 从速度更新刹车角度 -- 基于飞行器速度和刹车增益更新刹车角度
+// 
 void ModePosHold::update_brake_angle_from_velocity(float &brake_angle, float velocity)
 {
     float lean_angle;
@@ -536,6 +538,7 @@ void ModePosHold::update_brake_angle_from_velocity(float &brake_angle, float vel
     }
 
     // calculate velocity-only based lean angle
+    // 计算仅基于速度的刹车角度
     if (velocity >= 0) {
         lean_angle = -brake.gain * velocity * (1.0f + 500.0f / (velocity + 60.0f));
     } else {

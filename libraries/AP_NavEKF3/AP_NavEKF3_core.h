@@ -1123,7 +1123,7 @@ private:
     Vector3F earthMagFieldVar;      // NED earth mag field variances for last learned field (mGauss^2)
     Vector3F bodyMagFieldVar;       // XYZ body mag field variances for last learned field (mGauss^2)
     bool delAngBiasLearned;         // true when the gyro bias has been learned
-    nav_filter_status filterStatus; // contains the status of various filter outputs
+    nav_filter_status filterStatus; // contains the status of various filter outputs 包含各种过滤器输出的状态
     ftype ekfOriginHgtVar;          // Variance of the EKF WGS-84 origin height estimate (m^2)
     double ekfGpsRefHgt;            // floating point representation of the WGS-84 reference height used to convert GPS height to local height (m)
     uint32_t lastOriginHgtTime_ms;  // last time the ekf's WGS-84 origin height was corrected
@@ -1195,7 +1195,7 @@ private:
                      AID_NONE=1,       // no aiding is being used so only attitude and height estimates are available. Either constVelMode or constPosMode must be used to constrain tilt drift.
                      AID_RELATIVE=2    // only optical flow aiding is being used so position estimates will be relative
                     };
-    AidingMode PV_AidingMode;       // Defines the preferred mode for aiding of velocity and position estimates from the INS
+    AidingMode PV_AidingMode;       // Defines the preferred mode for aiding of velocity and position estimates from the INS    定义从 INS 辅助速度和位置估计的首选模式
     AidingMode PV_AidingModePrev;   // Value of PV_AidingMode from the previous frame - used to detect transitions
     bool gndOffsetValid;            // true when the ground offset state can still be considered valid
     Vector3F delAngBodyOF;          // bias corrected delta angle of the vehicle IMU measured summed across the time since the last OF measurement
