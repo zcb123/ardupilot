@@ -10,20 +10,24 @@ bool NavEKF3_core::healthy(void) const
     uint16_t faultInt;
     getFilterFaults(faultInt);
     if (faultInt > 0) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "faultInt! %5.3f", (double)3.142f);
         return false;
     }
     if (velTestRatio > 1 && posTestRatio > 1 && hgtTestRatio > 1) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "velTestRatio ! posTestRatio !  hgtTestRatio ! %5.3f", (double)3.142f);
         // all three metrics being above 1 means the filter is
         // extremely unhealthy.
         return false;
     }
     // Give the filter a second to settle before use
     if ((imuSampleTime_ms - ekfStartTime_ms) < 1000 ) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "imuSampleTime_ms - ekfStartTime_ms %5.3f", (double)3.142f);
         return false;
     }
     // position and height innovations must be within limits when on-ground and in a static mode of operation
     float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
     if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsF(hgtInnovFiltState) > 1.0f))) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "PV_AidingMode hgtInnovFiltState %5.3f", (double)3.142f);
         return false;
     }
 
