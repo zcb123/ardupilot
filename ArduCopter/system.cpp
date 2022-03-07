@@ -361,7 +361,7 @@ bool Copter::ekf_has_relative_position() const
     nav_filter_status filt_status = inertial_nav.get_filter_status();
 
     // if disarmed we accept a predicted horizontal relative position
-    if (!motors->armed()) {
+    if (!motors->armed()) {     //如果未解锁
         return (filt_status.flags.pred_horiz_pos_rel);
     } else {
         return (filt_status.flags.horiz_pos_rel && !filt_status.flags.const_pos_mode);

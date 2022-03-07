@@ -57,6 +57,8 @@ public:
 
     // returns false if we fail arming checks, in which case the buffer will be populated with a failure message
     // requires_position should be true if horizontal position configuration should be checked
+    // 如果我们没有通过解锁检查则返回false，在这种情况下，缓冲区则填充失败消息。
+    // 如果水平位置配置应检查，则 requires_position 应为 true
     bool pre_arm_check(bool requires_position, char *failure_msg, uint8_t failure_msg_len) const;
 
     // returns the index of the primary core
