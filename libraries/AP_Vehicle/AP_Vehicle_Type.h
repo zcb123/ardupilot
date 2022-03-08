@@ -19,6 +19,10 @@
   Also note that code needs to support other APM_BUILD_DIRECTORY
   values for example sketches
  */
+/*
+ 定义一般飞行器的构建类型
+ 另请注意，代码需要支持其他 APM_BUILD_DIRECTORY 值，例如草图
+ */
 #define APM_BUILD_Rover      1
 #define APM_BUILD_ArduCopter     2
 #define APM_BUILD_ArduPlane      3
@@ -40,4 +44,7 @@
   using this macro catches cases where we try to check vehicle type on
   build systems that don't support it
  */
+/*
+  使用这个宏可以捕获我们尝试在不支持它的构建系统上检查车辆类型的情况
+*/
 #define APM_BUILD_TYPE(type) ((type) == APM_BUILD_DIRECTORY)

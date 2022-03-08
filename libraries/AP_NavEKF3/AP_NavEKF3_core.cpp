@@ -483,7 +483,10 @@ timee to reduce the resulting tilt error. Yaw alignment is not performed by this
 function, but is perfomred later and initiated the SelectMagFusion() function
 after the tilt has stabilised.
 */
-
+/*
+从加速度计的数据中初始化状态。这里假设测量到的加速度是重力。如果这个假设不成立，那么EKF需要时间
+来减少倾斜误差。偏航对齐不在这个函数执行，在倾斜稳定之后在SelectMagFusion()函数中会初始化并执行。
+*/
 bool NavEKF3_core::InitialiseFilterBootstrap(void)
 {
     // update sensor selection (for affinity)

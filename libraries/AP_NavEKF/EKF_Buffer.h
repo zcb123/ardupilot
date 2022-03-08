@@ -14,6 +14,7 @@ typedef struct {
 // this class is to be used for observation buffers, the data is
 // pushed into buffer like any standard ring buffer return is based on
 // the sample time provided
+// 此类用于观察缓冲区，数据像任何标准环形缓冲区一样被推入缓冲区，返回基于提供的采样时间
 class ekf_ring_buffer
 {
 public:
@@ -28,15 +29,24 @@ public:
      * Zeros old data so it cannot not be used again
      * Returns false if no data can be found that is less than 100msec old
     */
+   /*
+   * 从缓冲区中搜索并返回比sample_time_ms指定时间更早的数据
+   * 归零旧数据使得它无法被再使用
+   * 返回false，如果没有小于100ms的旧数据被找到
+   */
     bool recall(void *element, uint32_t sample_time);
 
     /*
      * Writes data and timestamp to a Ring buffer and advances indices that
      * define the location of the newest and oldest data
     */
+   /*
+   * 将数据和时间戳写入环形缓冲区，并且推进定义最新和最旧数据位置的索引
+   */
     void push(const void *element);
 
     // zeroes all data in the ring buffer
+    // 归零环形缓冲区内的所有数据
     void reset();
 
 private:
