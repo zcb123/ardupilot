@@ -148,6 +148,7 @@ const AP_Param::GroupInfo AC_AttitudeControl::var_info[] = {
 };
 
 // Ensure attitude controller have zero errors to relax rate controller output
+// 确保姿态控制器具有零误差以放松速率控制器输出
 void AC_AttitudeControl::relax_attitude_controllers()
 {
     // Initialize the attitude variables to the current attitude
@@ -210,6 +211,7 @@ void AC_AttitudeControl::reset_rate_controller_I_terms_smoothly()
 //    trust vector drops below 2*AC_ATTITUDE_THRUST_ERROR_ANGLE. At this point the heading is also corrected.
 
 // Command a Quaternion attitude with feedforward and smoothing
+// 通过前馈和平滑控制四元数姿态
 void AC_AttitudeControl::input_quaternion(Quaternion attitude_desired_quat)
 {
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -264,11 +266,15 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler
 
     if (_rate_bf_ff_enabled) {
         // translate the roll pitch and yaw acceleration limits to the euler axis
+        // 将横滚,俯仰,偏航加速度限制转化到欧拉轴
         const Vector3f euler_accel = euler_accel_limit(_euler_angle_target, Vector3f{get_accel_roll_max_radss(), get_accel_pitch_max_radss(), get_accel_yaw_max_radss()});
 
         // When acceleration limiting and feedforward are enabled, the sqrt controller is used to compute an euler
         // angular velocity that will cause the euler angle to smoothly stop at the input angle with limited deceleration
         // and an exponential decay specified by smoothing_gain at the end.
+        // 当加速度限制与前馈被使能，平方根控制器则用于计算欧拉角
+        // 使欧拉角平滑地停止在输入角度的角速度，并具有有限的减速度
+        // 和最后由smoothing_gain指定的指数衰减
         _euler_rate_target.x = input_shaping_angle(wrap_PI(euler_roll_angle - _euler_angle_target.x), _input_tc, euler_accel.x, _euler_rate_target.x, _dt);
         _euler_rate_target.y = input_shaping_angle(wrap_PI(euler_pitch_angle - _euler_angle_target.y), _input_tc, euler_accel.y, _euler_rate_target.y, _dt);
 
@@ -300,6 +306,7 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler
 }
 
 // Command an euler roll, pitch and yaw angle with angular velocity feedforward and smoothing
+// 通过角速度前馈和平滑控制横滚、俯仰和偏航角(欧拉角) command sth with sth
 void AC_AttitudeControl::input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw)
 {
     // Convert from centidegrees on public interface to radians
@@ -358,6 +365,7 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_yaw(float euler_roll_angle
 }
 
 // Command an euler roll, pitch, and yaw rate with angular velocity feedforward and smoothing
+// 通过角速度前馈和平滑输出欧拉横滚，俯仰，偏航角速率
 void AC_AttitudeControl::input_euler_rate_roll_pitch_yaw(float euler_roll_rate_cds, float euler_pitch_rate_cds, float euler_yaw_rate_cds)
 {
     // Convert from centidegrees on public interface to radians

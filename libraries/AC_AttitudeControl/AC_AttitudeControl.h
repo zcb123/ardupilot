@@ -386,6 +386,7 @@ protected:
     AP_Float            _accel_yaw_max;
 
     // Enable/Disable body frame rate feed forward
+    // 使能/失能机体坐标系速率前馈
     AP_Int8             _rate_bf_ff_enabled;
 
     // Enable/Disable angle boost
@@ -416,6 +417,7 @@ protected:
 
     // This represents a quaternion rotation in NED frame to the target (setpoint)
     // attitude used in the attitude controller.
+    // 这个表示地理系下角度控制器中到目标(设定值)角度的四元数旋转
     Quaternion          _attitude_target;
 
     // This represents the angular velocity of the target (setpoint) attitude used in
