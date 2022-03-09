@@ -341,6 +341,9 @@ void AC_AttitudeControl_Multi::rate_controller_run()
     _motors.set_pitch(get_rate_pitch_pid().update_all(_ang_vel_body.y, gyro_latest.y, _motors.limit.pitch) + _actuator_sysid.y);
     _motors.set_pitch_ff(get_rate_pitch_pid().get_ff());
 
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw limit %d sysid %f scalar %f", _motors.limit.yaw,_actuator_sysid.z,_feedforward_scalar);
+    AP::logger().Write("YAG","TimeUs,SysAV,AVBz,Gyrz","Qff",AP_HAL::micros64(),_sysid_ang_vel_body.z,_ang_vel_body.z,gyro_latest.z);
+
     _motors.set_yaw(get_rate_yaw_pid().update_all(_ang_vel_body.z, gyro_latest.z, _motors.limit.yaw) + _actuator_sysid.z);
     _motors.set_yaw_ff(get_rate_yaw_pid().get_ff()*_feedforward_scalar);
 

@@ -33,7 +33,10 @@ void AC_AttitudeControl::control_monitor_update(void)
     control_monitor_filter_pid(ipitch.D,             _control_monitor.rms_pitch_D);
 
     const AP_Logger::PID_Info &iyaw   = get_rate_yaw_pid().get_pid_info();
-    control_monitor_filter_pid(iyaw.P + iyaw.D + iyaw.FF,  _control_monitor.rms_yaw);
+    control_monitor_filter_pid(iyaw.P                 ,  _control_monitor.rms_yaw);
+    control_monitor_filter_pid(iyaw.D                 , _control_monitor.rms_yaw_d);
+    control_monitor_filter_pid(iyaw.FF                ,_control_monitor.rms_yaw_ff);
+     
 }
 
 /*
@@ -49,13 +52,15 @@ void AC_AttitudeControl::control_monitor_log(void) const
 // @Field: RMSPitchP: LPF Root-Mean-Squared Pitch Rate controller P gain
 // @Field: RMSPitchD: LPF Root-Mean-Squared Pitch Rate controller D gain
 // @Field: RMSYaw: LPF Root-Mean-Squared Yaw Rate controller P+D gain
-    AP::logger().Write("CTRL", "TimeUS,RMSRollP,RMSRollD,RMSPitchP,RMSPitchD,RMSYaw", "Qfffff",
+    AP::logger().Write("CTRL", "Tus,RP,RD,PP,PD,YP,YD,YF", "Qfffffff",
                                            AP_HAL::micros64(),
                                            (double)safe_sqrt(_control_monitor.rms_roll_P),
                                            (double)safe_sqrt(_control_monitor.rms_roll_D),
                                            (double)safe_sqrt(_control_monitor.rms_pitch_P),
                                            (double)safe_sqrt(_control_monitor.rms_pitch_D),
-                                           (double)safe_sqrt(_control_monitor.rms_yaw));
+                                           (double)safe_sqrt(_control_monitor.rms_yaw),
+                                           (double)safe_sqrt(_control_monitor.rms_yaw_d),
+                                           (double)safe_sqrt(_control_monitor.rms_yaw_ff));
 
 }
 

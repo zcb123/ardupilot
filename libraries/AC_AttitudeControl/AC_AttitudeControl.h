@@ -425,15 +425,20 @@ protected:
 
     // This represents the angular velocity in radians per second in the body frame, used in the angular
     // velocity controller.
+    // 这代表机体坐标系下的角速度(rad/s)，使用在加速度控制器上。
     Vector3f            _ang_vel_body;
 
     // This is the the angular velocity in radians per second in the body frame, added to the output angular
     // attitude controller by the System Identification Mode.
     // It is reset to zero immediately after it is used.
+    // 这个是机体坐标系下的角速度(rad/s)，由系统识别模式添加到输出角姿态控制器
+    // 在它被用了之后立刻设置为零
     Vector3f            _sysid_ang_vel_body;
 
     // This is the the unitless value added to the output of the PID by the System Identification Mode.
     // It is reset to zero immediately after it is used.
+    // 这是系统识别模式添加到 PID 输出的无单位值
+    // 在它被用了之后立刻设置为零
     Vector3f            _actuator_sysid;
 
     // This represents a quaternion attitude error in the body frame, used for inertial frame reset handling.
@@ -483,6 +488,8 @@ protected:
         float rms_pitch_P;
         float rms_pitch_D;
         float rms_yaw;
+        float rms_yaw_d;
+        float rms_yaw_ff;
     } _control_monitor;
 
     // update state in ControlMonitor
