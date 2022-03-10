@@ -1419,6 +1419,7 @@ void AP_Param::set_value(enum ap_var_type type, void *ptr, float value)
 // load default values for scalars in a group. This does not recurse
 // into other objects. This is a static function that should be called
 // in the objects constructor
+// 为在组中的标量加载默认值。这不会递归到其他对象。这是一个静态函数，应该在对象构造函数中调用。
 void AP_Param::setup_object_defaults(const void *object_pointer, const struct GroupInfo *group_info)
 {
     ptrdiff_t base = (ptrdiff_t)object_pointer;

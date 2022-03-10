@@ -736,6 +736,7 @@ bool NavEKF3::InitialiseFilter(void)
 
     // remember expected frame time
     const float loop_rate = ins.get_loop_rate_hz();
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "looprate %f", loop_rate);
     if (!is_positive(loop_rate)) {
         return false;
     }

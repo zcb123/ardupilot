@@ -364,7 +364,7 @@ private:
     uint8_t  _framesPerPrediction;  // expected number of IMU frames per prediction
     
     // EKF Mavlink Tuneable Parameters
-    AP_Int8  _enable;               // zero to disable EKF3
+    AP_Int8  _enable;               // zero to disable EKF3     置0则失能EKF3
     AP_Float _gpsHorizVelNoise;     // GPS horizontal velocity measurement noise : m/s
     AP_Float _gpsVertVelNoise;      // GPS vertical velocity measurement noise : m/s
     AP_Float _gpsHorizPosNoise;     // GPS horizontal position measurement noise m
@@ -394,7 +394,7 @@ private:
     AP_Float _maxFlowRate;          // Maximum flow rate magnitude that will be accepted by the filter
     AP_Float _rngNoise;             // Range finder noise : m
     AP_Int8 _gpsCheck;              // Bitmask controlling which preflight GPS checks are bypassed
-    AP_Int8 _imuMask;               // Bitmask of IMUs to instantiate EKF3 for
+    AP_Int8 _imuMask;               // Bitmask of IMUs to instantiate EKF3 for  用于实例化 EKF3 的 IMU 的位掩码
     AP_Int16 _gpsCheckScaler;       // Percentage increase to be applied to GPS pre-flight accuracy and drift thresholds
     AP_Float _noaidHorizNoise;      // horizontal position measurement noise assumed when synthesised zero position measurements are used to constrain attitude drift : m
     AP_Float _yawNoise;             // magnetic yaw measurement noise : rad
