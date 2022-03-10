@@ -57,6 +57,8 @@ public:
 
     // returns false if we fail arming checks, in which case the buffer will be populated with a failure message
     // requires_position should be true if horizontal position configuration should be checked
+    // 如果我们没有通过解锁检查则返回false，在这种情况下，缓冲区则填充失败消息。
+    // 如果水平位置配置应检查，则 requires_position 应为 true
     bool pre_arm_check(bool requires_position, char *failure_msg, uint8_t failure_msg_len) const;
 
     // returns the index of the primary core
@@ -71,27 +73,41 @@ public:
     // An out of range instance (eg -1) returns data for the primary instance
     // If a calculated solution is not available, use the best available data and return false
     // If false returned, do not use for flight control
+    // 写入最新计算的北东坐标，这个坐标是特定实例相对于参考点的相对坐标
+    // 传入的实例超出范围（例如 -1）则返回主实例的数据
+    // 如果计算的解决方案不可用，请使用最佳可用数据并返回 false
+    // 如果返回的是false，不要用于飞行控制
     bool getPosNE(int8_t instance, Vector2f &posNE) const;
 
     // Write the last calculated D position relative to the reference point (m) for the specified instance.
     // An out of range instance (eg -1) returns data for the primary instance
     // If a calculated solution is not available, use the best available data and return false
     // If false returned, do not use for flight control
+    // 写入最新计算的地坐标，这个坐标是特定实例相对于参考点的相对坐标
+    // 传入的实例超出范围（例如 -1）则返回主实例的数据
+    // 如果计算的解决方案不可用，请使用最佳可用数据并返回 false
+    // 如果返回的是false，不要用于飞行控制
     bool getPosD(int8_t instance, float &posD) const;
 
     // return NED velocity in m/s for the specified instance
     // An out of range instance (eg -1) returns data for the primary instance
+    // 返回特定实例的北东地速度(m/s)。
+    // 传入的实例超出范围（例如 -1）则返回主实例的数据
     void getVelNED(int8_t instance, Vector3f &vel) const;
 
     // return estimate of true airspeed vector in body frame in m/s for the specified instance
     // An out of range instance (eg -1) returns data for the primary instance
     // returns false if estimate is unavailable
+    // 返回特定实例在机体坐标系下正确速度向量的估计值
+    // 传入的实例超出范围（例如 -1）则返回主实例的数据
+    // 返回false如果估计值不可获取
     bool getAirSpdVec(int8_t instance, Vector3f &vel) const;
 
     // Return the rate of change of vertical position in the down direction (dPosD/dt) in m/s for the specified instance
     // An out of range instance (eg -1) returns data for the primary instance
     // This can be different to the z component of the EKF velocity state because it will fluctuate with height errors and corrections in the EKF
     // but will always be kinematically consistent with the z component of the EKF position state
+    // 
     float getPosDownDerivative(int8_t instance) const;
 
     // return body axis gyro bias estimates in rad/sec for the specified instance
@@ -437,7 +453,7 @@ private:
     // Tuning parameters
     const float gpsNEVelVarAccScale = 0.05f;       // Scale factor applied to NE velocity measurement variance due to manoeuvre acceleration
     const float gpsDVelVarAccScale = 0.07f;        // Scale factor applied to vertical velocity measurement variance due to manoeuvre acceleration
-    const float gpsPosVarAccScale = 0.05f;         // Scale factor applied to horizontal position measurement variance due to manoeuvre acceleration
+    const float gpsPosVarAccScale = 0.05f;         // Scale factor applied to horizontal position measurement variance due to manoeuvre acceleration 用于机动加速度水平位置测量方差的系数
     const float extNavVelVarAccScale = 0.05f;      // Scale factor applied to ext nav velocity measurement variance due to manoeuvre acceleration
     const uint16_t magDelay_ms = 60;               // Magnetometer measurement delay (msec)
     const uint16_t tasDelay_ms = 100;              // Airspeed measurement delay (msec)

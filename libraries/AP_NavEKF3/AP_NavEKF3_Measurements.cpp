@@ -546,6 +546,7 @@ bool NavEKF3_core::readDeltaVelocity(uint8_t ins_index, Vector3F &dVel, ftype &d
 ********************************************************/
 
 // check for new valid GPS data and update stored measurement if available
+// 检查新的有效 GPS 数据并更新存储的测量值（如果可用）
 void NavEKF3_core::readGpsData()
 {
     // check for new GPS data

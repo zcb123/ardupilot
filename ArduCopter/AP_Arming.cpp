@@ -506,6 +506,7 @@ bool AP_Arming_Copter::proximity_checks(bool display_failure) const
 }
 
 // performs mandatory gps checks.  returns true if passed
+// 强制gps检查
 bool AP_Arming_Copter::mandatory_gps_checks(bool display_failure)
 {
     // check if flight mode requires GPS

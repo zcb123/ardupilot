@@ -127,7 +127,7 @@ public:
     // The predict flag is set true when a new prediction cycle can be started
     void UpdateFilter(bool predict);
 
-    // Check basic filter health metrics and return a consolidated health status
+    // Check basic filter health metrics and return a consolidated(合并的) health status
     bool healthy(void) const;
 
     // Return a consolidated error score where higher numbers are less healthy
@@ -308,6 +308,16 @@ public:
     * resetTime_ms : system time of the last position reset request (mSec)
     *
     */
+    /*
+    * 从外部导航系统写入位置和四元数数据
+    * pos:    在 RH 导航框架中的位置。 如果 frameIsNED 为真，则认为 Frame 是 NED。 
+    * quat: 描述导航系到机体系的旋转
+    * posErr:   1-sigma球面误差
+    * angErr:   1-sigma角度误差
+    * timeStamp_ms: 进行测量的系统时间，而不是收到测量的时间 (mSec)
+    * delay_ms: 相对于内部，外部导航测量的平均延迟
+    * resetTime_ms: 最新位置重置请求的系统时间
+    */
     void writeExtNavData(const Vector3f &pos, const Quaternion &quat, float posErr, float angErr, uint32_t timeStamp_ms, uint16_t delay_ms, uint32_t resetTime_ms);
 
     /*
@@ -483,6 +493,8 @@ private:
     // the states are available in two forms, either as a Vector24, or
     // broken down as individual elements. Both are equivalent (same
     // memory)
+    // 状态可以以两种方式获得，一种是以Vector24，另一种将其拆分成独立元素。
+    // 两者是相同的（一样的内存）。
     struct state_elements {
         QuaternionF quat;           // quaternion defining rotation from local NED earth frame to body frame 0..3
         Vector3F    velocity;       // velocity of IMU in local NED earth frame (m/sec) 4..6
@@ -491,7 +503,7 @@ private:
         Vector3F    accel_bias;     // body frame delta velocity IMU bias vector (m/sec) 13..15
         Vector3F    earth_magfield; // earth frame magnetic field vector (Gauss)         16..18
         Vector3F    body_magfield;  // body frame magnetic field vector (Gauss)          19..21
-        Vector2F    wind_vel;       // horizontal North East wind velocity vector in local NED earth frame (m/sec) 22..23
+        Vector2F    wind_vel;       // horizontal North East wind velocity vector in local NED earth frame (m/sec) 22..23  地理坐标系下北东的水平速度
     };
 
     union {
@@ -988,7 +1000,7 @@ private:
     EKF_obs_buffer_t<range_elements> storedRange;  // Range finder data buffer
     EKF_IMU_buffer_t<output_elements> storedOutput;// output state buffer
     Matrix3F prevTnb;               // previous nav to body transformation used for INS earth rotation compensation
-    ftype accNavMag;                // magnitude of navigation accel - used to adjust GPS obs variance (m/s^2)
+    ftype accNavMag;                // magnitude of navigation accel - used to adjust GPS obs variance (m/s^2) 导航加速度大小 - 用于调整GPS观测方差
     ftype accNavMagHoriz;           // magnitude of navigation accel in horizontal plane (m/s^2)
     Vector3F earthRateNED;          // earths angular rate vector in NED (rad/s)
     ftype dtIMUavg;                 // expected time between IMU measurements (sec)
@@ -1012,7 +1024,7 @@ private:
     ftype varInnovVtas;             // innovation variance output from fusion of airspeed measurements
     ftype defaultAirSpeed;          // default equivalent airspeed in m/s to be used if the measurement is unavailable. Do not use if not positive.
     ftype defaultAirSpeedVariance;  // default equivalent airspeed variance in (m/s)**2 to be used when defaultAirSpeed is specified. 
-    bool magFusePerformed;          // boolean set to true when magnetometer fusion has been perfomred in that time step
+    bool magFusePerformed;          // boolean set to true when magnetometer fusion has been perfomred in that time step  在该时间步执行磁力计融合时布尔值设置为真
     MagCal effectiveMagCal;         // the actual mag calibration being used as the default
     uint32_t prevTasStep_ms;        // time stamp of last TAS fusion step
     uint32_t prevBetaDragStep_ms;   // time stamp of last synthetic sideslip fusion step
@@ -1042,9 +1054,9 @@ private:
     ftype hgtTestRatio;             // sum of squares of baro height innovation divided by fail threshold
     Vector3F magTestRatio;          // sum of squares of magnetometer innovations divided by fail threshold
     ftype tasTestRatio;             // sum of squares of true airspeed innovation divided by fail threshold
-    bool inhibitWindStates;         // true when wind states and covariances are to remain constant
+    bool inhibitWindStates;         // true when wind states and covariances are to remain constant 当风状态与协方差保持常值置为true(继承上一时刻的风状态估计)
     bool windStatesAligned;         // true when wind states have been aligned
-    bool inhibitMagStates;          // true when magnetic field states are inactive
+    bool inhibitMagStates;          // true when magnetic field states are inactive  当磁场状态不活动时为真(继承上一时刻的磁场状态估计)
     bool lastInhibitMagStates;      // previous inhibitMagStates
     bool needMagBodyVarReset;       // we need to reset mag body variances at next CovariancePrediction
     bool needEarthBodyVarReset;     // we need to reset mag earth variances at next CovariancePrediction
@@ -1053,7 +1065,7 @@ private:
     struct Location EKF_origin;     // LLH origin of the NED axis system, internal only
     struct Location &public_origin; // LLH origin of the NED axis system, public functions
     bool validOrigin;               // true when the EKF origin is valid
-    ftype gpsSpdAccuracy;           // estimated speed accuracy in m/s returned by the GPS receiver
+    ftype gpsSpdAccuracy;           // estimated speed accuracy in m/s returned by the GPS receiver gps接收机返回的速度(m/s)精度估计
     ftype gpsPosAccuracy;           // estimated position accuracy in m returned by the GPS receiver
     ftype gpsHgtAccuracy;           // estimated height accuracy in m returned by the GPS receiver
     uint32_t lastGpsVelFail_ms;     // time of last GPS vertical velocity consistency check fail
@@ -1067,8 +1079,8 @@ private:
     bool yawAlignComplete;          // true when yaw alignment is complete
     bool magStateInitComplete;      // true when the magnetic field states have been initialised
     uint8_t stateIndexLim;          // Max state index used during matrix and array operations
-    imu_elements imuDataDelayed;    // IMU data at the fusion time horizon
-    imu_elements imuDataNew;        // IMU data at the current time horizon
+    imu_elements imuDataDelayed;    // IMU data at the fusion time horizon 在时间融合域内的IMU数据
+    imu_elements imuDataNew;        // IMU data at the current time horizon 在当前时间域内的IMU数据
     imu_elements imuDataDownSampledNew; // IMU data at the current time horizon that has been downsampled to a 100Hz rate
     QuaternionF imuQuatDownSampleNew; // Quaternion obtained by rotating through the IMU delta angles since the start of the current down sampled frame
     baro_elements baroDataNew;      // Baro data at the current time horizon
@@ -1079,8 +1091,8 @@ private:
     tas_elements tasDataDelayed;    // TAS data at the fusion time horizon
     bool usingDefaultAirspeed;      // true when a default airspeed is being used instead of a measured value
     mag_elements magDataDelayed;    // Magnetometer data at the fusion time horizon
-    gps_elements gpsDataNew;        // GPS data at the current time horizon
-    gps_elements gpsDataDelayed;    // GPS data at the fusion time horizon
+    gps_elements gpsDataNew;        // GPS data at the current time horizon 在当前时间域内的gps数据
+    gps_elements gpsDataDelayed;    // GPS data at the fusion time horizon  在时间融合域内的gps数据
     uint8_t last_gps_idx;           // sensor ID of the GPS receiver used for the last fusion or reset
     output_elements outputDataNew;  // output state data at the current time step
     output_elements outputDataDelayed; // output state data at the current time step
@@ -1094,7 +1106,7 @@ private:
     bool consistentMagData;         // true when the magnetometers are passing consistency checks
     bool motorsArmed;               // true when the motors have been armed
     bool prevMotorsArmed;           // value of motorsArmed from previous frame
-    bool posVelFusionDelayed;       // true when the position and velocity fusion has been delayed
+    bool posVelFusionDelayed;       // true when the position and velocity fusion has been delayed  当速度和位置被延时了值true
     bool optFlowFusionDelayed;      // true when the optical flow fusion has been delayed
     bool airSpdFusionDelayed;       // true when the air speed fusion has been delayed
     bool sideSlipFusionDelayed;     // true when the sideslip fusion has been delayed
@@ -1109,7 +1121,7 @@ private:
     uint32_t lastPosResetD_ms;      // System time at which the last position reset occurred. Returned by getLastPosDownReset
     ftype yawTestRatio;             // square of magnetometer yaw angle innovation divided by fail threshold
     QuaternionF prevQuatMagReset;    // Quaternion from the last time the magnetic field state reset condition test was performed
-    ftype hgtInnovFiltState;        // state used for fitering of the height innovations used for pre-flight checks
+    ftype hgtInnovFiltState;        // state used for fitering of the height innovations used for pre-flight checks 用于起飞前检查，高度更新滤波器的状态
     uint8_t magSelectIndex;         // Index of the magnetometer that is being used by the EKF
     bool runUpdates;                // boolean true when the EKF updates can be run
     uint32_t framesSincePredict;    // number of frames lapsed since EKF instance did a state prediction
@@ -1195,7 +1207,10 @@ private:
                      AID_NONE=1,       // no aiding is being used so only attitude and height estimates are available. Either constVelMode or constPosMode must be used to constrain tilt drift.
                      AID_RELATIVE=2    // only optical flow aiding is being used so position estimates will be relative
                     };
-    AidingMode PV_AidingMode;       // Defines the preferred mode for aiding of velocity and position estimates from the INS
+                                    // 正在使用 GPS 或其他形式的绝对位置参考辅助(光流可以平行使用)，所以位置估计是绝对的。
+                                    // 没有使用辅助，因此只有姿态和高度估计可用。 必须使用 constVelMode 或 constPosMode 来约束倾斜漂移。
+                                    // 只有光流辅助被使用，所以位置估计是相对的
+    AidingMode PV_AidingMode;       // Defines the preferred mode for aiding of velocity and position estimates from the INS 为速度和位置估计（INS）定义首选模式 
     AidingMode PV_AidingModePrev;   // Value of PV_AidingMode from the previous frame - used to detect transitions
     bool gndOffsetValid;            // true when the ground offset state can still be considered valid
     Vector3F delAngBodyOF;          // bias corrected delta angle of the vehicle IMU measured summed across the time since the last OF measurement

@@ -278,32 +278,40 @@ void NavEKF3_core::ResetHeight(void)
 
 // Zero the EKF height datum
 // Return true if the height datum reset has been performed
+// EKF高度基准归零
+// 如果已执行高度基准重置，则返回 true
 bool NavEKF3_core::resetHeightDatum(void)
 {
     if (activeHgtSource == AP_NavEKF_Source::SourceZ::RANGEFINDER || !onGround) {
-        // only allow resets when on the ground.
+        // only allow resets when on the ground.    
         // If using using rangefinder for height then never perform a
         // reset of the height datum
+        // 只允许在地面上重置
+        // 如果只使用测距仪定高，则不执行高度基准重置
         return false;
     }
     // record the old height estimate
     ftype oldHgt = -stateStruct.position.z;
     // reset the barometer so that it reads zero at the current height
+    // 重置气压计，以便它能够在当前高度读到0
     dal.baro().update_calibration();
     // reset the height state
     stateStruct.position.z = 0.0f;
     // adjust the height of the EKF origin so that the origin plus baro height before and after the reset is the same
+    // 调整EKF原点的高度，使原点加上复位前后的baro高度相同
     if (validOrigin) {
         if (!gpsGoodToAlign) {
             // if we don't have GPS lock then we shouldn't be doing a
             // resetHeightDatum, but if we do then the best option is
             // to maintain the old error
+            // 如果我们的gps未定位，则不能执行resetHeightDatum，但是如果我们做了，最好的选择是保留旧的误差。
             EKF_origin.alt += (int32_t)(100.0f * oldHgt);
         } else {
             // if we have a good GPS lock then reset to the GPS
             // altitude. This ensures the reported AMSL alt from
             // getLLH() is equal to GPS altitude, while also ensuring
             // that the relative alt is zero
+            // 如果我们的gps定位效果好，则重置成gps高度。
             EKF_origin.alt = dal.gps().location().alt;
         }
         ekfGpsRefHgt = (double)0.01 * (double)EKF_origin.alt;
@@ -311,6 +319,8 @@ bool NavEKF3_core::resetHeightDatum(void)
 
     // set the terrain state to zero (on ground). The adjustment for
     // frame height will get added in the later constraints
+    // 设置地形状态为0(在地上)。
+    // 框架高度的调整将会加到之后的约束中。
     terrainState = 0;
 
     return true;
@@ -319,6 +329,9 @@ bool NavEKF3_core::resetHeightDatum(void)
 /*
   correct GPS data for position offset of antenna phase centre relative to the IMU
  */
+/*
+    校正gps数据--天线相位中心相对于IMU的位置偏移
+*/
 void NavEKF3_core::CorrectGPSForAntennaOffset(gps_elements &gps_data) const
 {
     // return immediately if already corrected
@@ -353,6 +366,7 @@ void NavEKF3_core::CorrectExtNavForSensorOffset(ext_nav_elements &ext_nav_data)
     ext_nav_data.corrected = true;
 
     // external nav data is against the public_origin, so convert to offset from EKF_origin
+    // 外部导航数据不符合 public_origin，因此转换为从 EKF_origin 的偏移量
     ext_nav_data.pos.xy() += EKF_origin.get_distance_NE_ftype(public_origin);
 
 #if HAL_VISUALODOM_ENABLED
@@ -396,9 +410,11 @@ void NavEKF3_core::CorrectExtNavVelForSensorOffset(ext_nav_vel_elements &ext_nav
 }
 
 // calculate velocity variance helper function
+// 计算速度方差辅助函数
 void NavEKF3_core::CalculateVelInnovationsAndVariances(const Vector3F &velocity, ftype noise, ftype accel_scale, Vector3F &innovations, Vector3F &variances) const
 {
     // innovations are latest estimate - latest observation
+    // 最新估计数值 - 最新观测数值
     innovations = stateStruct.velocity - velocity;
 
     const ftype obs_data_chk = sq(constrain_ftype(noise, 0.05, 5.0)) + sq(accel_scale * accNavMag);
@@ -418,6 +434,9 @@ void NavEKF3_core::SelectVelPosFusion()
     // Check if the magnetometer has been fused on that time step and the filter is running at faster than 200 Hz
     // If so, don't fuse measurements on this time step to reduce frame over-runs
     // Only allow one time slip to prevent high rate magnetometer data preventing fusion of other measurements
+    // 检查磁力计是否在该时间步长上融合与滤波器是否运行频率大于200Hz
+    // 如果是这样，不在这次时间步中融合测量值以减少帧超限
+    // 只允许一次滑动以防止高速磁力计数据阻止其他测量的融合
     if (magFusePerformed && dtIMUavg < 0.005f && !posVelFusionDelayed) {
         posVelFusionDelayed = true;
         return;
@@ -448,6 +467,7 @@ void NavEKF3_core::SelectVelPosFusion()
     readGpsYawData();
 
     // get data that has now fallen behind the fusion time horizon
+    // 获取落后于时间融合域的数据
     gpsDataToFuse = storedGPS.recall(gpsDataDelayed,imuDataDelayed.time_ms);
     if (gpsDataToFuse) {
         CorrectGPSForAntennaOffset(gpsDataDelayed);
@@ -458,6 +478,7 @@ void NavEKF3_core::SelectVelPosFusion()
     }
 
     // detect position source changes.  Trigger position reset if position source is valid
+    // 检测位置源的变化。 位置源有效时触发位置复位
     const AP_NavEKF_Source::SourceXY posxy_source = frontend->sources.getPosXYSource();
     if (posxy_source != posxy_source_last) {
         posxy_source_reset = (posxy_source != AP_NavEKF_Source::SourceXY::NONE);
@@ -465,13 +486,16 @@ void NavEKF3_core::SelectVelPosFusion()
     }
 
     // initialise all possible data we may fuse
+    // 初始化所有我们可能融合的数据
     fusePosData = false;
     fuseVelData = false;
 
     // Determine if we need to fuse position and velocity data on this time step
+    // 决定我们是否在当前时间步融合位置和速度数据
     if (gpsDataToFuse && (PV_AidingMode == AID_ABSOLUTE) && (posxy_source == AP_NavEKF_Source::SourceXY::GPS)) {
 
         // Don't fuse velocity data if GPS doesn't support it
+        // 如果gps不支持则不融合速度数据
         fuseVelData = frontend->sources.useVelXYSource(AP_NavEKF_Source::SourceXY::GPS);
         fusePosData = true;
 #if EK3_FEATURE_EXTERNAL_NAV
@@ -479,6 +503,7 @@ void NavEKF3_core::SelectVelPosFusion()
 #endif
 
         // copy corrected GPS data to observation vector
+        // 将校正后的gps数据拷贝到观察向量
         if (fuseVelData) {
             velPosObs[0] = gpsDataDelayed.vel.x;
             velPosObs[1] = gpsDataDelayed.vel.y;
@@ -491,6 +516,7 @@ void NavEKF3_core::SelectVelPosFusion()
 #if EK3_FEATURE_EXTERNAL_NAV
     } else if (extNavDataToFuse && (PV_AidingMode == AID_ABSOLUTE) && (posxy_source == AP_NavEKF_Source::SourceXY::EXTNAV)) {
         // use external nav system for horizontal position
+        // 使用外部导航系统进行水平定位
         extNavUsedForPos = true;
         fusePosData = true;
         velPosObs[3] = extNavDataDelayed.pos.x;
@@ -501,6 +527,8 @@ void NavEKF3_core::SelectVelPosFusion()
 #if EK3_FEATURE_EXTERNAL_NAV
     // fuse external navigation velocity data if available
     // extNavVelDelayed is already corrected for sensor position
+    // 融合外部导航速度数据如果可用
+    // extNavVelDelayed 已针对传感器位置进行了校正
     if (extNavVelToFuse && frontend->sources.useVelXYSource(AP_NavEKF_Source::SourceXY::EXTNAV)) {
         fuseVelData = true;
         velPosObs[0] = extNavVelDelayed.vel.x;
@@ -510,14 +538,17 @@ void NavEKF3_core::SelectVelPosFusion()
 #endif
 
     // we have GPS data to fuse and a request to align the yaw using the GPS course
+    // 我们有gps数据用于融合并请求用gps对准航向角
     if (gpsYawResetRequest) {
         realignYawGPS();
     }
 
     // Select height data to be fused from the available baro, range finder and GPS sources
+    // 从可用的气压计、测距仪、gps源中选择高度数据
     selectHeightForFusion();
 
     // if we are using GPS, check for a change in receiver and reset position and height
+    // 如果我们正在使用gps，检查接收机变化并重置位置和高度
     if (gpsDataToFuse && (PV_AidingMode == AID_ABSOLUTE) && (posxy_source == AP_NavEKF_Source::SourceXY::GPS) && (gpsDataDelayed.sensor_idx != last_gps_idx || posxy_source_reset)) {
         // mark a source reset as consumed
         posxy_source_reset = false;
@@ -551,6 +582,9 @@ void NavEKF3_core::SelectVelPosFusion()
     // If we are operating without any aiding, fuse in constant position of constant
     // velocity measurements to constrain tilt drift. This assumes a non-manoeuvring
     // vehicle. Do this to coincide with the height fusion.
+    // 如果我们在没有任何辅助下运行，
+    //
+    // 
     if (fuseHgtData && PV_AidingMode == AID_NONE) {
         if (assume_zero_sideslip() && tiltAlignComplete && motorsArmed) {
             // handle special case where we are launching a FW aircraft without magnetometer
@@ -596,18 +630,20 @@ void NavEKF3_core::SelectVelPosFusion()
 void NavEKF3_core::FuseVelPosNED()
 {
     // health is set bad until test passed
-    bool velCheckPassed = false; // boolean true if velocity measurements have passed innovation consistency checks
+    bool velCheckPassed = false; // boolean true if velocity measurements have passed innovation consistency checks 如果速度测量通过了更新一致性检查，则为true
     bool posCheckPassed = false; // boolean true if position measurements have passed innovation consistency check
     bool hgtCheckPassed = false; // boolean true if height measurements have passed innovation consistency check
 
     // declare variables used to control access to arrays
+    // 声明用于控制操作数据的变量
     bool fuseData[6] {};
     uint8_t stateIndex;
     uint8_t obsIndex;
 
     // declare variables used by state and covariance update calculations
-    Vector6 R_OBS; // Measurement variances used for fusion
-    Vector6 R_OBS_DATA_CHECKS; // Measurement variances used for data checks only
+    // 声明用于状态和协方差更新计算的变量
+    Vector6 R_OBS; // Measurement variances used for fusion 用于融合的测量方差
+    Vector6 R_OBS_DATA_CHECKS; // Measurement variances used for data checks only   只用于数据检查的测量方差
     ftype SK;
 
     // perform sequential fusion of GPS measurements. This assumes that the
@@ -616,17 +652,25 @@ void NavEKF3_core::FuseVelPosNED()
     // data from the GPS receiver it is the only assumption we can make
     // so we might as well take advantage of the computational efficiencies
     // associated with sequential fusion
+    // 执行 GPS 测量的顺序融合。在不同速度和位置分量上的误差是不相关的假设是不对的。
+    // 可是在没有gps接收机协方差数据的情况下，我们只能这么假设。
+    // 所以我们不妨利用与顺序融合相关的计算效率。
     if (fuseVelData || fusePosData || fuseHgtData) {
         // calculate additional error in GPS position caused by manoeuvring
+        // 计算由机动引起的gps位置误差
         ftype posErr = frontend->gpsPosVarAccScale * accNavMag;
 
         // To-Do: this posErr should come from external nav when fusing external nav position
-
+        // To-Do: 当更新外部导航位置时这个posErr应当来自外部导航
         // estimate the GPS Velocity, GPS horiz position and height measurement variances.
         // Use different errors if operating without external aiding using an assumed position or velocity of zero
+        // 估计gps速度水平位置与高度测量的方差
+        // 如果在没有外部帮助的情况下使用假定的位置或速度为零进行操作，则使用不同的误差
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "FuseVelPosNED PV_AidingMode %d ",PV_AidingMode);
         if (PV_AidingMode == AID_NONE) {
             if (tiltAlignComplete && motorsArmed) {
                 // This is a compromise between corrections for gyro errors and reducing effect of manoeuvre accelerations on tilt estimate
+                // 这是陀螺仪误差校正和减少机动加速度对倾斜估计的影响之间的折衷方案
                 R_OBS[0] = sq(constrain_ftype(frontend->_noaidHorizNoise, 0.5f, 50.0f));
             } else {
                 // Use a smaller value to give faster initial alignment
@@ -643,6 +687,7 @@ void NavEKF3_core::FuseVelPosNED()
                 R_OBS[0] = sq(constrain_ftype(gpsSpdAccuracy, frontend->_gpsHorizVelNoise, 50.0f));
                 R_OBS[2] = sq(constrain_ftype(gpsSpdAccuracy, frontend->_gpsVertVelNoise, 50.0f));
 #if EK3_FEATURE_EXTERNAL_NAV
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "EK3_FEATURE_EXTERNAL_NAV true");
             } else if (extNavVelToFuse) {
                 R_OBS[2] = R_OBS[0] = sq(constrain_ftype(extNavVelDelayed.err, 0.05f, 5.0f));
 #endif
@@ -666,6 +711,9 @@ void NavEKF3_core::FuseVelPosNED()
             // For data integrity checks we use the same measurement variances as used to calculate the Kalman gains for all measurements except GPS horizontal velocity
             // For horizontal GPS velocity we don't want the acceptance radius to increase with reported GPS accuracy so we use a value based on best GPS performance
             // plus a margin for manoeuvres. It is better to reject GPS horizontal velocity errors early
+            // 对于数据完整性检查，我们使用相同的测量方差于计算的所有测量值的卡尔曼增益，GPS水平速度除外
+            // 对于水平 GPS 速度，我们不想接受半径随着报告 GPS 精度而增加，因此我们使用基于最佳 GPS 性能的值加上机动余量
+            // 早一些拒绝gps水平速度误差是更好的
             ftype obs_data_chk;
 #if EK3_FEATURE_EXTERNAL_NAV
             if (extNavVelToFuse) {
@@ -820,8 +868,11 @@ void NavEKF3_core::FuseVelPosNED()
             }
 
             // Use height data if innovation check passed or timed out or if bad IMU data
+            
             // Always fuse data if bad IMU to prevent aliasing and clipping pulling the state estimate away
             // from the measurement un-opposed if test threshold is exceeded.
+            // 使用高度数据如果更新检查通过或者超时或者IMU数据不对
+            // 如果 IMU 损坏，始终融合数据，以防止出现混叠和削波，如果超过测试阈值，则将状态估计从测量结果中拉开。
             if (hgtCheckPassed || hgtTimeout || badIMUdata) {
                 // Calculate a filtered value to be used by pre-flight health checks
                 // We need to filter because wind gusts can generate significant baro noise and we want to be able to detect bias errors in the inertial solution
@@ -945,6 +996,7 @@ void NavEKF3_core::FuseVelPosNED()
                 }
 
                 // inhibit magnetic field state estimation by setting Kalman gains to zero
+                // 通过将卡尔曼增益置零继承磁场状态估计
                 if (!inhibitMagStates) {
                     for (uint8_t i = 16; i<=21; i++) {
                         Kfusion[i] = P[i][stateIndex]*SK;
@@ -955,6 +1007,7 @@ void NavEKF3_core::FuseVelPosNED()
                 }
 
                 // inhibit wind state estimation by setting Kalman gains to zero
+                // 通过将卡尔曼增益置零继承风状态估计
                 if (!inhibitWindStates) {
                     Kfusion[22] = P[22][stateIndex]*SK;
                     Kfusion[23] = P[23][stateIndex]*SK;
@@ -965,12 +1018,15 @@ void NavEKF3_core::FuseVelPosNED()
 
                 // update the covariance - take advantage of direct observation of a single state at index = stateIndex to reduce computations
                 // this is a numerically optimised implementation of standard equation P = (I - K*H)*P;
+                // 更新协方差 - 利用对索引处单个状态的直接观察 = 状态索引可以减少运算
+                // 这是标准方程P=(I-K*H)*P的数值优化实现
                 for (uint8_t i= 0; i<=stateIndexLim; i++) {
                     for (uint8_t j= 0; j<=stateIndexLim; j++) {
                         KHP[i][j] = Kfusion[i] * P[stateIndex][j];
                     }
                 }
                 // Check that we are not going to drive any variances negative and skip the update if so
+                // 检查我们不会导致任何负面变化，如果会，则跳过更新
                 bool healthyFusion = true;
                 for (uint8_t i= 0; i<=stateIndexLim; i++) {
                     if (KHP[i][i] > P[i][i]) {

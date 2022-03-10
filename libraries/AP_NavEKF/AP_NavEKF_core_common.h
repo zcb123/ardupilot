@@ -42,10 +42,10 @@ public:
 #endif
 
 protected:
-    static Matrix24 KH;                   // intermediate result used for covariance updates
-    static Matrix24 KHP;                  // intermediate result used for covariance updates
-    static Matrix24 nextP;                // Predicted covariance matrix before addition of process noise to diagonals
-    static Vector28 Kfusion;              // intermediate fusion vector
+    static Matrix24 KH;                   // intermediate result used for covariance updates    用于协方差更新的中间结果
+    static Matrix24 KHP;                  // intermediate result used for covariance updates    用于协方差更新的中间结果
+    static Matrix24 nextP;                // Predicted covariance matrix before addition of process noise to diagonals  在将过程噪声添加到对角线之前的预测协方差矩阵
+    static Vector28 Kfusion;              // intermediate fusion vector 中间融合向量
 
     // fill all the common scratch variables with NaN on SITL
     void fill_scratch_variables(void);

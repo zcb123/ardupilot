@@ -29,8 +29,8 @@ union nav_filter_status {
         bool vert_pos           : 1; // 5 - true if the vertical position estimate is valid
         bool terrain_alt        : 1; // 6 - true if the terrain height estimate is valid
         bool const_pos_mode     : 1; // 7 - true if we are in const position mode
-        bool pred_horiz_pos_rel : 1; // 8 - true if filter expects it can produce a good relative horizontal position estimate - used before takeoff
-        bool pred_horiz_pos_abs : 1; // 9 - true if filter expects it can produce a good absolute horizontal position estimate - used before takeoff
+        bool pred_horiz_pos_rel : 1; // 8 - true if filter expects it can produce a good relative horizontal position estimate - used before takeoff 如果滤波器期望它可以产生良好的相对水平位置估计，则为真 - 在起飞前使用
+        bool pred_horiz_pos_abs : 1; // 9 - true if filter expects it can produce a good absolute horizontal position estimate - used before takeoff 如果滤波器期望它可以产生良好的绝对水平位置估计，则为真 - 在起飞前使用    
         bool takeoff_detected   : 1; // 10 - true if optical flow takeoff has been detected
         bool takeoff            : 1; // 11 - true if filter is compensating for baro errors during takeoff
         bool touchdown          : 1; // 12 - true if filter is compensating for baro errors during touchdown
