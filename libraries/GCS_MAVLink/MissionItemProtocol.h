@@ -8,11 +8,14 @@
 
 // MissionItemProtocol objects are used for transfering missions from
 // a GCS to ArduPilot and vice-versa.
-//
+// MissionItemProtocol 对象用于将任务从 GCS 传输到 ArduPilot，反之亦然
+// 
 // There exists one MissionItemProtocol instance for each of the types
 // of item that might be transfered - e.g. MissionItemProtocol_Rally
 // for rally point uploads.  These objects are static in GCS_MAVLINK
 // and used by all of the backends.
+// 对于可能被转移的每种类型的项目，都存在一个 MissionItemProtocol 实例 - 例如MissionItemProtocol_Rally 用于集结点上传
+// 这些对象在GCS_MAVLINK中都是静态的，并且用于所有后端
 //
 // While prompting the GCS for items required to complete the mission,
 // a link is stored to the link the MissionItemProtocol should send
@@ -21,6 +24,7 @@
 // Starting of uploads (for the same protocol) is also blocked -
 // essentially the GCS uploading a set of items (e.g. a mission) has a
 // mutex over the mission.
+
 class MissionItemProtocol
 {
 public:

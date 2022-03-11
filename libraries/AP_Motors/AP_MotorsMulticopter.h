@@ -164,7 +164,7 @@ protected:
     AP_Float            _spin_max;              // throttle out ratio which produces the maximum thrust.  (i.e. 0 ~ 1 ) of the full throttle range
     AP_Float            _spin_arm;              // throttle out ratio which produces the armed spin rate.  (i.e. 0 ~ 1 ) of the full throttle range
     AP_Float            _batt_voltage_max;      // maximum voltage used to scale lift
-    AP_Float            _batt_voltage_min;      // minimum voltage used to scale lift
+    AP_Float            _batt_voltage_min;      // minimum voltage used to scale lift   缩放版升力的最小电压
     AP_Float            _batt_current_max;      // current over which maximum throttle is limited
     AP_Float            _batt_current_time_constant;    // Time constant used to limit the maximum current
     AP_Int8             _batt_idx;              // battery index used for compensation

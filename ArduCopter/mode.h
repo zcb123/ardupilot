@@ -131,6 +131,7 @@ protected:
     AltHoldModeState get_alt_hold_state(float target_climb_rate_cms);
 
     // convenience references to avoid code churn in conversion:
+    // 方便参考以避免转换中的代码搅动
     Parameters &g;
     ParametersG2 &g2;
     AC_WPNav *&wp_nav;
@@ -138,7 +139,7 @@ protected:
     AC_PosControl *&pos_control;
     AP_InertialNav &inertial_nav;
     AP_AHRS &ahrs;
-    AC_AttitudeControl_t *&attitude_control;
+    AC_AttitudeControl_t *&attitude_control;    //*&表示指针的引用
     MOTOR_CLASS *&motors;
     RC_Channel *&channel_roll;
     RC_Channel *&channel_pitch;

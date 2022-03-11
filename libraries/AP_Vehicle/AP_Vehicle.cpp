@@ -77,9 +77,11 @@ extern AP_Vehicle& vehicle;
 void AP_Vehicle::setup()
 {
     // load the default values of variables listed in var_info[]
+    // 加载在var_info[]中变量列表的默认值
     AP_Param::setup_sketch_defaults();
 
     // initialise serial port
+    // 初始化串口
     serial_manager.init_console();
 
     hal.console->printf("\n\nInit %s"
@@ -190,6 +192,10 @@ void AP_Vehicle::loop()
           briefly driving a servo to a position out of the configured
           range which could damage hardware
         */
+       /*
+          如果要求禁用安全性。 这会延迟到第一个循环运行之后，以确保所有伺服系统都收到了初始值的更新。（update for 更新为）
+          否则我们最终可能会短暂地将伺服驱动到配置范围之外的位置，这可能会损坏硬件。
+       */
         done_safety_init = true;
         BoardConfig.init_safety();
 

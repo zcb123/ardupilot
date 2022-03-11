@@ -52,7 +52,7 @@ void AC_AttitudeControl::control_monitor_log(void) const
 // @Field: RMSPitchP: LPF Root-Mean-Squared Pitch Rate controller P gain
 // @Field: RMSPitchD: LPF Root-Mean-Squared Pitch Rate controller D gain
 // @Field: RMSYaw: LPF Root-Mean-Squared Yaw Rate controller P+D gain
-    AP::logger().Write("CTRL", "Tus,RP,RD,PP,PD,YP,YD,YF", "Qfffffff",
+    AP::logger().Write("CTRL", "TimeUs,RP,RD,PP,PD,YP,YD,YF", "Qfffffff",
                                            AP_HAL::micros64(),
                                            (double)safe_sqrt(_control_monitor.rms_roll_P),
                                            (double)safe_sqrt(_control_monitor.rms_roll_D),
@@ -61,6 +61,7 @@ void AC_AttitudeControl::control_monitor_log(void) const
                                            (double)safe_sqrt(_control_monitor.rms_yaw),
                                            (double)safe_sqrt(_control_monitor.rms_yaw_d),
                                            (double)safe_sqrt(_control_monitor.rms_yaw_ff));
+    
 
 }
 

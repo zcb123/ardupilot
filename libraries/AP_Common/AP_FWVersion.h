@@ -8,7 +8,7 @@ class PACKED AP_FWVersion {
 public:
     /**
      * @brief Struct to hold infomation about the software version struct
-     *
+     *        存储软件信息的结构体
      */
     // First 7 MSBs are a start sequence, LSB is a checksum
     const uint64_t header;
@@ -17,7 +17,7 @@ public:
     // Pointer size to extract pointer values
     const uint8_t pointer_size;
 
-    const uint8_t reserved; // padding
+    const uint8_t reserved; // padding  填充
     const uint8_t vehicle_type;
     const uint8_t board_type;
     const uint16_t board_subtype;

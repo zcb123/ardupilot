@@ -450,6 +450,7 @@ const AP_Param::Info Copter::var_info[] = {
     // @Param: ACRO_BAL_PITCH
     // @DisplayName: Acro Balance Pitch
     // @Description: rate at which pitch angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the pitch axis. A higher value causes faster decay of desired to actual attitude.
+    // @Description: 在特技和运动模式下俯仰角返回水平的速率。 较高的值会使车辆更快地返回水平。 对于直升机，设置俯仰轴上虚拟飞杆的衰减率。 较高的值会导致期望的姿态更快地衰减到实际的姿态
     // @Range: 0 3
     // @Increment: 0.1
     // @User: Advanced
@@ -1128,6 +1129,14 @@ ParametersG2::ParametersG2(void)
   The second column below is the index in the var_info[] table for the
   old object. This should be zero for top level parameters.
  */
+/*
+  这是一个从旧参数数值到新参数数值的转换表。启动代码会查找旧参数已保存的值，并且拷贝到新参数上
+  如果新参数还没有存储该值。
+
+  注意这个工作会继续即使旧参数被移除。这取决于k_param索引没有被移除
+
+
+*/
 const AP_Param::ConversionInfo conversion_table[] = {
     { Parameters::k_param_log_bitmask_old,    0,      AP_PARAM_INT16, "LOG_BITMASK" },
     { Parameters::k_param_serial0_baud,       0,      AP_PARAM_INT16, "SERIAL0_BAUD" },
@@ -1157,6 +1166,7 @@ void Copter::load_parameters(void)
     }
 
     // disable centrifugal force correction, it will be enabled as part of the arming process
+    // 禁用离心力校正，它将作为解锁过程的一部分启用
     ahrs.set_correct_centrifugal(false);
     hal.util->set_soft_armed(false);
 
@@ -1185,7 +1195,11 @@ void Copter::load_parameters(void)
 
     // convert fs_options parameters
     convert_fs_options_params();
-
+    // enum ap_var_type ptype;
+    // AP_Param *res = AP_Param::find("INS_POS3_X",&ptype);
+    // if(res!=nullptr){
+    //     hal.console->printf("found!!");
+    // }   
     hal.console->printf("load_all took %uus\n", (unsigned)(micros() - before));
 
     // setup AP_Param frame type flags
@@ -1356,6 +1370,7 @@ void Copter::convert_pid_parameters(void)
 #if LANDING_GEAR_ENABLED == ENABLED
 /*
   convert landing gear parameters
+  转换起落架参数
  */
 void Copter::convert_lgr_parameters(void)
 {

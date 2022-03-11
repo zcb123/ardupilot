@@ -117,6 +117,7 @@ public:
     NavEKF3_core(class NavEKF3 *_frontend);
 
     // setup this core backend
+    // 启动这个内核后端
     bool setup_core(uint8_t _imu_index, uint8_t _core_index);
     
     // Initialise the states from accelerometer and magnetometer data (if present)
