@@ -230,27 +230,35 @@ AP_MotorsMulticopter::AP_MotorsMulticopter(uint16_t loop_rate, uint16_t speed_hz
 void AP_MotorsMulticopter::output()
 {
     // update throttle filter
+    // 更新油门滤波器; 一阶低通滤波器
     update_throttle_filter();
 
     // calc filtered battery voltage and lift_max
+    // 计算滤波电池电压和最大升力(lift_max)
     update_lift_max_from_batt_voltage();
 
     // run spool logic
+    
     output_logic();
 
     // calculate thrust
+    // 计算油门
     output_armed_stabilizing();
 
     // apply any thrust compensation for the frame
+    // 根据机架应用油门补偿
     thrust_compensation();
 
     // convert rpy_thrust values to pwm
+    // 
     output_to_motors();
 
     // output any booster throttle
+    // 输出任一助推油门
     output_boost_throttle();
 
     // output raw roll/pitch/yaw/thrust
+    // 输出原始的roll/pitch/yaw/thrust
     output_rpyt();
 };
 
@@ -355,10 +363,13 @@ float AP_MotorsMulticopter::apply_thrust_curve_and_volt_scaling(float thrust) co
 }
 
 // update_lift_max from battery voltage - used for voltage compensation
+// 从电池电压更新最大升力 - 用于电压补偿
 void AP_MotorsMulticopter::update_lift_max_from_batt_voltage()
 {
     // sanity check battery_voltage_min is not too small
     // if disabled or misconfigured exit immediately
+    // 完整性检查battery_voltage_min不会太小
+    // 如果禁用或配置错误立即退出
     float _batt_voltage_resting_estimate = AP::battery().voltage_resting_estimate(_batt_idx);
     if ((_batt_voltage_max <= 0) || (_batt_voltage_min >= _batt_voltage_max) || (_batt_voltage_resting_estimate < 0.25f * _batt_voltage_min)) {
         _batt_voltage_filt.reset(1.0f);
@@ -369,12 +380,14 @@ void AP_MotorsMulticopter::update_lift_max_from_batt_voltage()
     _batt_voltage_min = MAX(_batt_voltage_min, _batt_voltage_max * 0.6f);
 
     // contrain resting voltage estimate (resting voltage is actual voltage with sag removed based on current draw and resistance)
+    // 约束待机电压估计（待机电压是实际电压，根据电流消耗和电阻消除了下陷）
     _batt_voltage_resting_estimate = constrain_float(_batt_voltage_resting_estimate, _batt_voltage_min, _batt_voltage_max);
 
     // filter at 0.5 Hz
     float batt_voltage_filt = _batt_voltage_filt.apply(_batt_voltage_resting_estimate / _batt_voltage_max, 1.0f / _loop_rate);
 
     // calculate lift max
+    // 计算最大升力
     float thrust_curve_expo = constrain_float(_thrust_curve_expo, -1.0f, 1.0f);
     _lift_max = batt_voltage_filt * (1 - thrust_curve_expo) + thrust_curve_expo * batt_voltage_filt * batt_voltage_filt;
 }

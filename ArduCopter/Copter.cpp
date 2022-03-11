@@ -486,7 +486,7 @@ void Copter::ten_hz_logging_loop()
         AP::ins().Write_Vibration();
     }
     if (should_log(MASK_LOG_CTUN)) {
-        attitude_control->control_monitor_log();
+        attitude_control->control_monitor_log();    //这个函数在rate_controller_run()中已经运行了，为啥这里还要再运行一次?
 #if HAL_PROXIMITY_ENABLED
         logger.Write_Proximity(g2.proximity);  // Write proximity sensor distances
 #endif
@@ -656,7 +656,16 @@ void Copter::update_super_simple_bearing(bool force_update)
 void Copter::read_AHRS(void)
 {
     // we tell AHRS to skip INS update as we have already done it in fast_loop()
+    // 告诉AHRS跳过INS更新，因为我们已经在fast_loop()中做完了
     ahrs.update(true);
+    #if APM_BUILD_TYPE(APM_BUILD_Replay)
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello ahrs.update ! %5.3f", (double)3.142f);
+    #endif
+
+    #if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world !");
+    #endif
+    
 }
 
 // read baro and log control tuning

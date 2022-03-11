@@ -490,9 +490,11 @@ after the tilt has stabilised.
 bool NavEKF3_core::InitialiseFilterBootstrap(void)
 {
     // update sensor selection (for affinity)
+    // 传感器更新选择(亲和力选择)
     update_sensor_selection();
 
     // If we are a plane and don't have GPS lock then don't initialise
+    // 我们是一架固定翼飞机并且GPS未定位，则不初始化
     if (assume_zero_sideslip() && dal.gps().status(preferred_gps) < AP_DAL_GPS::GPS_OK_FIX_3D) {
         dal.snprintf(prearm_fail_string,
                      sizeof(prearm_fail_string),
@@ -502,6 +504,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     }
 
     // read all the sensors required to start the EKF the states
+    // 读取所有需要开始ekf状态的传感器
     readIMUData();
     readMagData();
     readGpsData();
@@ -512,6 +515,8 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
         // we are initialised, but we don't return true until the IMU
         // buffer has been filled. This prevents a timing
         // vulnerability with a pause in IMU data during filter startup
+        // 初始化完毕，如果IMU缓冲未填满则不返回true。这防止在IMU数据在滤波器启动阶段时间暂停。
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "EKF3 buffer filled ");
         return storedIMU.is_filled();
     }
 
@@ -545,13 +550,16 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     }
 
     // calculate initial roll and pitch orientation
+    // 计算初始化横滚和俯仰旋转
     stateStruct.quat.from_euler(roll, pitch, 0.0f);
 
     // initialise dynamic states
+    // 初始化动态状态
     stateStruct.velocity.zero();
     stateStruct.position.zero();
 
     // initialise static process model states
+    // 初始化静态过程模型状态
     stateStruct.gyro_bias.zero();
     stateStruct.accel_bias.zero();
     stateStruct.wind_vel.zero();
@@ -559,6 +567,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     stateStruct.body_magfield.zero();
 
     // set the position, velocity and height
+    // 设置位置、速度和高度
     ResetVelocity(resetDataSource::DEFAULT);
     ResetPosition(resetDataSource::DEFAULT);
     ResetHeight();

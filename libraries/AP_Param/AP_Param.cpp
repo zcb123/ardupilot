@@ -693,7 +693,9 @@ void AP_Param::set_key(Param_header &phdr, uint16_t key)
 
 /*
   return true if a header is the end of eeprom sentinal
+  如果标头是 eeprom sentinel 的结尾，则返回 true
  */
+
 bool AP_Param::is_sentinal(const Param_header &phdr)
 {
     // note that this is an ||, not an && on the key and group, as
@@ -1477,11 +1479,13 @@ void AP_Param::setup_sketch_defaults(void)
 
 
 // Load all variables from EEPROM
-//
+// 从EEPROM中加载所有变量
 bool AP_Param::load_all()
 {
     struct Param_header phdr;
-    uint16_t ofs = sizeof(AP_Param::EEPROM_header);
+    uint16_t ofs = sizeof(AP_Param::EEPROM_header);     //返回AP_Param::EEPROM_header字节数
+
+    //hal.console->printf("ofs %u \n", ofs);
 
     reload_defaults_file(false);
 

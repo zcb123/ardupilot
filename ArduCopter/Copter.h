@@ -174,7 +174,7 @@
 #endif
 
 #include "mode.h"
-
+// 下面这些类既是友元，也是成员变量
 class Copter : public AP_Vehicle {
 public:
     friend class GCS_MAVLINK_Copter;
@@ -383,7 +383,7 @@ private:
     // inertial nav alt when we armed
     float arming_altitude_m;
 
-    // Failsafe
+    // Failsafe  故障保护
     struct {
         uint32_t terrain_first_failure_ms;  // the first time terrain data access failed - used to calculate the duration of the failure
         uint32_t terrain_last_failure_ms;   // the most recent time terrain data access failed

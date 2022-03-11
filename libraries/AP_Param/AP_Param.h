@@ -110,6 +110,7 @@
 #define AP_GROUPINFO(name, idx, clazz, element, def) AP_GROUPINFO_FLAGS(name, idx, clazz, element, def, 0)
 
 // declare a nested group entry in a group var_info
+// 在组 var_info 中声明一个嵌套组条目
 #define AP_NESTEDGROUPINFO(clazz, idx) { AP_PARAM_GROUP, idx, "", 0, { group_info : clazz::var_info }, 0 }
 
 // declare a subgroup entry in a group var_info. This is for having another arbitrary object as a member of the parameter list of

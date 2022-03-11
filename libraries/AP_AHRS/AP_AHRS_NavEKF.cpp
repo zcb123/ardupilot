@@ -318,6 +318,8 @@ void AP_AHRS_NavEKF::update_EKF3(void)
         }
         // if we're doing Replay logging then don't allow any data
         // into the EKF yet.  Don't allow it to block us for long.
+        // 如果我们正在进行重播日志记录，还不允许任何数据进入EKF。
+        // 不让它阻止我们太久
         if (!hal.util->was_watchdog_reset()) {
             if (AP_HAL::millis() - start_time_ms < 5000) {
                 if (!AP::logger().allow_start_ekf()) {

@@ -12,6 +12,13 @@
    We also record the failure reason so that pre_arm_check()
    can give a good report to the user on why arming is failing
 */
+/*
+    检测GPS数据是否足够好来初始化EKF
+    检测磁力计更新观察航向是否足够使用gps
+    所有条件都通过10s，则返回true
+
+    我们也记录失败原因，以便于pre_arm_check()函数可以给出好的报告，告诉用户为什么pre_arm_check失败
+*/
 void NavEKF3_core::calcGpsGoodToAlign(void)
 {
     if (inFlight && assume_zero_sideslip() && !use_compass()) {

@@ -118,6 +118,7 @@ public:
     float get_input_tc() const { return _input_tc; }
 
     // set the rate control input smoothing time constant
+    // 设置速率控制输入平滑时间常数
     void set_input_tc(float input_tc) { _input_tc = constrain_float(input_tc, 0.0f, 1.0f); }
 
     // Ensure attitude controller have zero errors to relax rate controller output
@@ -264,9 +265,11 @@ public:
     bool get_bf_feedforward() { return _rate_bf_ff_enabled; }
 
     // Enable or disable body-frame feed forward
+    // 使能或者失能机体前馈
     void accel_limiting(bool enable_or_disable);
 
     // Update Alt_Hold angle maximum
+    // 更新定高角度最大值
     virtual void update_althold_lean_angle_max(float throttle_in) = 0;
 
     // Set output throttle
@@ -306,6 +309,7 @@ public:
     Vector3f euler_accel_limit(const Vector3f &euler_rad, const Vector3f &euler_accel);
 
     // Calculates the body frame angular velocities to follow the target attitude
+    // 计算机体坐标系下角速率以跟踪目标姿态
     void attitude_controller_run_quat();
 
     // thrust_heading_rotation_angles - calculates two ordered rotations to move the attitude_body quaternion to the attitude_target quaternion.
@@ -351,9 +355,11 @@ public:
                         const uint8_t failure_msg_len);
 
     // enable inverted flight on backends that support it
+    // 在后端使能倒飞
     virtual void set_inverted_flight(bool inverted) {}
     
     // User settable parameters
+    // 用户设置参数
     static const struct AP_Param::GroupInfo var_info[];
 
 protected:
@@ -377,6 +383,7 @@ protected:
     AP_Float            _ang_vel_yaw_max;
 
     // Maximum rotation acceleration for earth-frame roll axis
+    // 地理坐标系横滚轴最大旋转加速度
     AP_Float            _accel_roll_max;
 
     // Maximum rotation acceleration for earth-frame pitch axis
@@ -398,6 +405,7 @@ protected:
     AC_P                _p_angle_yaw;
 
     // Angle limit time constant (to maintain altitude)
+    // 角度限制时间常数(维持姿态)
     AP_Float            _angle_limit_tc;
 
     // rate controller input smoothing time constant
@@ -408,16 +416,20 @@ protected:
 
     // This represents a 321-intrinsic rotation in NED frame to the target (setpoint)
     // attitude used in the attitude controller, in radians.
+    // 这个代表了北东地坐标系中，目标(设定点)姿态的321(yaw-pitch-roll)固定旋转
+    // 这个姿态在姿态控制器中使用，以弧度为单位
     Vector3f            _euler_angle_target;
 
     // This represents the angular velocity of the target (setpoint) attitude used in
     // the attitude controller as 321-intrinsic euler angle derivatives, in radians per
     // second.
+    // 
     Vector3f            _euler_rate_target;
 
     // This represents a quaternion rotation in NED frame to the target (setpoint)
     // attitude used in the attitude controller.
     // 这个表示地理系下角度控制器中到目标(设定值)角度的四元数旋转
+    // 这个姿态在姿态控制器中使用
     Quaternion          _attitude_target;
 
     // This represents the angular velocity of the target (setpoint) attitude used in
@@ -464,15 +476,19 @@ protected:
     bool                _use_sqrt_controller;
 
     // Filtered Alt_Hold lean angle max - used to limit lean angle when throttle is saturated using Alt_Hold
+    // 过滤后
     float               _althold_lean_angle_max = 0.0f;
 
     // desired throttle_low_comp value, actual throttle_low_comp is slewed towards this value over 1~2 seconds
+    // 想要的throttle_low_comp值，实际的throttle_low_comp（_throttle_rpy_mix）在1~2s内向该值倾斜
     float               _throttle_rpy_mix_desired;
 
     // mix between throttle and hover throttle for 0 to 1 and ratio above hover throttle for >1
+    // 在0~1之间混合油门和悬停油门
     float               _throttle_rpy_mix;
 
     // Yaw feed forward percent to allow zero yaw actuator output during extreme roll and pitch corrections
+    // 在极端横滚和俯仰矫正中允许零偏航执行器输出的偏航前馈百分比
     float               _feedforward_scalar = 1.0f;
 
     // References to external libraries

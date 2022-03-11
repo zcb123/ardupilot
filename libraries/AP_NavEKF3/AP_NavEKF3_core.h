@@ -117,6 +117,7 @@ public:
     NavEKF3_core(class NavEKF3 *_frontend);
 
     // setup this core backend
+    // 启动这个内核后端
     bool setup_core(uint8_t _imu_index, uint8_t _core_index);
     
     // Initialise the states from accelerometer and magnetometer data (if present)
@@ -125,6 +126,8 @@ public:
 
     // Update Filter States - this should be called whenever new IMU data is available
     // The predict flag is set true when a new prediction cycle can be started
+    // 更新滤波器状态 - 新的IMU数据可获得时这个应当被调用
+    // 预测标志被设置为true当新的预测轮开始时
     void UpdateFilter(bool predict);
 
     // Check basic filter health metrics and return a consolidated(合并的) health status

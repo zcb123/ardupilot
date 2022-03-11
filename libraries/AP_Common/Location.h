@@ -22,6 +22,7 @@ public:
     int32_t lng;
 
     /// enumeration of possible altitude types
+    // 枚举可能的高度类型
     enum class AltFrame {
         ABSOLUTE = 0,
         ABOVE_HOME = 1,

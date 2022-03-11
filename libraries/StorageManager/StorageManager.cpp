@@ -159,6 +159,7 @@ StorageAccess::StorageAccess(StorageManager::StorageType _type) :
 /*
   base read function. The src offset is within the bytes allocated
   for the storage type of this StorageAccess object
+  基础读取功能。 src 偏移量在为此 StorageAccess 对象的存储类型分配的字节内
 */
 bool StorageAccess::read_block(void *data, uint16_t addr, size_t n) const
 {

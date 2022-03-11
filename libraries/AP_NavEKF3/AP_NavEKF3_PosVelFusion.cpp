@@ -666,7 +666,7 @@ void NavEKF3_core::FuseVelPosNED()
         // Use different errors if operating without external aiding using an assumed position or velocity of zero
         // 估计gps速度水平位置与高度测量的方差
         // 如果在没有外部帮助的情况下使用假定的位置或速度为零进行操作，则使用不同的误差
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "FuseVelPosNED PV_AidingMode %d ",PV_AidingMode);
+        //gcs().send_text(MAV_SEVERITY_CRITICAL, "FuseVelPosNED PV_AidingMode %d ",PV_AidingMode);
         if (PV_AidingMode == AID_NONE) {
             if (tiltAlignComplete && motorsArmed) {
                 // This is a compromise between corrections for gyro errors and reducing effect of manoeuvre accelerations on tilt estimate

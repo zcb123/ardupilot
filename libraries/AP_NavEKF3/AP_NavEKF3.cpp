@@ -759,6 +759,7 @@ bool NavEKF3::InitialiseFilter(void)
     if (core == nullptr) {
 
         // don't run multiple filters for 1 IMU
+        // 对于1IMU不运行多个滤波器
         uint8_t mask = (1U<<ins.get_accel_count())-1;
         _imuMask.set(_imuMask.get() & mask);
         
