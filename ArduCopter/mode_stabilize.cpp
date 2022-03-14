@@ -2,13 +2,16 @@
 
 /*
  * Init and run calls for stabilize flight mode
+ * 自稳模式初始化与运行的调用
  */
 
 // stabilize_run - runs the main stabilize controller
 // should be called at 100hz or more
+
 void ModeStabilize::run()
 {
     // apply simple mode transform to pilot inputs
+    // 对驾驶员输入应用简单模式转换
     update_simple_mode();
 
     // convert pilot input to lean angles

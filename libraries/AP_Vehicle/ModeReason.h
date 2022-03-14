@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 // interface to set the vehicles mode
+// 设置飞行棋模式的接口
 enum class ModeReason : uint8_t {
   UNKNOWN,
   RC_COMMAND,

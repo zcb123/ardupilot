@@ -301,6 +301,7 @@ void AP_DAL::WriteLogMessage(enum LogMessages msg_type, void *msg, const void *o
 /*
   check if we are low on CPU for this core. This needs to capture the
   timing of running the cores
+  
 */
 bool AP_DAL::ekf_low_time_remaining(EKFType etype, uint8_t core)
 {

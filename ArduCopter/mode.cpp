@@ -4,6 +4,10 @@
  * High level calls to set and update flight modes logic for individual
  * flight modes is in control_acro.cpp, control_stabilize.cpp, etc
  */
+/*
+* 为各个飞行模式设置和更新飞行模式逻辑的高级调用位于 control_acro.cpp、control_stabilize.cpp 等
+* control_acro.cpp、control_stabilize.cpp 这两个文件不存在，可能注释过时了
+*/
 
 /*
   constructor for Mode object
@@ -178,6 +182,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
 
 // called when an attempt to change into a mode is unsuccessful:
+// 当尝试模式切换失败时调用
 void Copter::mode_change_failed(const Mode *mode, const char *reason)
 {
     gcs().send_text(MAV_SEVERITY_WARNING, "Mode change to %s failed: %s", mode->name(), reason);
@@ -188,10 +193,15 @@ void Copter::mode_change_failed(const Mode *mode, const char *reason)
 // optional force parameter used to force the flight mode change (used only first time mode is set)
 // returns true if mode was successfully set
 // ACRO, STABILIZE, ALTHOLD, LAND, DRIFT and SPORT can always be set successfully but the return state of other flight modes should be checked and the caller should deal with failures appropriately
+// 设置模式 - 飞行模式切换，并且执行所有需要的初始化
+// 用于强制更改飞行模式的可选强制参数（仅用于设置第一次模式）
+// 返回true如果模式设置成功
+// 速率、自稳、定高、降落、漂移和运动模式总是能设置成功，而其他飞行模式的返回状态则需要检查且调用者需要合理地处理失败
 bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 {
 
     // return immediately if we are already in the desired mode
+    // 如果在期望的模式下立即返回
     if (mode == flightmode->mode_number()) {
         control_mode_reason = reason;
         return true;
@@ -204,8 +214,9 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
         return false;
     }
 
-    bool ignore_checks = !motors->armed();   // allow switching to any mode if disarmed.  We rely on the arming check to perform
-
+    bool ignore_checks = !motors->armed();   // allow switching to any mode if disarmed.  We rely on the arming check to perform        
+                                             // 如果上锁，允许切换到任何模式。依赖于解锁检查去执行模式切换。motors->armed()返回1为解锁，返回0为上锁。
+                                             // 若ignore_checks = 1 则为上锁状态，可以忽略检查。若为0，则为解锁状态，不能忽略检查。
 #if FRAME_CONFIG == HELI_FRAME
     // do not allow helis to enter a non-manual throttle mode if the
     // rotor runup is not complete
@@ -231,6 +242,8 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     // into a manual throttle mode from a non-manual-throttle mode
     // (e.g. user arms in guided, raises throttle to 1300 (not enough to
     // trigger auto takeoff), then switches into manual):
+    // 如果驾驶员从非手动油门模式切换到手动油门模式，确保飞行棋不会离开地面。
+    // 例如：驾驶员在引导模式下解锁，将油门提高到1300(不足以触发起飞)，然后切换到手动模式。
     bool user_throttle = new_flightmode->has_manual_throttle();
 #if MODE_DRIFT_ENABLED == ENABLED
     if (new_flightmode == &mode_drift) {
@@ -256,6 +269,8 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 
     // check for valid altitude if old mode did not require it but new one does
     // we only want to stop changing modes if it could make things worse
+    // 检查有效的高度，如果旧模式不需要而新模式需要。
+    // 仅仅尝试停止模式切换如果这会让事情变得更糟。
     if (!ignore_checks &&
         !copter.ekf_alt_ok() &&
         flightmode->has_manual_throttle() &&
@@ -270,9 +285,11 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     }
 
     // perform any cleanup required by previous flight mode
+    // 清理上一个模式所需要的东西
     exit_mode(flightmode, new_flightmode);
 
     // store previous flight mode (only used by tradeheli's autorotation)
+    // 存储上一模式(仅用于传统直升机自动旋转)
     prev_control_mode = flightmode->mode_number();
 
     // update flight mode
@@ -289,6 +306,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     // pilot requested flight mode change during a fence breach indicates pilot is attempting to manually recover
     // this flight mode change could be automatic (i.e. fence, battery, GPS or GCS failsafe)
     // but it should be harmless to disable the fence temporarily in these situations as well
+    
     fence.manual_recovery_start();
 #endif
 
@@ -361,6 +379,7 @@ void Copter::exit_mode(Mode *&old_flightmode,
 }
 
 // notify_flight_mode - sets notify object based on current flight mode.  Only used for OreoLED notify device
+// 
 void Copter::notify_flight_mode() {
     AP_Notify::flags.autopilot_mode = flightmode->is_autopilot();
     AP_Notify::flags.flight_mode = (uint8_t)flightmode->mode_number();

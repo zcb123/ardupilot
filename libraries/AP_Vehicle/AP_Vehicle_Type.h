@@ -23,8 +23,8 @@
  定义一般飞行器的构建类型
  另请注意，代码需要支持其他 APM_BUILD_DIRECTORY 值，例如草图
  */
-//这里不是很懂APM_BUILD_TYPE(type) type==APM_BUILD_ArduCopter为true
-// type == APM_BUILD_UNKNOWN时为false
+//这里不是很懂APM_BUILD_TYPE(type) 
+//type为编译的代码类型，若编译为arducopter，则type==APM_BUILD_ArduCopter时为true。若编译为arduplane，则type==APM_BUILD_ArduPlane时为true。
 #define APM_BUILD_Rover      1
 #define APM_BUILD_ArduCopter     2
 #define APM_BUILD_ArduPlane      3

@@ -658,14 +658,6 @@ void Copter::read_AHRS(void)
     // we tell AHRS to skip INS update as we have already done it in fast_loop()
     // 告诉AHRS跳过INS更新，因为我们已经在fast_loop()中做完了
     ahrs.update(true);
-    #if APM_BUILD_TYPE(APM_BUILD_Replay)
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello ahrs.update ! %5.3f", (double)3.142f);
-    #endif
-
-    #if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world !");
-    #endif
-    
 }
 
 // read baro and log control tuning
