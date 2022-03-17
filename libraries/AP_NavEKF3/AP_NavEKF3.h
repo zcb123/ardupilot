@@ -379,7 +379,8 @@ private:
     uint32_t _frameTimeUsec;        // time per IMU frame
     uint8_t  _framesPerPrediction;  // expected number of IMU frames per prediction
     
-    // EKF Mavlink Tuneable Parameters
+    // EKF Mavlink Tuneable Parameters 
+    // 可以通过Mavlink调整的参数
     AP_Int8  _enable;               // zero to disable EKF3     置0则失能EKF3
     AP_Float _gpsHorizVelNoise;     // GPS horizontal velocity measurement noise : m/s
     AP_Float _gpsVertVelNoise;      // GPS vertical velocity measurement noise : m/s

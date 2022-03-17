@@ -212,6 +212,7 @@ void NavEKF3_core::ResetHeight(void)
     outputDataDelayed.position.z = stateStruct.position.z;
 
     // reset the terrain state height
+    // 重置地形状态高度
     if (onGround) {
         // assume vehicle is sitting on the ground
         terrainState = stateStruct.position.z + rngOnGnd;
@@ -876,6 +877,8 @@ void NavEKF3_core::FuseVelPosNED()
             if (hgtCheckPassed || hgtTimeout || badIMUdata) {
                 // Calculate a filtered value to be used by pre-flight health checks
                 // We need to filter because wind gusts can generate significant baro noise and we want to be able to detect bias errors in the inertial solution
+                // 计算一个用于起飞前健康检查的滤波后的值
+                // 我们需要过滤，因为阵风会产生明显的气压噪声，并且我们希望能够检测惯性解中的偏差误差
                 if (onGround) {
                     ftype dtBaro = (imuSampleTime_ms - lastHgtPassTime_ms) * 1.0e-3;
                     const ftype hgtInnovFiltTC = 2.0;
@@ -913,12 +916,14 @@ void NavEKF3_core::FuseVelPosNED()
             fuseData[5] = true;
         }
 
-        // fuse measurements sequentially
+        // fuse measurements sequentially   顺序融合测量值
         for (obsIndex=0; obsIndex<=5; obsIndex++) {
             if (fuseData[obsIndex]) {
                 stateIndex = 4 + obsIndex;
                 // calculate the measurement innovation, using states from a different time coordinate if fusing height data
                 // adjust scaling on GPS measurement noise variances if not enough satellites
+                // 计算测量更新，如果融合高度数据，则使用来自不同时间坐标的状态
+                // 调整GPS测量噪声的方差系数，如果星数不够
                 if (obsIndex <= 2) {
                     innovVelPos[obsIndex] = stateStruct.velocity[obsIndex] - velPosObs[obsIndex];
                     R_OBS[obsIndex] *= sq(gpsNoiseScaler);
@@ -944,7 +949,7 @@ void NavEKF3_core::FuseVelPosNED()
                     }
                 }
 
-                // calculate the Kalman gain and calculate innovation variances
+                // calculate the Kalman gain and calculate innovation variances 计算卡尔曼增益与更新方差
                 varInnovVelPos[obsIndex] = P[stateIndex][stateIndex] + R_OBS[obsIndex];
                 SK = 1.0f/varInnovVelPos[obsIndex];
                 for (uint8_t i= 0; i<=9; i++) {

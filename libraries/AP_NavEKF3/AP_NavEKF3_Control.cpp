@@ -728,10 +728,12 @@ void NavEKF3_core::runYawEstimatorPrediction()
 void NavEKF3_core::runYawEstimatorCorrection()
 {
     // exit immediately if no yaw estimator
+    // 如果没有偏航估计，立即退出
     if (yawEstimator == nullptr) {
         return;
     }
     // ensure GPS is used for horizontal position and velocity
+    // 确保GPS用于水平位置和速度
     if (frontend->sources.getPosXYSource() != AP_NavEKF_Source::SourceXY::GPS ||
         !frontend->sources.useVelXYSource(AP_NavEKF_Source::SourceXY::GPS)) {
         return;

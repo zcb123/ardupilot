@@ -10,7 +10,7 @@
 *                   RESET FUNCTIONS                     *
 ********************************************************/
 
-// Control reset of yaw and magnetic field states
+// Control reset of yaw and magnetic field states   航向和磁场状态的控制重置
 void NavEKF3_core::controlMagYawReset()
 {
 
@@ -463,13 +463,16 @@ void NavEKF3_core::FuseMagnetometer()
     Vector5 SK_MY;
     Vector5 SK_MZ;
 
-    // perform sequential fusion of magnetometer measurements.
+    // perform sequential fusion of magnetometer measurements.  
     // this assumes that the errors in the different components are
     // uncorrelated which is not true, however in the absence of covariance
     // data fit is the only assumption we can make
     // so we might as well take advantage of the computational efficiencies
     // associated with sequential fusion
     // calculate observation jacobians and Kalman gains
+    // 执行磁力计测量值的序列化融合
+    // 这假设不同组件中的错误是不相关的，这是不正确的，但是在没有协方差的情况下，数据拟合是我们可以做出的唯一假设，
+    // 因此我们不妨利用与顺序融合相关的计算效率计算观察雅可比和 卡尔曼收益
 
     // copy required states to local variable names
     q0       = stateStruct.quat[0];
@@ -483,8 +486,9 @@ void NavEKF3_core::FuseMagnetometer()
     magYbias = stateStruct.body_magfield[1];
     magZbias = stateStruct.body_magfield[2];
 
-    // rotate predicted earth components into body axes and calculate
-    // predicted measurements
+    // rotate predicted earth components into body axes and calculate   将预测的地磁旋转到机体坐标系并计算  
+    // predicted measurements   预测的测量值
+    // 下面是地理系到机体系的旋转矩阵
     DCM[0][0] = q0*q0 + q1*q1 - q2*q2 - q3*q3;
     DCM[0][1] = 2.0f*(q1*q2 + q0*q3);
     DCM[0][2] = 2.0f*(q1*q3-q0*q2);
@@ -498,7 +502,7 @@ void NavEKF3_core::FuseMagnetometer()
     MagPred[1] = DCM[1][0]*magN + DCM[1][1]*magE  + DCM[1][2]*magD + magYbias;
     MagPred[2] = DCM[2][0]*magN + DCM[2][1]*magE  + DCM[2][2]*magD + magZbias;
 
-    // calculate the measurement innovation for each axis
+    // calculate the measurement innovation for each axis   计算每个轴最新的测量值
     for (uint8_t i = 0; i<=2; i++) {
         innovMag[i] = MagPred[i] - magDataDelayed.mag[i];
     }
@@ -507,6 +511,7 @@ void NavEKF3_core::FuseMagnetometer()
     R_MAG = sq(constrain_ftype(frontend->_magNoise, 0.01f, 0.5f)) + sq(frontend->magVarRateScale*imuDataDelayed.delAng.length() / imuDataDelayed.delAngDT);
 
     // calculate common expressions used to calculate observation jacobians an innovation variance for each component
+    // 计算通用表达式，用于为每个部分更新的方差计算观察雅克比矩阵
     SH_MAG[0] = 2.0f*magD*q3 + 2.0f*magE*q2 + 2.0f*magN*q1;
     SH_MAG[1] = 2.0f*magD*q0 - 2.0f*magE*q1 + 2.0f*magN*q2;
     SH_MAG[2] = 2.0f*magD*q1 + 2.0f*magE*q0 - 2.0f*magN*q3;
@@ -519,6 +524,7 @@ void NavEKF3_core::FuseMagnetometer()
 
     // Calculate the innovation variance for each axis
     // X axis
+    // P[19][19]
     varInnovMag[0] = (P[19][19] + R_MAG + P[1][19]*SH_MAG[0] - P[2][19]*SH_MAG[1] + P[3][19]*SH_MAG[2] - P[16][19]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + (2.0f*q0*q3 + 2.0f*q1*q2)*(P[19][17] + P[1][17]*SH_MAG[0] - P[2][17]*SH_MAG[1] + P[3][17]*SH_MAG[2] - P[16][17]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][17]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][17]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][17]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) - (2.0f*q0*q2 - 2.0f*q1*q3)*(P[19][18] + P[1][18]*SH_MAG[0] - P[2][18]*SH_MAG[1] + P[3][18]*SH_MAG[2] - P[16][18]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][18]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][18]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][18]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) + (SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)*(P[19][0] + P[1][0]*SH_MAG[0] - P[2][0]*SH_MAG[1] + P[3][0]*SH_MAG[2] - P[16][0]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][0]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][0]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][0]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) + P[17][19]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][19]*(2.0f*q0*q2 - 2.0f*q1*q3) + SH_MAG[0]*(P[19][1] + P[1][1]*SH_MAG[0] - P[2][1]*SH_MAG[1] + P[3][1]*SH_MAG[2] - P[16][1]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][1]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][1]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][1]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) - SH_MAG[1]*(P[19][2] + P[1][2]*SH_MAG[0] - P[2][2]*SH_MAG[1] + P[3][2]*SH_MAG[2] - P[16][2]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][2]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][2]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][2]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) + SH_MAG[2]*(P[19][3] + P[1][3]*SH_MAG[0] - P[2][3]*SH_MAG[1] + P[3][3]*SH_MAG[2] - P[16][3]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][3]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][3]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][3]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) - (SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6])*(P[19][16] + P[1][16]*SH_MAG[0] - P[2][16]*SH_MAG[1] + P[3][16]*SH_MAG[2] - P[16][16]*(SH_MAG[3] + SH_MAG[4] - SH_MAG[5] - SH_MAG[6]) + P[17][16]*(2.0f*q0*q3 + 2.0f*q1*q2) - P[18][16]*(2.0f*q0*q2 - 2.0f*q1*q3) + P[0][16]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2)) + P[0][19]*(SH_MAG[7] + SH_MAG[8] - 2.0f*magD*q2));
     if (varInnovMag[0] >= R_MAG) {
         faultStatus.bad_xmag = false;
@@ -623,7 +629,7 @@ void NavEKF3_core::FuseMagnetometer()
                 // zero indexes 13 to 15
                 zero_range(&Kfusion[0], 13, 15);
             }
-            // zero Kalman gains to inhibit magnetic field state estimation
+            // zero Kalman gains to inhibit magnetic field state estimation     卡尔曼增益归零以继承上一时刻磁场状态估计
             if (!inhibitMagStates) {
                 Kfusion[16] = SK_MX[0]*(P[16][19] + P[16][1]*SH_MAG[0] - P[16][2]*SH_MAG[1] + P[16][3]*SH_MAG[2] + P[16][0]*SK_MX[2] - P[16][16]*SK_MX[1] + P[16][17]*SK_MX[4] - P[16][18]*SK_MX[3]);
                 Kfusion[17] = SK_MX[0]*(P[17][19] + P[17][1]*SH_MAG[0] - P[17][2]*SH_MAG[1] + P[17][3]*SH_MAG[2] + P[17][0]*SK_MX[2] - P[17][16]*SK_MX[1] + P[17][17]*SK_MX[4] - P[17][18]*SK_MX[3]);

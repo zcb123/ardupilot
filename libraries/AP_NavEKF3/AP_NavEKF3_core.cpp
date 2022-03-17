@@ -28,9 +28,11 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     /*
       The imu_buffer_length needs to cope with the worst case sensor delay at the
       target EKF state prediction rate. Non-IMU data coming in faster is downsampled.
+      imu_buffer_length 需要以目标 EKF 状态预测速率应对最坏情况下的传感器延迟。 更快进入的非 IMU 数据被下采样。
      */
 
     // Calculate the expected EKF time step
+    // 计算EKF期望的时间步长
     if (dal.ins().get_loop_rate_hz() > 0) {
         dtEkfAvg = 1.0f / dal.ins().get_loop_rate_hz();
         dtEkfAvg = MAX(dtEkfAvg,EKF_TARGET_DT);
@@ -39,6 +41,7 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     }
 
     // find the maximum time delay for all potential sensors
+    // 找出所有潜在传感器的最大时间延迟
     uint16_t maxTimeDelay_ms = MAX(frontend->_hgtDelay_ms ,
             MAX(frontend->_flowDelay_ms ,
                 MAX(frontend->_rngBcnDelay_ms ,
@@ -47,6 +50,7 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
                                   ))));
 
     // GPS sensing can have large delays and should not be included if disabled
+    // GPS 可能有很大的延迟，如果禁用则不应包括在内
     if (frontend->sources.usingGPS()) {
         // Wait for the configuration of all GPS units to be confirmed. Until this has occurred the GPS driver cannot provide a correct time delay
         float gps_delay_sec = 0;
