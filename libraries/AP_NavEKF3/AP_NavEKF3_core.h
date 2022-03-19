@@ -640,6 +640,7 @@ private:
     };
 
     // specifies the method to be used when fusing yaw observations
+    // 指定融合航向角观测值的方法
     enum class yawFusionMethod {
 	    MAGNETOMETER=0,
 	    GPS=1,
@@ -1085,7 +1086,7 @@ private:
     uint32_t lastYawReset_ms;       // System time at which the last yaw reset occurred. Returned by getLastYawResetAngle
     bool tiltAlignComplete;         // true when tilt alignment is complete
     bool yawAlignComplete;          // true when yaw alignment is complete
-    bool magStateInitComplete;      // true when the magnetic field states have been initialised
+    bool magStateInitComplete;      // true when the magnetic field states have been initialised    当磁场状态被初始化时为true
     uint8_t stateIndexLim;          // Max state index used during matrix and array operations  矩阵和数组操作中用的最大状态索引
     imu_elements imuDataDelayed;    // IMU data at the fusion time horizon 在时间融合域内的IMU数据
     imu_elements imuDataNew;        // IMU data at the current time horizon 在当前时间域内的IMU数据
@@ -1342,7 +1343,7 @@ private:
     bool finalInflightYawInit;      // true when the final post takeoff initialisation of yaw angle has been performed
     uint8_t magYawAnomallyCount;    // Number of times the yaw has been reset due to a magnetic anomaly during initial ascent
     bool finalInflightMagInit;      // true when the final post takeoff initialisation of magnetic field states been performed
-    bool magStateResetRequest;      // true if magnetic field states need to be reset using the magnetomter measurements
+    bool magStateResetRequest;      // true if magnetic field states need to be reset using the magnetomter measurements    如果磁场状态需要使用磁场测量值重置时为true
     bool magYawResetRequest;        // true if the vehicle yaw and magnetic field states need to be reset using the magnetometer measurements
     bool gpsYawResetRequest;        // true if the vehicle yaw needs to be reset to the GPS course
     ftype posDownAtLastMagReset;    // vertical position last time the mag states were reset (m)
@@ -1354,7 +1355,7 @@ private:
     ftype accel_diff;                   // filtered acceerometer difference (m/s/s)
     Vector3F gyro_prev;                 // gyro vector from previous time step (rad/s)
     Vector3F accel_prev;                // accelerometer vector from previous time step (m/s/s)
-    bool onGroundNotMoving;             // true when on the ground and not moving
+    bool onGroundNotMoving;             // true when on the ground and not moving   当处于地面且不移动时为true
     uint32_t lastMoveCheckLogTime_ms;   // last time the movement check data was logged (msec)
 
 	// variables used to inhibit accel bias learning
@@ -1377,7 +1378,7 @@ private:
     Vector3F extNavVelInnov;            // external nav velocity innovations
     Vector3F extNavVelVarInnov;         // external nav velocity innovation variances
     uint32_t extNavVelInnovTime_ms;     // system time that external nav velocity innovations were recorded (to detect timeouts)
-    EKF_obs_buffer_t<yaw_elements> storedExtNavYawAng;  // external navigation yaw angle buffer
+    EKF_obs_buffer_t<yaw_elements> storedExtNavYawAng;  // external navigation yaw angle buffer 外部偏航角导航缓冲区
     yaw_elements extNavYawAngDataDelayed;   // external navigation yaw angle at the fusion time horizon
     uint32_t last_extnav_yaw_fusion_ms; // system time that external nav yaw was last fused
 #endif // EK3_FEATURE_EXTERNAL_NAV

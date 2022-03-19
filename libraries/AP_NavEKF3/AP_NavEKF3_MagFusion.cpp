@@ -195,6 +195,8 @@ void NavEKF3_core::SelectMagFusion()
 {
     // clear the flag that lets other processes know that the expensive magnetometer fusion operation has been performed on that time step
     // used for load levelling
+    // 清除标志，让其他进程知道在该时间步执行了开销大的磁力计融合操作
+    // 用于负载均衡
     magFusePerformed = false;
 
     // get default yaw source
@@ -205,6 +207,7 @@ void NavEKF3_core::SelectMagFusion()
     }
 
     // Store yaw angle when moving for use as a static reference when not moving
+    // 移动时存储偏航角，以便在不移动时用作静态参考
     if (!onGroundNotMoving) {
         if (fabsF(prevTnb[0][2]) < fabsF(prevTnb[1][2])) {
             // A 321 rotation order is best conditioned because the X axis is closer to horizontal than the Y axis
@@ -221,12 +224,13 @@ void NavEKF3_core::SelectMagFusion()
 
     // Handle case where we are not using a yaw sensor of any type and attempt to reset the yaw in
     // flight using the output from the GSF yaw estimator.
+    // 处理不用任何类型的偏航角传感器而在飞行中使用GSF偏航角估计重置偏航角
     if ((yaw_source == AP_NavEKF_Source::SourceYaw::GSF) ||
         (!use_compass() &&
          yaw_source != AP_NavEKF_Source::SourceYaw::GPS &&
          yaw_source != AP_NavEKF_Source::SourceYaw::GPS_COMPASS_FALLBACK &&
          yaw_source != AP_NavEKF_Source::SourceYaw::EXTNAV)) {
-
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw GSF !");
         // because this type of reset event is not as time critical, require a continuous history of valid estimates
         if ((!yawAlignComplete || yaw_source_reset) && EKFGSF_yaw_valid_count >= GSF_YAW_VALID_HISTORY_THRESHOLD) {
             const bool emergency_reset = (yaw_source != AP_NavEKF_Source::SourceYaw::GSF);
@@ -259,7 +263,9 @@ void NavEKF3_core::SelectMagFusion()
     }
 
     // Handle case where we are using GPS yaw sensor instead of a magnetomer
+    // 处理使用GPS偏航角传感器而不是磁力计的情况
     if (yaw_source == AP_NavEKF_Source::SourceYaw::GPS || yaw_source == AP_NavEKF_Source::SourceYaw::GPS_COMPASS_FALLBACK) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw GPS not COMPASS !");
         bool have_fused_gps_yaw = false;
         if (storedYawAng.recall(yawAngDataDelayed,imuDataDelayed.time_ms)) {
             if (tiltAlignComplete && (!yawAlignComplete || yaw_source_reset)) {
@@ -300,7 +306,7 @@ void NavEKF3_core::SelectMagFusion()
             return;
         }
 
-        // get new mag data into delay buffer
+        // get new mag data from delay buffer   mofified by zcb 2022.03.18 17:39 (into -> from)
         readMagData();
 
         if (have_fused_gps_yaw) {
@@ -332,13 +338,15 @@ void NavEKF3_core::SelectMagFusion()
             gps_yaw_mag_fallback_active = true;
             GCS_SEND_TEXT(MAV_SEVERITY_INFO, "EKF3 IMU%u yaw fallback active",(unsigned)imu_index);
         }
-        // fall through to magnetometer fusion
+        // fall through to magnetometer fusion  磁力计融合失败 
     }
 
 #if EK3_FEATURE_EXTERNAL_NAV
     // Handle case where we are using an external nav for yaw
+    // 处理使用外部偏航导航的情况
     const bool extNavYawDataToFuse = storedExtNavYawAng.recall(extNavYawAngDataDelayed, imuDataDelayed.time_ms);
     if (yaw_source == AP_NavEKF_Source::SourceYaw::EXTNAV) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw External Navigation !");
         if (extNavYawDataToFuse) {
             if (tiltAlignComplete && (!yawAlignComplete || yaw_source_reset)) {
                 alignYawAngle(extNavYawAngDataDelayed);
@@ -366,6 +374,7 @@ void NavEKF3_core::SelectMagFusion()
 #endif // EK3_FEATURE_EXTERNAL_NAV
 
     // If we are using the compass and the magnetometer has been unhealthy for too long we declare a timeout
+    // 如果正在使用罗盘，且罗盘太久不正常，则报告超时
     if (magHealth) {
         magTimeout = false;
         lastHealthyMagTime_ms = imuSampleTime_ms;
@@ -377,13 +386,16 @@ void NavEKF3_core::SelectMagFusion()
         // check for and read new magnetometer measurements. We don't
         // read for GPS_COMPASS_FALLBACK as it has already been read
         // above
+        // 检查并且读取新的磁力计测量值。GPS_COMPASS_FALLBACK不需要读取，因为已经从上面读出来了
         readMagData();
     }
 
     // check for availability of magnetometer or other yaw data to fuse
+    // 检查磁力计可用性或者其他偏航角数据来融合
     magDataToFuse = storedMag.recall(magDataDelayed,imuDataDelayed.time_ms);
 
     // Control reset of yaw and magnetic field states if we are using compass data
+    // 控制偏航角和磁场状态重置如果正常使用罗盘数据
     if (magDataToFuse) {
         if (yaw_source_reset && (yaw_source == AP_NavEKF_Source::SourceYaw::COMPASS ||
                                  yaw_source == AP_NavEKF_Source::SourceYaw::GPS_COMPASS_FALLBACK)) {
@@ -395,13 +407,16 @@ void NavEKF3_core::SelectMagFusion()
 
     // determine if conditions are right to start a new fusion cycle
     // wait until the EKF time horizon catches up with the measurement
+    // 决定条件是否允许开始一个新的融合循环
+    // 等到EKF时间域获取了测量值
     bool dataReady = (magDataToFuse && statesInitialised && use_compass() && yawAlignComplete);
     if (dataReady) {
         // use the simple method of declination to maintain heading if we cannot use the magnetic field states
+        // 如果我们不能使用磁场状态，请使用简单的偏角方法来保持航向
         if(inhibitMagStates || magStateResetRequest || !magStateInitComplete) {
             fuseEulerYaw(yawFusionMethod::MAGNETOMETER);
-
             // zero the test ratio output from the inactive 3-axis magnetometer fusion
+            // 将非活动 3 轴磁力计融合的测试比率输出归零
             magTestRatio.zero();
 
         } else {
@@ -426,6 +441,7 @@ void NavEKF3_core::SelectMagFusion()
     }
 
     // record the last learned field variances
+    // 记录最新更新的磁场方差
     if (magFieldLearned && !inhibitMagStates) {
         earthMagFieldVar.x = P[16][16];
         earthMagFieldVar.y = P[17][17];
@@ -902,6 +918,10 @@ void NavEKF3_core::FuseMagnetometer()
  * /AP_NavEKF3/derivation/main.py with output recorded in /AP_NavEKF3/derivation/generated/yaw_generated.cpp
  * Returns true if the fusion was successful
 */
+/*
+* 使用显示代数方程融合直接航向测量值。这个方程是自动生成的。
+* 如果融合成功返回true
+*/
 bool NavEKF3_core::fuseEulerYaw(yawFusionMethod method)
 {
     const ftype &q0 = stateStruct.quat[0];
@@ -917,6 +937,7 @@ bool NavEKF3_core::fuseEulerYaw(yawFusionMethod method)
     }
 
     // yaw measurement error variance (rad^2)
+    // 航向测量误差的方差
     ftype R_YAW;
     switch (method) {
     case yawFusionMethod::GPS:
@@ -971,6 +992,7 @@ bool NavEKF3_core::fuseEulerYaw(yawFusionMethod method)
     }
 
     // calculate observation jacobian, predicted yaw and zero yaw body to earth rotation matrix
+    // 计算观测雅克比矩阵，航向角预测和零偏航向角机体到地理旋转矩阵
     ftype yawAngPredicted;
     ftype H_YAW[4];
     Matrix3F Tbn_zeroYaw;

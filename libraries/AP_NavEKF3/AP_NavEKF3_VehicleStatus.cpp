@@ -84,9 +84,11 @@ void NavEKF3_core::calcGpsGoodToAlign(void)
     }
 
     // Check that the vertical GPS vertical velocity is reasonable after noise filtering
+    // 检查噪声过滤后的 GPS 垂直速度是否合理
     bool gpsVertVelFail;
     if (gpsDataNew.have_vz && onGround) {
         // check that the average vertical GPS velocity is close to zero
+        // 检查GPS平均垂直速度是否接近于0
         gpsVertVelFilt = 0.1f * gpsDataNew.vel.z + 0.9f * gpsVertVelFilt;
         gpsVertVelFilt = constrain_ftype(gpsVertVelFilt,-10.0f,10.0f);
         gpsVertVelFail = (fabsF(gpsVertVelFilt) > 0.3f*checkScaler) && (frontend->_gpsCheck & MASK_GPS_VERT_SPD);

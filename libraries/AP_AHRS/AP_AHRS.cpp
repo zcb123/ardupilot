@@ -344,6 +344,7 @@ void AP_AHRS::calc_trig(const Matrix3f &rot,
 
 // update_trig - recalculates _cos_roll, _cos_pitch, etc based on latest attitude
 //      should be called after _dcm_matrix is updated
+// 三角函数值更新 - 重新计算cos(roll),cos(pitch)等，都是基于最新的姿态，需要在_dcm_matrix更新之后运行
 void AP_AHRS::update_trig(void)
 {
     if (_last_trim != _trim.get()) {
@@ -362,6 +363,7 @@ void AP_AHRS::update_trig(void)
  */
 void AP_AHRS::update_cd_values(void)
 {
+    // 这里的roll,pitch,yaw是刚刚从EKF3中更新完的
     roll_sensor  = degrees(roll) * 100;
     pitch_sensor = degrees(pitch) * 100;
     yaw_sensor   = degrees(yaw) * 100;

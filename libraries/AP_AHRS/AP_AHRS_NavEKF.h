@@ -363,6 +363,7 @@ private:
 #endif
 
     // rotation from vehicle body to NED frame
+    // 机体向北东地坐标系的旋转
     Matrix3f _dcm_matrix;
     Vector3f _dcm_attitude;
     

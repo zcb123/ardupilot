@@ -873,6 +873,8 @@ bool NavEKF3::coreBetterScore(uint8_t new_core, uint8_t current_core) const
 /* 
   Update Filter States - this should be called whenever new IMU data is available
   Execution speed governed by SCHED_LOOP_RATE
+  更新滤波器状态 - 一旦新的IMU数据可用则应当被调用
+  执行速度由SCHED_LOOP_RATE控制
 */
 void NavEKF3::UpdateFilter(void)
 {
@@ -889,6 +891,8 @@ void NavEKF3::UpdateFilter(void)
         // have already used more than 1/3 of the CPU budget for this
         // loop then suppress the prediction step. This allows
         // multiple EKF instances to cooperate on scheduling
+        // 如果没有运行超过3个IMU实例，并且这个循环已经使用了超过1/3CPU资源则停止预测步骤。
+        // 这样能允许多个EKF实例在调度器中运行
         bool allow_state_prediction = true;
         if (core[i].getFramesSincePredict() < (_framesPerPrediction+3) &&
             AP::dal().ekf_low_time_remaining(AP_DAL::EKFType::EKF3, i)) {
@@ -900,17 +904,21 @@ void NavEKF3::UpdateFilter(void)
     // If the current core selected has a bad error score or is unhealthy, switch to a healthy core with the lowest fault score
     // Don't start running the check until the primary core has started returned healthy for at least 10 seconds to avoid switching
     // due to initial alignment fluctuations and race conditions
-    if (!runCoreSelection) {
+    // 如果当前选择的内核有一个糟糕的错误分数或者不正常，切换到一个最底错误分数的健康内核
+    // 在主核心开始恢复健康至少 10 秒之前不要开始运行检查，以避免由于初始对齐波动和竞争条件而切换
+
+    if (!runCoreSelection) {    // 默认应该为false,这里代码没有初始化 不太好
         static uint64_t lastUnhealthyTime_us = 0;
         if (!core[primary].healthy() || lastUnhealthyTime_us == 0) {
             lastUnhealthyTime_us = imuSampleTime_us;
         }
-        runCoreSelection = (imuSampleTime_us - lastUnhealthyTime_us) > 1E7;
+        runCoreSelection = (imuSampleTime_us - lastUnhealthyTime_us) > 1E7;     //从内核不正常开始 >10s 为 true
     }
 
     const bool armed  = AP::dal().get_armed();
 
     // core selection is only available after the vehicle is armed, else forced to lane 0 if its healthy
+    // 只有在飞行器解锁状态下才内核切换，如果它正常则强制进入0通道
     if (runCoreSelection && armed) {
         // update this instance's error scores for all active cores and get the primary core's error score
         float primaryErrorScore = updateCoreErrorScores();
@@ -966,8 +974,8 @@ void NavEKF3::UpdateFilter(void)
         }       
     }
 
-    const uint8_t user_primary = uint8_t(_primary_core) < num_cores? _primary_core : 0;
-    if (primary != 0 && core[user_primary].healthy() && !armed) {
+    const uint8_t user_primary = uint8_t(_primary_core) < num_cores? _primary_core : 0; //user_primary须小于num_cores，否则为0
+    if (primary != 0 && core[user_primary].healthy() && !armed) {   //解锁状态下进入
         // when on the ground and disarmed force the selected primary
         // core. This avoids us ending with with a lottery for which
         // IMU is used in each flight. Otherwise the alignment of the
@@ -976,10 +984,14 @@ void NavEKF3::UpdateFilter(void)
         // used as primary for some flights. As different IMUs may
         // have quite different noise characteristics this leads to
         // inconsistent performance
+        // 在地面上解锁时会强制选择主内核。这避免了IMU在每次飞行中以小概率的特殊情况结束
+        // 否则，核心选择更新的时间与 GPS 更新的时间的对齐可能导致第一个核心以外的核心被用作某些飞行的主要核心。
+        // 由于不同的 IMU 可能具有完全不同的噪声特性，这会导致性能不一致.
         primary = user_primary;
     }
 
     // align position of inactive sources to ahrs
+    // 将非激活源的位置与ahrs对齐   (align ... to ... )
     sources.align_inactive_sources();
 }
 

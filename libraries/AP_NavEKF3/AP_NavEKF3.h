@@ -518,7 +518,7 @@ private:
 #define CORE_ERR_LIM      1 // -LIM to LIM relative error range for a core
 #define BETTER_THRESH   0.5 // a lane should have this much relative error difference to be considered for overriding a healthy primary core
     
-    bool runCoreSelection;                          // true when the primary core has stabilised and the core selection logic can be started
+    bool runCoreSelection;                          // true when the primary core has stabilised and the core selection logic can be started    当主内核稳定且内核切换逻辑可以开始则为true
     bool coreSetupRequired[MAX_EKF_CORES];          // true when this core index needs to be setup
     uint8_t coreImuIndex[MAX_EKF_CORES];            // IMU index used by this core
     float coreRelativeErrors[MAX_EKF_CORES];        // relative errors of cores with respect to primary

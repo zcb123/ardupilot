@@ -333,7 +333,7 @@ void AP_AHRS_NavEKF::update_EKF3(void)
     }
     if (_ekf3_started) {
         EKF3.UpdateFilter();
-        if (active_EKF_type() == EKFType::THREE) {
+        if (active_EKF_type() == EKFType::THREE) {  //确认类型为EKF3
             Vector3f eulers;
             EKF3.getRotationBodyToNED(_dcm_matrix);
             EKF3.getEulerAngles(-1,eulers);
@@ -347,37 +347,48 @@ void AP_AHRS_NavEKF::update_EKF3(void)
             const AP_InertialSensor &_ins = AP::ins();
 
             // Use the primary EKF to select the primary gyro
+            // 用主EKF选择主陀螺仪
             const int8_t primary_imu = EKF3.getPrimaryCoreIMUIndex();
 
             // get gyro bias for primary EKF and change sign to give gyro drift
             // Note sign convention used by EKF is bias = measurement - truth
+            // 获取主EKF的陀螺仪偏移，并为陀螺仪偏移改变符号
+            // 注意到EKF使用的符号约定是 偏移 = 测量 - 真实 。 而不是真实 - 测量
             _gyro_drift.zero();
-            EKF3.getGyroBias(-1,_gyro_drift);
+            EKF3.getGyroBias(-1,_gyro_drift);   // 这里的陀螺仪偏移是24维状态变量之三
             _gyro_drift = -_gyro_drift;
 
             // calculate corrected gyro estimate for get_gyro()
+            // 为get_gyro()计算矫正后的陀螺仪估计值
             _gyro_estimate.zero();
             if (primary_imu == -1 || !_ins.get_gyro_health(primary_imu)) {
                 // the primary IMU is undefined so use an uncorrected default value from the INS library
+                // 主IMU为定义，所以使用一个INS库中未矫正的默认值
                 _gyro_estimate = _ins.get_gyro();
             } else {
                 // use the same IMU as the primary EKF and correct for gyro drift
+                // 使用和主EKF一样的IMU，并且用陀螺仪偏移矫正
                 _gyro_estimate = _ins.get_gyro(primary_imu) + _gyro_drift;
             }
 
-            // get 3-axis accel bias festimates for active EKF (this is usually for the primary IMU)
+            // get 3-axis accel bias estimates for active EKF (this is usually for the primary IMU)
+            // 获得激活的EKF的3轴加速度偏差估计值（这通常用于主 IMU）
             Vector3f abias;
-            EKF3.getAccelBias(-1,abias);
+            EKF3.getAccelBias(-1,abias);    //这里的abias也是来自于24维状态变量之三
 
             // This EKF uses the primary IMU
             // Eventually we will run a separate instance of the EKF for each IMU and do the selection and blending of EKF outputs upstream
             // update _accel_ef_ekf
+            // 这个EKF使用主IMU
+            // 最终，我们将为每个 IMU 运行一个单独的 EKF 实例，并对上游的 EKF 输出进行选择和混合
+            // 更新 _accel_ef_ekf
             for (uint8_t i=0; i<_ins.get_accel_count(); i++) {
                 Vector3f accel = _ins.get_accel(i);
-                if (i==_ins.get_primary_accel()) {
+                //以下两个if可能同时满足
+                if (i==_ins.get_primary_accel()) {  //加速度偏移矫正
                     accel -= abias;
                 }
-                if (_ins.get_accel_health(i)) {
+                if (_ins.get_accel_health(i)) {     //若加速度值正常，则旋转到北东地坐标系
                     _accel_ef_ekf[i] = _dcm_matrix * accel;
                 }
             }
