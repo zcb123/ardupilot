@@ -885,7 +885,7 @@ void NavEKF3::UpdateFilter(void)
     }
 
     imuSampleTime_us = AP::dal().micros64();
-
+    
     for (uint8_t i=0; i<num_cores; i++) {
         // if we have not overrun by more than 3 IMU frames, and we
         // have already used more than 1/3 of the CPU budget for this
@@ -898,6 +898,7 @@ void NavEKF3::UpdateFilter(void)
             AP::dal().ekf_low_time_remaining(AP_DAL::EKFType::EKF3, i)) {
             allow_state_prediction = false;
         }
+        //gcs().send_text(MAV_SEVERITY_CRITICAL, "UpdateFilter! %d",allow_state_prediction);
         core[i].UpdateFilter(allow_state_prediction);
     }
 
@@ -984,7 +985,7 @@ void NavEKF3::UpdateFilter(void)
         // used as primary for some flights. As different IMUs may
         // have quite different noise characteristics this leads to
         // inconsistent performance
-        // 在地面上解锁时会强制选择主内核。这避免了IMU在每次飞行中以小概率的特殊情况结束
+        // 在地面上解锁时会强制选择主内核。这避免了IMU在每次飞行中以小概率的特殊情况结束。
         // 否则，核心选择更新的时间与 GPS 更新的时间的对齐可能导致第一个核心以外的核心被用作某些飞行的主要核心。
         // 由于不同的 IMU 可能具有完全不同的噪声特性，这会导致性能不一致.
         primary = user_primary;

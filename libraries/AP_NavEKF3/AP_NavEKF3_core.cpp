@@ -686,13 +686,16 @@ void NavEKF3_core::UpdateFilter(bool predict)
 
     // Run the EKF equations to estimate at the fusion time horizon if new IMU data is available in the buffer
     // 如果在缓冲区中有新的IMU数据可用，则在融合时间域中运行EKF方程估计  ？？ 
+
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "runUpdate! %d",runUpdates);
+
     if (runUpdates) {       // 在readIMUData()中置true
         // Predict states using IMU data from the delayed time horizon
         // 使用IMU数据预测状态，这些IMU数据来自于延迟时间域
         UpdateStrapdownEquationsNED();
 
         // Predict the covariance growth
-        // 预测协方差变化
+        // 预测协方差传递
         CovariancePrediction(nullptr);
 
         // Run the IMU prediction step for the GSF yaw estimator algorithm
@@ -1200,8 +1203,11 @@ void NavEKF3_core::CovariancePrediction(Vector3F *rotVarVecPtr)
 
     // calculate the predicted covariance due to inertial sensor error propagation
     // we calculate the lower diagonal and copy to take advantage of symmetry
-
+    // 计算由于惯性传感器误差传播而导致的预测协方差
+    // 我们计算下对角线并利用对称性复制
+    
     // intermediate calculations
+    // 过程变量计算
     const ftype PS0 = sq(q1);
     const ftype PS1 = 0.25F*daxVar;
     const ftype PS2 = sq(q2);
