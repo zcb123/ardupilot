@@ -12,8 +12,8 @@
 // @Field: Alt: calculated altitude
 // @Field: Press: measured atmospheric pressure
 // @Field: Temp: measured atmospheric temperature
-// @Field: CRt: derived climb rate from primary barometer
-// @Field: SMS: time last sample was taken
+// @Field: CRt: derived climb rate from primary barometer   主气压计导出的爬升率
+// @Field: SMS: time last sample was taken  最新一次采样时间
 // @Field: Offset: raw adjustment of barometer altitude, zeroed on calibration, possibly set by GCS
 // @Field: GndTemp: temperature on ground, specified by parameter or measured while on ground
 // @Field: Health: true if barometer is considered healthy

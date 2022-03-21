@@ -687,7 +687,7 @@ void NavEKF3_core::UpdateFilter(bool predict)
     // Run the EKF equations to estimate at the fusion time horizon if new IMU data is available in the buffer
     // 如果在缓冲区中有新的IMU数据可用，则在融合时间域中运行EKF方程估计  ？？ 
 
-    gcs().send_text(MAV_SEVERITY_CRITICAL, "runUpdate! %d",runUpdates);
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "runUpdate! %d",runUpdates);
 
     if (runUpdates) {       // 在readIMUData()中置true
         // Predict states using IMU data from the delayed time horizon

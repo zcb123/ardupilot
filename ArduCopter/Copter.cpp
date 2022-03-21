@@ -600,7 +600,7 @@ void Copter::init_simple_bearing()
 }
 
 // update_simple_mode - rotates pilot input if we are in simple mode
-// 更新简单模式 - 如果在简单模式，旋转驾驶员输入
+// 更新简单模式 - 如果在简单模式，旋转驾驶员输入值
 void Copter::update_simple_mode(void)
 {
     float rollx, pitchx;
