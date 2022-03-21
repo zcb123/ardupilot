@@ -174,7 +174,7 @@
 #endif
 
 #include "mode.h"
-
+// 下面这些类既是友元，也是成员变量
 class Copter : public AP_Vehicle {
 public:
     friend class GCS_MAVLINK_Copter;

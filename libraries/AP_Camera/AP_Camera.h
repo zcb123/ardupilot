@@ -15,6 +15,7 @@
 
 /// @class	Camera
 /// @brief	Object managing a Photo or video camera
+/// 管理照片或者视频的相机对象
 class AP_Camera {
 
 public:

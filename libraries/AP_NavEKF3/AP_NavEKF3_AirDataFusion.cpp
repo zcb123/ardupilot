@@ -31,6 +31,7 @@ void NavEKF3_core::FuseAirspeed()
     ftype VtasPred;
 
     // copy required states to local variable names
+    // 把需要的状态拷贝到局部变量
     vn = stateStruct.velocity.x;
     ve = stateStruct.velocity.y;
     vd = stateStruct.velocity.z;
@@ -38,8 +39,10 @@ void NavEKF3_core::FuseAirspeed()
     vwe = stateStruct.wind_vel.y;
 
     // calculate the predicted airspeed
+    // 计算预测风速
     VtasPred = norm((ve - vwe) , (vn - vwn) , vd);
     // perform fusion of True Airspeed measurement
+    // 执行真实风速测量值的融合
     if (VtasPred > 1.0f)
     {
         // calculate observation innovation and variance

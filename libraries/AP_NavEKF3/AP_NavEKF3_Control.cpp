@@ -590,12 +590,14 @@ bool NavEKF3_core::using_external_yaw(void) const
 
 /*
   should we assume zero sideslip?
+  是否可以假设零侧滑
  */
 bool NavEKF3_core::assume_zero_sideslip(void) const
 {
     // we don't assume zero sideslip for ground vehicles as EKF could
     // be quite sensitive to a rapid spin of the ground vehicle if
     // traction is lost
+    // 我们不假设地面车辆的侧滑为零，因为如果失去牵引力，EKF 可能对地面车辆的快速旋转非常敏感
     return dal.get_fly_forward() && dal.get_vehicle_class() != AP_DAL::VehicleClass::GROUND;
 }
 
@@ -706,13 +708,16 @@ void  NavEKF3_core::updateFilterStatus(void)
 void NavEKF3_core::runYawEstimatorPrediction()
 {
     // exit immediately if no yaw estimator
+    // 如果没有航向角估计立刻退出
     if (yawEstimator == nullptr) {
         return;
     }
 
     // ensure GPS is used for horizontal position and velocity
+    // 确保GPS用于水平位置和速度
     if (frontend->sources.getPosXYSource() != AP_NavEKF_Source::SourceXY::GPS ||
         !frontend->sources.useVelXYSource(AP_NavEKF_Source::SourceXY::GPS)) {
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "using gps for horizontal position and velocity");
         return;
     }
 
@@ -728,10 +733,12 @@ void NavEKF3_core::runYawEstimatorPrediction()
 void NavEKF3_core::runYawEstimatorCorrection()
 {
     // exit immediately if no yaw estimator
+    // 如果没有偏航估计，立即退出
     if (yawEstimator == nullptr) {
         return;
     }
     // ensure GPS is used for horizontal position and velocity
+    // 确保GPS用于水平位置和速度
     if (frontend->sources.getPosXYSource() != AP_NavEKF_Source::SourceXY::GPS ||
         !frontend->sources.useVelXYSource(AP_NavEKF_Source::SourceXY::GPS)) {
         return;
@@ -745,6 +752,7 @@ void NavEKF3_core::runYawEstimatorCorrection()
 
             // after velocity data has been fused the yaw variance estimate will have been refreshed and
             // is used maintain a history of validity
+            // 融合速度数据后，偏航方差估计将被刷新并使用保持有效性历史
             ftype gsfYaw, gsfYawVariance;
             if (EKFGSF_getYaw(gsfYaw, gsfYawVariance)) {
                 if (EKFGSF_yaw_valid_count <  GSF_YAW_VALID_HISTORY_THRESHOLD) {

@@ -28,9 +28,11 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     /*
       The imu_buffer_length needs to cope with the worst case sensor delay at the
       target EKF state prediction rate. Non-IMU data coming in faster is downsampled.
+      imu_buffer_length 需要以目标 EKF 状态预测速率应对最坏情况下的传感器延迟。 更快进入的非 IMU 数据被下采样。
      */
 
     // Calculate the expected EKF time step
+    // 计算EKF期望的时间步长
     if (dal.ins().get_loop_rate_hz() > 0) {
         dtEkfAvg = 1.0f / dal.ins().get_loop_rate_hz();
         dtEkfAvg = MAX(dtEkfAvg,EKF_TARGET_DT);
@@ -39,6 +41,7 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
     }
 
     // find the maximum time delay for all potential sensors
+    // 找出所有潜在传感器的最大时间延迟
     uint16_t maxTimeDelay_ms = MAX(frontend->_hgtDelay_ms ,
             MAX(frontend->_flowDelay_ms ,
                 MAX(frontend->_rngBcnDelay_ms ,
@@ -47,6 +50,7 @@ bool NavEKF3_core::setup_core(uint8_t _imu_index, uint8_t _core_index)
                                   ))));
 
     // GPS sensing can have large delays and should not be included if disabled
+    // GPS 可能有很大的延迟，如果禁用则不应包括在内
     if (frontend->sources.usingGPS()) {
         // Wait for the configuration of all GPS units to be confirmed. Until this has occurred the GPS driver cannot provide a correct time delay
         float gps_delay_sec = 0;
@@ -651,43 +655,59 @@ void NavEKF3_core::CovarianceInit()
 *                 UPDATE FUNCTIONS                      *
 ********************************************************/
 // Update Filter States - this should be called whenever new IMU data is available
+// 更新滤波器状态 - 一旦IMU数据可用，这个就应当被调用
 void NavEKF3_core::UpdateFilter(bool predict)
 {
     // Set the flag to indicate to the filter that the front-end has given permission for a new state prediction cycle to be started
+    // 设置标志指示前端已经允许新的状态预测周期可以开始了
     startPredictEnabled = predict;
 
     // don't run filter updates if states have not been initialised
+    // 不运行状态更新，如果状态未被初始化
     if (!statesInitialised) {
         return;
     }
-
+    // SITL模式中使用
     fill_scratch_variables();
 
     // update sensor selection (for affinity)
+    // 更新传感器选择(从亲和性角度)
     update_sensor_selection();
 
-    // TODO - in-flight restart method
+    // TODO - in-flight restart method  TODO:飞行中重启方法
 
     // Check arm status and perform required checks and mode changes
+    // 检查解锁状态，执行必需的检查和模式切换
     controlFilterModes();
 
     // read IMU data as delta angles and velocities
+    // 读取IMU角度和速度增量
     readIMUData();
 
     // Run the EKF equations to estimate at the fusion time horizon if new IMU data is available in the buffer
-    if (runUpdates) {
+    // 如果在缓冲区中有新的IMU数据可用，则在融合时间域中运行EKF方程估计  ？？ 
+
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "runUpdate! %d",runUpdates);
+
+    if (runUpdates) {       // 在readIMUData()中置true
         // Predict states using IMU data from the delayed time horizon
+        // 使用IMU数据预测状态，这些IMU数据来自于延迟时间域
         UpdateStrapdownEquationsNED();
 
         // Predict the covariance growth
+        // 预测协方差传递
         CovariancePrediction(nullptr);
 
         // Run the IMU prediction step for the GSF yaw estimator algorithm
         // using IMU and optionally true airspeed data.
         // Must be run before SelectMagFusion() to provide an up to date yaw estimate
+        // 为运行GSF偏航角估计算法运行IMU预测步骤
+        // 使用IMU和潜在真实的空速数据
+        // 必须运行在SelectMagFusion()之前，以提供最新的偏航估计
         runYawEstimatorPrediction();
 
         // Update states using  magnetometer or external yaw sensor data
+        // 使用磁力计或者外部偏航角传感器数据更新状态估计
         SelectMagFusion();
 
         // Update states using GPS and altimeter data
@@ -736,6 +756,11 @@ void NavEKF3_core::UpdateFilter(bool predict)
       that state the EKF can't recover, so we do a hard reset and let
       it try again.
      */
+    /*
+    * 这是处理飞行器闲置在地面上与对状态过分自信的一个检查。
+    * 当驾驶员尝试上锁时，会出现"陀螺仪任然在设置"的问题。
+    * 在那种状态下EKF不能恢复，因此做一个硬重置，并让其重新尝试一遍
+    */
     if (filterStatus.value != 0) {
         last_filter_ok_ms = dal.millis();
     }
@@ -744,7 +769,7 @@ void NavEKF3_core::UpdateFilter(bool predict)
         dal.millis() - last_filter_ok_ms > 5000 &&
         !dal.get_armed()) {
         // we've been unhealthy for 5 seconds after being healthy, reset the filter
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF3 IMU%u forced reset",(unsigned)imu_index);
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF3 IMU%u forced reset",(unsigned)imu_index); //等遇到这个问题再说了
         last_filter_ok_ms = 0;
         statesInitialised = false;
         InitialiseFilterBootstrap();
@@ -767,6 +792,11 @@ void NavEKF3_core::correctDeltaVelocity(Vector3F &delVel, ftype delVelDT, uint8_
  * not used by the EKF equations, which instead estimate the error in the attitude of
  * the vehicle when each observation is fused. This attitude error is then used to correct
  * the quaternion.
+*/
+/*
+* 使用延迟IMU测量值更新四元数,速度,位置状态，因为EKF正运行在延迟时间域中。
+* 注意到四元数未在EKF方程中使用，而是在每次观测值被融合时估计飞行棋的姿态误差。
+* 这个姿态误差之后被用于矫正四元数。
 */
 void NavEKF3_core::UpdateStrapdownEquationsNED()
 {
@@ -1173,8 +1203,11 @@ void NavEKF3_core::CovariancePrediction(Vector3F *rotVarVecPtr)
 
     // calculate the predicted covariance due to inertial sensor error propagation
     // we calculate the lower diagonal and copy to take advantage of symmetry
-
+    // 计算由于惯性传感器误差传播而导致的预测协方差
+    // 我们计算下对角线并利用对称性复制
+    
     // intermediate calculations
+    // 过程变量计算
     const ftype PS0 = sq(q1);
     const ftype PS1 = 0.25F*daxVar;
     const ftype PS2 = sq(q2);

@@ -47,19 +47,22 @@
 #define MASK_GPS_VERT_SPD   (1<<6)
 #define MASK_GPS_HORIZ_SPD  (1<<7)
 
-#define earthRate 0.000072921f // earth rotation rate (rad/sec)
+#define earthRate 0.000072921f // earth rotation rate (rad/sec) 地球旋转速率(rad/s)
 
-// maximum allowed gyro bias (rad/sec)
+// maximum allowed gyro bias (rad/sec)  陀螺仪允许最大漂移
 #define GYRO_BIAS_LIMIT 0.5f
 
 // initial accel bias uncertainty as a fraction of the state limit
+// 初始加速度偏差不确定性作为状态限制的一部分
 #define ACCEL_BIAS_LIM_SCALER 0.2f
 
 // target update time for the EKF in msec and sec
+// EKF目标更新时间(毫秒和秒)
 #define EKF_TARGET_DT_MS 12
 #define EKF_TARGET_DT    0.012f
 
 // mag fusion final reset altitude (using NED frame so altitude is negative)
+// 磁力计融合最终重置高度(使用北东地坐标系，所以高度是负值)
 #define EKF3_MAG_FINAL_RESET_ALT 2.5f
 
 // learning rate for mag biases when using GPS yaw
@@ -105,7 +108,7 @@
 // number of milliseconds the bad IMU data response settings will be held after the last bad IMU data is detected
 #define BAD_IMU_DATA_HOLD_MS 10000
 
-// wind state variance limits
+// wind state variance limits  风状态方差限制
 #define WIND_VEL_VARIANCE_MAX 400.0f
 #define WIND_VEL_VARIANCE_MIN 0.25f
 
@@ -126,6 +129,8 @@ public:
 
     // Update Filter States - this should be called whenever new IMU data is available
     // The predict flag is set true when a new prediction cycle can be started
+    // 更新滤波器状态 - 新的IMU数据可获得时这个应当被调用
+    // 预测标志被设置为true当新的预测轮开始时
     void UpdateFilter(bool predict);
 
     // Check basic filter health metrics and return a consolidated(合并的) health status
@@ -227,6 +232,7 @@ public:
     bool getInnovations(Vector3f &velInnov, Vector3f &posInnov, Vector3f &magInnov, float &tasInnov, float &yawInnov) const;
 
     // return the synthetic air data drag and sideslip innovations
+    // 返回合成空气数据阻力和侧滑更新
     void getSynthAirDataInnovations(Vector2f &dragInnov, float &betaInnov) const;
 
    // return the innovation consistency test ratios for the velocity, position, magnetometer and true airspeed measurements
@@ -495,11 +501,12 @@ private:
     // broken down as individual elements. Both are equivalent (same
     // memory)
     // 状态可以以两种方式获得，一种是以Vector24，另一种将其拆分成独立元素。
-    // 两者是相同的（一样的内存）。
+    // 两者是相同的（一样的内存(下面用的是联合体)）。
+    // EKF估计的24个状态变量
     struct state_elements {
-        QuaternionF quat;           // quaternion defining rotation from local NED earth frame to body frame 0..3
-        Vector3F    velocity;       // velocity of IMU in local NED earth frame (m/sec) 4..6
-        Vector3F    position;       // position of IMU in local NED earth frame (m)     7..9
+        QuaternionF quat;           // quaternion defining rotation from local NED earth frame to body frame 0..3   从当地北东地坐标系到机体坐标系的旋转四元数
+        Vector3F    velocity;       // velocity of IMU in local NED earth frame (m/sec) 4..6    北东地坐标系下的IMU速度(m/s)
+        Vector3F    position;       // position of IMU in local NED earth frame (m)     7..9    北东地坐标系下的IMU位置(m)
         Vector3F    gyro_bias;      // body frame delta angle IMU bias vector (rad)     10..12
         Vector3F    accel_bias;     // body frame delta velocity IMU bias vector (m/sec) 13..15
         Vector3F    earth_magfield; // earth frame magnetic field vector (Gauss)         16..18
@@ -532,8 +539,8 @@ private:
         int32_t     lat, lng;       // latitude and longitude in 1e7 degrees
         ftype       hgt;            // height of the GPS antenna in local NED earth frame (m)
         Vector3F    vel;            // velocity of the GPS antenna in local NED earth frame (m/sec)
-        uint8_t     sensor_idx;     // unique integer identifying the GPS sensor
-        bool        corrected;      // true when the position and velocity have been corrected for sensor position
+        uint8_t     sensor_idx;     // unique integer identifying the GPS sensor    GPS传感器唯一的识别数
+        bool        corrected;      // true when the position and velocity have been corrected for sensor position  当传感器的位置和速度都被矫正时为true
         bool        have_vz;        // true when vertical velocity is valid
     };
 
@@ -633,6 +640,7 @@ private:
     };
 
     // specifies the method to be used when fusing yaw observations
+    // 指定融合航向角观测值的方法
     enum class yawFusionMethod {
 	    MAGNETOMETER=0,
 	    GPS=1,
@@ -992,7 +1000,7 @@ private:
     uint32_t vertVelVarClipCounter; // counter used to control reset of vertical velocity variance following collapse against the lower limit
 
     ftype gpsNoiseScaler;           // Used to scale the  GPS measurement noise and consistency gates to compensate for operation with small satellite counts
-    Matrix24 P;                     // covariance matrix
+    Matrix24 P;                     // covariance matrix    协方差矩阵  
     EKF_IMU_buffer_t<imu_elements> storedIMU;      // IMU data buffer
     EKF_obs_buffer_t<gps_elements> storedGPS;      // GPS data buffer
     EKF_obs_buffer_t<mag_elements> storedMag;      // Magnetometer data buffer
@@ -1078,8 +1086,8 @@ private:
     uint32_t lastYawReset_ms;       // System time at which the last yaw reset occurred. Returned by getLastYawResetAngle
     bool tiltAlignComplete;         // true when tilt alignment is complete
     bool yawAlignComplete;          // true when yaw alignment is complete
-    bool magStateInitComplete;      // true when the magnetic field states have been initialised
-    uint8_t stateIndexLim;          // Max state index used during matrix and array operations
+    bool magStateInitComplete;      // true when the magnetic field states have been initialised    当磁场状态被初始化时为true
+    uint8_t stateIndexLim;          // Max state index used during matrix and array operations  矩阵和数组操作中用的最大状态索引
     imu_elements imuDataDelayed;    // IMU data at the fusion time horizon 在时间融合域内的IMU数据
     imu_elements imuDataNew;        // IMU data at the current time horizon 在当前时间域内的IMU数据
     imu_elements imuDataDownSampledNew; // IMU data at the current time horizon that has been downsampled to a 100Hz rate
@@ -1095,7 +1103,7 @@ private:
     gps_elements gpsDataNew;        // GPS data at the current time horizon 在当前时间域内的gps数据
     gps_elements gpsDataDelayed;    // GPS data at the fusion time horizon  在时间融合域内的gps数据
     uint8_t last_gps_idx;           // sensor ID of the GPS receiver used for the last fusion or reset
-    output_elements outputDataNew;  // output state data at the current time step
+    output_elements outputDataNew;  // output state data at the current time step   当前时刻输出的状态数据
     output_elements outputDataDelayed; // output state data at the current time step
     Vector3F delAngCorrection;      // correction applied to delta angles used by output observer to track the EKF
     Vector3F velErrintegral;        // integral of output predictor NED velocity tracking error (m)
@@ -1111,7 +1119,7 @@ private:
     bool optFlowFusionDelayed;      // true when the optical flow fusion has been delayed
     bool airSpdFusionDelayed;       // true when the air speed fusion has been delayed
     bool sideSlipFusionDelayed;     // true when the sideslip fusion has been delayed
-    bool airDataFusionWindOnly;     // true when  sideslip and airspeed fusion is only allowed to modify the wind states
+    bool airDataFusionWindOnly;     // true when  sideslip and airspeed fusion is only allowed to modify the wind states 当侧滑和空速融合只允许修改风状态时为真
     Vector3F lastMagOffsets;        // Last magnetometer offsets from COMPASS_ parameters. Used to detect parameter changes.
     bool lastMagOffsetsValid;       // True when lastMagOffsets has been initialized
     Vector2F posResetNE;            // Change in North/East position due to last in-flight reset in metres. Returned by getLastPosNorthEastReset
@@ -1313,7 +1321,7 @@ private:
     drag_elements dragDownSampled;	    // down sampled from filter prediction rate to observation rate
     uint8_t dragSampleCount;	        // number of drag specific force samples accumulated at the filter prediction rate
     ftype dragSampleTimeDelta;	        // time integral across all samples used to form _drag_down_sampled (sec)
-    Vector2F innovDrag;		            // multirotor drag measurement innovation (m/sec**2)
+    Vector2F innovDrag;		            // multirotor drag measurement innovation (m/sec**2) 多转子阻力测量更新
 	Vector2F innovDragVar;	            // multirotor drag measurement innovation variance ((m/sec**2)**2)
 	Vector2F dragTestRatio;		        // drag innovation consistency check ratio
 #endif
@@ -1335,7 +1343,7 @@ private:
     bool finalInflightYawInit;      // true when the final post takeoff initialisation of yaw angle has been performed
     uint8_t magYawAnomallyCount;    // Number of times the yaw has been reset due to a magnetic anomaly during initial ascent
     bool finalInflightMagInit;      // true when the final post takeoff initialisation of magnetic field states been performed
-    bool magStateResetRequest;      // true if magnetic field states need to be reset using the magnetomter measurements
+    bool magStateResetRequest;      // true if magnetic field states need to be reset using the magnetomter measurements    如果磁场状态需要使用磁场测量值重置时为true
     bool magYawResetRequest;        // true if the vehicle yaw and magnetic field states need to be reset using the magnetometer measurements
     bool gpsYawResetRequest;        // true if the vehicle yaw needs to be reset to the GPS course
     ftype posDownAtLastMagReset;    // vertical position last time the mag states were reset (m)
@@ -1347,7 +1355,7 @@ private:
     ftype accel_diff;                   // filtered acceerometer difference (m/s/s)
     Vector3F gyro_prev;                 // gyro vector from previous time step (rad/s)
     Vector3F accel_prev;                // accelerometer vector from previous time step (m/s/s)
-    bool onGroundNotMoving;             // true when on the ground and not moving
+    bool onGroundNotMoving;             // true when on the ground and not moving   当处于地面且不移动时为true
     uint32_t lastMoveCheckLogTime_ms;   // last time the movement check data was logged (msec)
 
 	// variables used to inhibit accel bias learning
@@ -1370,7 +1378,7 @@ private:
     Vector3F extNavVelInnov;            // external nav velocity innovations
     Vector3F extNavVelVarInnov;         // external nav velocity innovation variances
     uint32_t extNavVelInnovTime_ms;     // system time that external nav velocity innovations were recorded (to detect timeouts)
-    EKF_obs_buffer_t<yaw_elements> storedExtNavYawAng;  // external navigation yaw angle buffer
+    EKF_obs_buffer_t<yaw_elements> storedExtNavYawAng;  // external navigation yaw angle buffer 外部偏航角导航缓冲区
     yaw_elements extNavYawAngDataDelayed;   // external navigation yaw angle at the fusion time horizon
     uint32_t last_extnav_yaw_fusion_ms; // system time that external nav yaw was last fused
 #endif // EK3_FEATURE_EXTERNAL_NAV
@@ -1417,9 +1425,12 @@ private:
         uint16_t value;
     } gpsCheckStatus;
 
-    // states held by magnetometer fusion across time steps
+    // states held by magnetometer fusion across time steps 
     // magnetometer X,Y,Z measurements are fused across three time steps
     // to level computational load as this is an expensive operation
+    // 磁力计融合在时间步长保持的状态
+    // 磁力计X,Y,Z三轴测量值在三个运行周期中融合以平衡计算负载。因为这是项开销大的操作。
+    // 磁力计三个运行周期才能更新一次状态
     struct {
         ftype q0;
         ftype q1;
@@ -1492,7 +1503,7 @@ private:
     uint32_t EKFGSF_yaw_reset_ms;           // timestamp of last emergency yaw reset (uSec)
     uint32_t EKFGSF_yaw_reset_request_ms;   // timestamp of last emergency yaw reset request (uSec)
     uint8_t EKFGSF_yaw_reset_count;         // number of emergency yaw resets performed
-    bool EKFGSF_run_filterbank;             // true when the filter bank is active
+    bool EKFGSF_run_filterbank;             // true when the filter bank is active  当滤波器组处于活动状态时为真
     uint8_t EKFGSF_yaw_valid_count;         // number of updates since the last invalid yaw estimate
 
     // bits in EK3_AFFINITY

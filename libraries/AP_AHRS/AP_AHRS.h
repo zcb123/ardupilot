@@ -677,6 +677,7 @@ protected:
     uint32_t _compass_last_update;
 
     // a vector to capture the difference between the controller and body frames
+    // 一个用于获取控制器和机体结构之间差异的向量
     AP_Vector3f         _trim;
 
     // cached trim rotations

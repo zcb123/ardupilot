@@ -469,6 +469,10 @@ void NavEKF3_core::readIMUData()
      * than twice the target time has lapsed. Adjust the target EKF step time threshold to allow for timing jitter in the
      * IMU data.
      */
+    /*
+    如果目标 EKF 时间步长已经累积，并且前端允许开始新的预测周期，则存储累积的 IMU 数据以供状态预测使用，如果超过目标时间的两倍以上，则忽略前端权限。 
+    调整目标 EKF 步长时间阈值以允许 IMU 数据中的时序抖动。
+    */
     if ((imuDataDownSampledNew.delAngDT >= (EKF_TARGET_DT-(dtIMUavg*0.5f)) && startPredictEnabled) ||
         (imuDataDownSampledNew.delAngDT >= 2.0f*EKF_TARGET_DT)) {
 
@@ -520,6 +524,7 @@ void NavEKF3_core::readIMUData()
 
     } else {
         // we don't have new IMU data in the buffer so don't run filter updates on this time step
+        // 在缓冲区中没有新的IMU数据，所以当前时间步上不运行滤波器更新
         runUpdates = false;
     }
 }

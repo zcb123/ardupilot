@@ -36,7 +36,8 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
                         ftype TAS)
 {
 
-    // copy to class variables
+    // copy to class variables  
+    // 拷贝到类变量
     delta_angle = delAng;
     delta_velocity = delVel;
     angle_dt = delAngDT;
@@ -46,11 +47,14 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
 
     // Calculate a low pass filtered acceleration vector that will be used to keep the AHRS tilt aligned
     // The time constant of the filter is a fixed ratio relative to the time constant of the AHRS tilt correction loop
+    // 计算将用于保持 AHRS 倾斜对齐的低通滤波加速度矢量
+    // 滤波器的时间常数是相对于 AHRS 倾斜校正回路的时间常数的固定比率
     const ftype filter_coef = fminF(EKFGSF_accelFiltRatio * delVelDT * EKFGSF_tiltGain, 1.0f);
     const Vector3F accel = delVel / fmaxF(delVelDT, 0.001f);
     ahrs_accel = ahrs_accel * (1.0f - filter_coef) + accel * filter_coef;
 
     // Iniitialise states and only when acceleration is close to 1g to prevent vehicle movement casuing a large initial tilt error
+    // 初始化状态，并且仅在加速度接近 1g 时进行，以防止车辆移动导致较大的初始倾斜误差
     if (!ahrs_tilt_aligned) {
         const ftype accel_norm_sq = accel.length_squared();
         const ftype upper_accel_limit = GRAVITY_MSS * 1.1f;
@@ -66,16 +70,21 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
     }
 
     // Calculate common variables used by the AHRS prediction models
+    // 计算 AHRS 预测模型使用的公共变量
     ahrs_accel_norm = ahrs_accel.length();
 
-    // Calculate AHRS acceleration fusion gain using a quadratic weighting function that is unity at 1g
+    // Calculate AHRS acceleration fusion gain using a quadratic(二次方) weighting function that is unity at 1g
     // and zero at the min and max g limits. This reduces the effect of large g transients on the attitude
     // esitmates.
+    // 使用二次加权函数计算 AHRS 加速融合增益，该函数在 1g 处为单位，在最小和最大 g 限制处为零。 
+    // 这减少了大 g 瞬变对姿态估计的影响。
     ftype EKFGSF_ahrs_ng = ahrs_accel_norm / GRAVITY_MSS;
     if (EKFGSF_ahrs_ng > 1.0f) {
         if (is_positive(true_airspeed)) {
             // When flying in fixed wing mode we need to allow for more positive g due to coordinated turns
             // Gain varies from unity at 1g to zero at 2g
+            // 当以固定翼模式飞行时，由于协调转弯，允许更大的正g
+            // 增益从0变化到2g
             accel_gain = EKFGSF_tiltGain * sq(2.0f - EKFGSF_ahrs_ng);
         } else if (accel_gain <= 1.5f) {
             // Gain varies from unity at 1g to zero at 1.5g
@@ -86,6 +95,7 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
         }
     } else if (accel_gain > 0.5f) {
         // Gain varies from zero at 0.5g to unity at 1g
+        // 增益从0.5g到一个单位的g
         accel_gain = EKFGSF_tiltGain * sq(2.0f * EKFGSF_ahrs_ng - 1.0f);
     } else {
         // Gain is zero below min g
@@ -93,6 +103,7 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
     }
 
     // Always run the AHRS prediction cycle for each model
+    // 总是为每个模型运行AHRS预测循环
     for (uint8_t mdl_idx = 0; mdl_idx < N_MODELS_EKFGSF; mdl_idx ++) {
         predict(mdl_idx);
     }
@@ -104,6 +115,8 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
     // Calculate a composite yaw as a weighted average of the states for each model.
     // To avoid issues with angle wrapping, the yaw state is converted to a vector with legnth
     // equal to the weighting value before it is summed.
+    // 计算复合偏航作为每个模型状态的加权平均值
+    // 为了避免角度环绕问题，偏航状态在求和之前被转换为长度等于权重值的向量。
     Vector2F yaw_vector = {};
     for (uint8_t mdl_idx = 0; mdl_idx < N_MODELS_EKFGSF; mdl_idx ++) {
         yaw_vector[0] += GSF.weights[mdl_idx] * cosF(EKF[mdl_idx].X[2]);
@@ -117,7 +130,7 @@ void EKFGSF_yaw::update(const Vector3F &delAng,
     for (uint8_t mdl_idx = 0; mdl_idx < N_MODELS_EKFGSF; mdl_idx ++) {
         ftype delta[3];
         for (uint8_t row = 0; row < 3; row++) {
-            delta[row] = EKF[mdl_idx].X[row] - GSF.X[row];
+            delta[row] = EKF[mdl_idx].X[row] - GSF.X[row];imuDataDelayed
         }
         for (uint8_t row = 0; row < 3; row++) {
             for (uint8_t col = 0; col < 3; col++) {
@@ -308,6 +321,7 @@ void EKFGSF_yaw::alignYaw()
 }
 
 // predict states and covariance for specified model index
+// 为指定索引模型预测状态和协方差
 void EKFGSF_yaw::predict(const uint8_t mdl_idx)
 {
     // generate an attitude reference using IMU data
@@ -319,8 +333,10 @@ void EKFGSF_yaw::predict(const uint8_t mdl_idx)
     }
 
     // Calculate the yaw state using a projection onto the horizontal that avoids gimbal lock
+    // 使用投影到水平面上来计算偏航状态，以避免万向节锁定
     if (fabsF(AHRS[mdl_idx].R[2][0]) < fabsF(AHRS[mdl_idx].R[2][1])) {
         // use 321 Tait-Bryan rotation to define yaw state
+        // 使用 321 Tait-Bryan 旋转来定义偏航状态
         EKF[mdl_idx].X[2] = atan2F(AHRS[mdl_idx].R[1][0], AHRS[mdl_idx].R[0][0]);
     } else {
         // use 312 Tait-Bryan rotation to define yaw state
@@ -328,11 +344,13 @@ void EKFGSF_yaw::predict(const uint8_t mdl_idx)
     }
 
     // calculate delta velocity in a horizontal front-right frame
+    // 在水平面前右系下计算速度增量
     const Vector3F del_vel_NED = AHRS[mdl_idx].R * delta_velocity;
     const ftype dvx =   del_vel_NED[0] * cosF(EKF[mdl_idx].X[2]) + del_vel_NED[1] * sinF(EKF[mdl_idx].X[2]);
     const ftype dvy = - del_vel_NED[0] * sinF(EKF[mdl_idx].X[2]) + del_vel_NED[1] * cosF(EKF[mdl_idx].X[2]);
 
     // sum delta velocities in earth frame:
+    // 在地理系下求速度增量之和(求地理系下北东速度)
     EKF[mdl_idx].X[0] += del_vel_NED[0];
     EKF[mdl_idx].X[1] += del_vel_NED[1];
 
@@ -340,6 +358,9 @@ void EKFGSF_yaw::predict(const uint8_t mdl_idx)
 
     // Local short variable name copies required for readability
     // Compiler might be smart enough to optimise these out
+    // 为了可读性，复制到本地短的变量名
+    // 编译器可能会把这里优化掉
+    // 上一时刻协方差矩阵
     const ftype P00 = EKF[mdl_idx].P[0][0];
     const ftype P01 = EKF[mdl_idx].P[0][1];
     const ftype P02 = EKF[mdl_idx].P[0][2];
@@ -351,9 +372,10 @@ void EKFGSF_yaw::predict(const uint8_t mdl_idx)
     const ftype P22 = EKF[mdl_idx].P[2][2];
 
     // Use fixed values for delta velocity and delta angle process noise variances
-    const ftype dvxVar = sq(EKFGSF_accelNoise * velocity_dt); // variance of forward delta velocity - (m/s)^2
-    const ftype dvyVar = dvxVar; // variance of right delta velocity - (m/s)^2
-    const ftype dazVar = sq(EKFGSF_gyroNoise * angle_dt); // variance of yaw delta angle - rad^2
+    // 对增量速度和增量角度过程噪声方差使用固定值
+    const ftype dvxVar = sq(EKFGSF_accelNoise * velocity_dt); // variance of forward delta velocity - (m/s)^2   前向速度增量方差(m/s)^2
+    const ftype dvyVar = dvxVar; // variance of right delta velocity - (m/s)^2  右向速度增量的方差(m/s)^2
+    const ftype dazVar = sq(EKFGSF_gyroNoise * angle_dt); // variance of yaw delta angle - rad^2    偏航角增量的方差 rad^2
 
     const ftype t2 = sinF(EKF[mdl_idx].X[2]);
     const ftype t3 = cosF(EKF[mdl_idx].X[2]);
@@ -371,7 +393,8 @@ void EKFGSF_yaw::predict(const uint8_t mdl_idx)
     const ftype t15 = P22*t10;
     const ftype t16 = P12+t15;
 
-    const ftype min_var = 1e-6f;
+    // Pk = A*Pk_*A' + Q
+    const ftype min_var = 1e-6f;    //最小方差
     EKF[mdl_idx].P[0][0] = fmaxF(P00-P20*t6+dvxVar*t14+dvyVar*t13-t6*t7, min_var);
     EKF[mdl_idx].P[0][1] = P01+t12-P21*t6+t7*t10-dvyVar*t2*t3;
     EKF[mdl_idx].P[0][2] = t7;
@@ -382,7 +405,7 @@ void EKFGSF_yaw::predict(const uint8_t mdl_idx)
     EKF[mdl_idx].P[2][1] = P21+t15;
     EKF[mdl_idx].P[2][2] = fmaxF(P22+dazVar, min_var);
 
-    // force symmetry
+    // force symmetry   强制对称
     forceSymmetry(mdl_idx);
 }
 

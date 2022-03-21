@@ -600,6 +600,7 @@ void Copter::init_simple_bearing()
 }
 
 // update_simple_mode - rotates pilot input if we are in simple mode
+// 更新简单模式 - 如果在简单模式，旋转驾驶员输入
 void Copter::update_simple_mode(void)
 {
     float rollx, pitchx;
@@ -656,6 +657,7 @@ void Copter::update_super_simple_bearing(bool force_update)
 void Copter::read_AHRS(void)
 {
     // we tell AHRS to skip INS update as we have already done it in fast_loop()
+    // 告诉AHRS跳过INS更新，因为我们已经在fast_loop()中做完了
     ahrs.update(true);
 }
 

@@ -23,6 +23,7 @@ NavEKF_core_common::Vector28 NavEKF_core_common::Kfusion;
 
 /*
   fill common scratch variables, for detecting re-use of variables between loops in SITL
+  填充常见的临时变量，用于检测 SITL 中循环之间的变量重用
  */
 void NavEKF_core_common::fill_scratch_variables(void)
 {

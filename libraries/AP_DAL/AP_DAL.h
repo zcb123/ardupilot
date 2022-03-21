@@ -96,6 +96,7 @@ public:
     bool ekf_low_time_remaining(EKFType etype, uint8_t core);
     
     // returns armed state for the current frame
+    // 返回当前机架的解锁状态
     bool get_armed() const { return _RFRN.armed; }
 
     // memory available at start of current frame.  While this could
@@ -144,6 +145,8 @@ public:
     // this method *always* returns you the compass.  This is in
     // constrast to get_compass, which only returns the compass once
     // the vehicle deigns to permit its use by the EKF.
+    // 这个方法*总是*返回罗盘。
+    // 这与 get_compass 形成对比，后者仅在飞行棋设计允许 EKF 使用时才返回罗盘。
     AP_DAL_Compass &compass() { return _compass; }
 
     // this call replaces AP::ahrs()->get_compass(), whose return

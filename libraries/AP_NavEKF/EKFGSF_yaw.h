@@ -16,15 +16,23 @@ public:
     EKFGSF_yaw();
 
     // Update Filter States - this should be called whenever new IMU data is available
-    void update(const Vector3F &delAng,// IMU delta angle rotation vector meassured in body frame (rad)
-                const Vector3F &delVel,// IMU delta velocity vector meassured in body frame (m/s)
-                const ftype delAngDT, // time interval that delAng was integrated over (sec) - must be no less than IMU_DT_MIN_SEC
+    void update(const Vector3F &delAng,// IMU delta angle rotation vector meassured in body frame (rad) 
+                const Vector3F &delVel,// IMU delta velocity vector meassured in body frame (m/s)   
+                const ftype delAngDT, // time interval that delAng was integrated over (sec) - must be no less than IMU_DT_MIN_SEC 
                 const ftype delVelDT, // time interval that delVel was integrated over (sec) - must be no less than IMU_DT_MIN_SEC
                 bool runEKF,          // set to true when flying or movement suitable for yaw estimation
                 ftype TAS);           // true airspeed used for centripetal accel compensation - set to 0 when not required.
 
+                                      // IMU角度旋转向量，测量于机体坐标系(rad)
+                                      // IMU速度测量向量，测量于机体坐标系(m/s)
+                                      // delAng 积分的时间间隔（秒） - 必须不小于 IMU_DT_MIN_SEC(0.001)
+                                      // delVel 积分的时间间隔（秒） - 必须不小于 IMU_DT_MIN_SEC(0.001)
+                                      // 当飞行或运动适合偏航估计时设置为真
+                                      // 用于向心加速度补偿的真实空速 - 不需要时设置为 0
+
     // Fuse NE velocty mesurements and update the EKF's and GSF state and covariance estimates
     // Should be called after update(...) whenever new velocity data is available
+    // 融合 NE 速度测量并更新 ELVE 和 GSF 状态和协方差估计。
     void fuseVelData(const Vector2F &vel,    // NE velocity measurement (m/s)
                      const ftype velAcc);   // 1-sigma accuracy of velocity measurement (m/s)
 
@@ -33,6 +41,8 @@ public:
 
     // get yaw estimated and corresponding variance
     // return false if yaw estimation is inactive
+    // 获得偏航角估计与相关方差
+    // 如果偏航角估计未激活则返回false
     bool getYawData(ftype &yaw, ftype &yawVariance) const;
 
     // get the length of the weighted average velocity innovation vector
@@ -66,13 +76,14 @@ private:
     // Declarations used by the bank of AHRS complementary filters that use IMU data augmented by true
     // airspeed data when in fixed wing mode to estimate the quaternions that are used to rotate IMU data into a
     // Front, Right, Yaw frame of reference.
+    // AHRS 互补滤波器组使用的声明，在固定翼模式下使用由真实空速数据增强的 IMU 数据来估计用于将 IMU 数据旋转到前、右、偏航参考系的四元数。
     Vector3F delta_angle;
     Vector3F delta_velocity;
     ftype angle_dt;
     ftype velocity_dt;
     struct ahrs_struct {
-        Matrix3F R;             // matrix that rotates a vector from body to earth frame
-        Vector3F gyro_bias;     // gyro bias learned and used by the quaternion calculation
+        Matrix3F R;             // matrix that rotates a vector from body to earth frame    //从机体系到地理系的旋转矩阵
+        Vector3F gyro_bias;     // gyro bias learned and used by the quaternion calculation //陀螺仪偏移用于四元数计算
         bool aligned;           // true when AHRS has been aligned
         ftype accel_FR[2];      // front-right acceleration vector in a horizontal plane (m/s/s)
         ftype vel_NE[2];        // NE velocity vector from last GPS measurement (m/s)
@@ -101,7 +112,7 @@ private:
     // The Following declarations are used by bank of EKF's that estimate yaw angle starting from a different yaw hypothesis for each filter.
 
     struct EKF_struct {
-        ftype X[3];     // Vel North (m/s),  Vel East (m/s), yaw (rad)
+        ftype X[3];     // Vel North (m/s),  Vel East (m/s), yaw (rad)  
         ftype P[3][3];  // covariance matrix
         ftype S[2][2];  // N,E velocity innovation variance (m/s)^2
         ftype innov[2]; // Velocity N,E innovation (m/s)
@@ -129,7 +140,7 @@ private:
     struct GSF_struct {
         ftype yaw;                      // yaw (rad)
         ftype yaw_variance;             // Yaw state variance (rad^2)
-        ftype weights[N_MODELS_EKFGSF]; // Weighting applied to each EKF model. Sum of weights is unity.
+        ftype weights[N_MODELS_EKFGSF]; // Weighting applied to each EKF model. Sum of weights is unity.    用于每个EKF模型的权重。权重之和为单位1。
     };
     GSF_struct GSF;
 

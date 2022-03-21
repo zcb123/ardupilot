@@ -73,6 +73,7 @@ struct log_RFRN {
 };
 
 // Replay Data Structure - Inertial Sensor header
+// 回复数据结构体 - 内部传感器头
 struct log_RISH {
     uint16_t loop_rate_hz;
     uint8_t primary_gyro;

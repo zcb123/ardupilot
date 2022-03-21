@@ -10,6 +10,7 @@
  */
 
 // return horizontal distance in centimeters between two positions
+// 返回两个位置的水平距离(cm)
 float        get_horizontal_distance_cm(const Vector3f &origin, const Vector3f &destination);
 
 // return bearing in centi-degrees between two positions

@@ -354,9 +354,11 @@ void AC_AttitudeControl_Multi::rate_controller_run()
 }
 
 // sanity check parameters.  should be called once before takeoff
+// 参数一致性检查 - 起飞前应当执行一次
 void AC_AttitudeControl_Multi::parameter_sanity_check()
 {
     // sanity check throttle mix parameters
+    // 油门混合参数一致性检查
     if (_thr_mix_man < 0.1f || _thr_mix_man > 4.0f) {
         // parameter description recommends thr-mix-man be no higher than 0.9 but we allow up to 4.0
         // which can be useful for very high powered copters with very low hover throttle

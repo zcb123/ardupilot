@@ -217,6 +217,7 @@ bool AP_NavEKF_Source::haveVelZSource() const
 AP_NavEKF_Source::SourceYaw AP_NavEKF_Source::getYawSource() const
 {
     // check for special case of disabled compasses
+    // 检查禁用指南针的特殊情况
     if ((_source_set[active_source_set].yaw == SourceYaw::COMPASS) && (AP::dal().compass().get_num_enabled() == 0)) {
         return SourceYaw::NONE;
     }
