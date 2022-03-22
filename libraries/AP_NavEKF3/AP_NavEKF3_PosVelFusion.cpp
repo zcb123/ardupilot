@@ -688,7 +688,6 @@ void NavEKF3_core::FuseVelPosNED()
                 R_OBS[0] = sq(constrain_ftype(gpsSpdAccuracy, frontend->_gpsHorizVelNoise, 50.0f));
                 R_OBS[2] = sq(constrain_ftype(gpsSpdAccuracy, frontend->_gpsVertVelNoise, 50.0f));
 #if EK3_FEATURE_EXTERNAL_NAV
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "EK3_FEATURE_EXTERNAL_NAV true");
             } else if (extNavVelToFuse) {
                 R_OBS[2] = R_OBS[0] = sq(constrain_ftype(extNavVelDelayed.err, 0.05f, 5.0f));
 #endif
@@ -874,11 +873,16 @@ void NavEKF3_core::FuseVelPosNED()
             // from the measurement un-opposed if test threshold is exceeded.
             // 使用高度数据如果更新检查通过或者超时或者IMU数据不对
             // 如果 IMU 损坏，始终融合数据，以防止出现混叠和削波，如果超过测试阈值，则将状态估计从测量结果中拉开。
+            
             if (hgtCheckPassed || hgtTimeout || badIMUdata) {
                 // Calculate a filtered value to be used by pre-flight health checks
                 // We need to filter because wind gusts can generate significant baro noise and we want to be able to detect bias errors in the inertial solution
                 // 计算一个用于起飞前健康检查的滤波后的值
                 // 我们需要过滤，因为阵风会产生明显的气压噪声，并且我们希望能够检测惯性解中的偏差误差
+                if(!send_flag_fuse_hgt){
+                    gcs().send_text(MAV_SEVERITY_CRITICAL, "hgtCheck %d hgtTimeout %d badIMUdata %d!", hgtCheckPassed,hgtTimeout,badIMUdata);
+                    send_flag_fuse_hgt = true;
+                }
                 if (onGround) {
                     ftype dtBaro = (imuSampleTime_ms - lastHgtPassTime_ms) * 1.0e-3;
                     const ftype hgtInnovFiltTC = 2.0;

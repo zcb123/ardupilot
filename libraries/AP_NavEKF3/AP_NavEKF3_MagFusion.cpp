@@ -222,6 +222,13 @@ void NavEKF3_core::SelectMagFusion()
         yawAngDataStatic.time_ms = imuDataDelayed.time_ms;
     }
 
+    // if(!send_flag_mag_source){
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw source %u ",(uint8_t)yaw_source);
+
+    //AP::logger().Write("YS","TimeUs,YawS","QH",AP_HAL::micros64(),(uint16_t)yaw_source);
+
+    //     send_flag_mag_source = true;
+    // }
     // Handle case where we are not using a yaw sensor of any type and attempt to reset the yaw in
     // flight using the output from the GSF yaw estimator.
     // 处理不用任何类型的偏航角传感器而在飞行中使用GSF偏航角估计重置偏航角
@@ -230,7 +237,6 @@ void NavEKF3_core::SelectMagFusion()
          yaw_source != AP_NavEKF_Source::SourceYaw::GPS &&
          yaw_source != AP_NavEKF_Source::SourceYaw::GPS_COMPASS_FALLBACK &&
          yaw_source != AP_NavEKF_Source::SourceYaw::EXTNAV)) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw GSF !");
         // because this type of reset event is not as time critical, require a continuous history of valid estimates
         if ((!yawAlignComplete || yaw_source_reset) && EKFGSF_yaw_valid_count >= GSF_YAW_VALID_HISTORY_THRESHOLD) {
             const bool emergency_reset = (yaw_source != AP_NavEKF_Source::SourceYaw::GSF);
@@ -265,7 +271,6 @@ void NavEKF3_core::SelectMagFusion()
     // Handle case where we are using GPS yaw sensor instead of a magnetomer
     // 处理使用GPS偏航角传感器而不是磁力计的情况
     if (yaw_source == AP_NavEKF_Source::SourceYaw::GPS || yaw_source == AP_NavEKF_Source::SourceYaw::GPS_COMPASS_FALLBACK) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw GPS not COMPASS !");
         bool have_fused_gps_yaw = false;
         if (storedYawAng.recall(yawAngDataDelayed,imuDataDelayed.time_ms)) {
             if (tiltAlignComplete && (!yawAlignComplete || yaw_source_reset)) {
@@ -346,7 +351,7 @@ void NavEKF3_core::SelectMagFusion()
     // 处理使用外部偏航导航的情况
     const bool extNavYawDataToFuse = storedExtNavYawAng.recall(extNavYawAngDataDelayed, imuDataDelayed.time_ms);
     if (yaw_source == AP_NavEKF_Source::SourceYaw::EXTNAV) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw External Navigation !");
+        
         if (extNavYawDataToFuse) {
             if (tiltAlignComplete && (!yawAlignComplete || yaw_source_reset)) {
                 alignYawAngle(extNavYawAngDataDelayed);

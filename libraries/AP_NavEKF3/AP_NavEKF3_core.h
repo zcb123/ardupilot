@@ -435,6 +435,10 @@ public:
     // returns true when the state estimates are significantly degraded by vibration
     bool isVibrationAffected() const { return badIMUdata; }
 
+    
+    bool send_flag_fuse_hgt = false;
+    bool send_flag_mag_source = false;
+
 private:
     EKFGSF_yaw *yawEstimator;
     AP_DAL &dal;
@@ -1023,7 +1027,7 @@ private:
     bool manoeuvring;               // boolean true when the flight vehicle is performing horizontal changes in velocity
     Vector6 innovVelPos;            // innovation output for a group of measurements
     Vector6 varInnovVelPos;         // innovation variance output for a group of measurements
-    Vector6 velPosObs;              // observations for combined velocity and positon group of measurements (3x1 m , 3x1 m/s)
+    Vector6 velPosObs;              // observations for combined velocity and positon group of measurements (3x1 m , 3x1 m/s) 对组合速度和位置组测量的观测
     bool fuseVelData;               // this boolean causes the velNED measurements to be fused
     bool fusePosData;               // this boolean causes the posNE measurements to be fused
     bool fuseHgtData;               // this boolean causes the hgtMea measurements to be fused
@@ -1259,7 +1263,7 @@ private:
 #endif
 
     // GPS yaw sensor fusion
-    uint32_t yawMeasTime_ms;            // system time GPS yaw angle was last input to the data buffer
+    uint32_t yawMeasTime_ms;            // system time GPS yaw angle was last input to the data buffer  GPS航向角数据最后输入数据缓冲区的系统时间
     EKF_obs_buffer_t<yaw_elements> storedYawAng;    // GPS yaw angle buffer
     yaw_elements yawAngDataNew;         // GPS yaw angle at the current time horizon
     yaw_elements yawAngDataDelayed;     // GPS yaw angle at the fusion time horizon
@@ -1549,4 +1553,8 @@ private:
     void Log_Write_State_Variances(uint64_t time_us) const;
     void Log_Write_Timing(uint64_t time_us);
     void Log_Write_GSF(uint64_t time_us);
+
+
+   
+    
 };

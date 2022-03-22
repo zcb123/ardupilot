@@ -4,31 +4,33 @@
 #include "AP_NavEKF3_core.h"
 #include <AP_DAL/AP_DAL.h>
 
+bool send_flag_core_healthy = false;
 // Check basic filter health metrics and return a consolidated health status
 bool NavEKF3_core::healthy(void) const
 {
     uint16_t faultInt;
     getFilterFaults(faultInt);
     if (faultInt > 0) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "faultInt! %d", faultInt);
         return false;
     }
     if (velTestRatio > 1 && posTestRatio > 1 && hgtTestRatio > 1) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "velTestRatio %lf! posTestRatio %lf !  hgtTestRatio %lf ! ", velTestRatio,posTestRatio,hgtTestRatio);
         // all three metrics being above 1 means the filter is
         // extremely unhealthy.
         return false;
     }
-    // Give the filter a second to settle before use
+    // Give the filter a second to settle before use    延迟1s报健康
     if ((imuSampleTime_ms - ekfStartTime_ms) < 1000 ) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "imuSampleTime_ms %lu - ekfStartTime_ms %lu", imuSampleTime_ms,ekfStartTime_ms);
         return false;
     }
     // position and height innovations must be within limits when on-ground and in a static mode of operation
     float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
     if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsF(hgtInnovFiltState) > 1.0f))) {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "onGround %d PV_AidingMode %d horizErrSq %lf hgtInnovFiltState %lf", onGround,PV_AidingMode,horizErrSq,hgtInnovFiltState);
         return false;
+    }
+
+    if(!send_flag_core_healthy){
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "fInt %d velR %lf! posR %lf !  hgtR %lf oG %d AMode %d hESq %lf hgtInSta %lf", faultInt,velTestRatio,posTestRatio,hgtTestRatio,onGround,PV_AidingMode,horizErrSq,hgtInnovFiltState);
+        send_flag_core_healthy = true;
     }
 
     // all OK
@@ -37,17 +39,23 @@ bool NavEKF3_core::healthy(void) const
 
 // Return a consolidated error score where higher numbers represent larger errors
 // Intended to be used by the front-end to determine which is the primary EKF
+// 返回综合错误分数，其中数字越大表示错误越大。
+// 由前端确定哪个是主 EKF。
 float NavEKF3_core::errorScore() const
 {
     float score = 0.0f;
     if (tiltAlignComplete && yawAlignComplete) {
         // Check GPS fusion performance
+        // 检查GPS融合性能
         score = MAX(score, 0.5f * (velTestRatio + posTestRatio));
         // Check altimeter fusion performance
+        // 检查高度融合性能
         score = MAX(score, hgtTestRatio);
         // Check airspeed fusion performance - only when we are using at least 2 airspeed sensors so we can switch lanes with 
         // a better one. This only comes into effect for a forward flight vehicle. A sensitivity factor of 0.3 is added to keep the
         // EKF less sensitive to innovations arising due events like strong gusts of wind, thus, prevent reporting high error scores
+        // 检查空速融合性能 - 仅当我们使用至少 2 个空速传感器时，我们才能使用更好的传感器切换通道。 这仅对向前飞行的飞行器生效。 
+        // 添加了 0.3 的灵敏度因子，以使 EKF 对因强风等事件引起的更新不太敏感，从而防止报告高错误分数。
         if (assume_zero_sideslip()) {
             const auto *arsp = dal.airspeed();
             if (arsp != nullptr && arsp->get_num_sensors() >= 2 && (frontend->_affinity & EKF_AFFINITY_ARSP)) {
@@ -56,6 +64,7 @@ float NavEKF3_core::errorScore() const
         }
         // Check magnetometer fusion performance - need this when magnetometer affinity is enabled to override the inherent compass
         // switching mechanism, and instead be able to move to a better lane
+        // 检查磁力计融合性能 -  
         if (frontend->_affinity & EKF_AFFINITY_MAG) {
             score = MAX(score, 0.3f * (magTestRatio.x + magTestRatio.y + magTestRatio.z));
         }

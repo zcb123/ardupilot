@@ -736,7 +736,7 @@ bool NavEKF3::InitialiseFilter(void)
 
     // remember expected frame time
     const float loop_rate = ins.get_loop_rate_hz();
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "looprate %f", loop_rate);
+    //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "looprate %f", loop_rate);
     if (!is_positive(loop_rate)) {
         return false;
     }
@@ -922,9 +922,11 @@ void NavEKF3::UpdateFilter(void)
     // 只有在飞行器解锁状态下才内核切换，如果它正常则强制进入0通道
     if (runCoreSelection && armed) {
         // update this instance's error scores for all active cores and get the primary core's error score
+        // 更新此实例的所有活动核心的错误分数并获取主核心的错误分数
         float primaryErrorScore = updateCoreErrorScores();
 
         // update the accumulated relative error scores for all active cores
+        // 更新所有活动核心的累积相对错误分数
         updateCoreRelativeErrors();
 
         bool betterCore = false;
@@ -940,6 +942,10 @@ void NavEKF3::UpdateFilter(void)
                 // 1. healthy and states have been updated on this time step
                 // 2. has relative error less than primary core error
                 // 3. not been the primary core for at least 10 seconds
+                // 可根据 2 个条件选择替代核心
+                // 1.运行正常且状态在当前时间步更新了
+                // 2.相对误差小于主核心
+                // 3.至少不是主核心10s
                 altCoreAvailable = coreBetterScore(coreIndex, newPrimaryIndex) &&
                     imuSampleTime_us - coreLastTimePrimary_us[coreIndex] > 1E7;
 

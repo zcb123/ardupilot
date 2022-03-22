@@ -1795,6 +1795,7 @@ void AP_InertialSensor::calc_vibration_and_clipping(uint8_t instance, const Vect
         Vector3f accel_filt = _accel_vibe_floor_filter[instance].apply(accel, dt);
 
         // calc difference from this sample and 5hz filtered value, square and filter at 2hz
+        // 计算此样本和 5hz 滤波值的差异，平方并以 2hz 滤波
         Vector3f accel_diff = (accel - accel_filt);
         accel_diff.x *= accel_diff.x;
         accel_diff.y *= accel_diff.y;
@@ -1821,6 +1822,7 @@ void AP_InertialSensor::set_accel_peak_hold(uint8_t instance, const Vector3f &ac
 }
 
 // retrieve latest calculated vibration levels
+// 
 Vector3f AP_InertialSensor::get_vibration_levels(uint8_t instance) const
 {
     Vector3f vibe;

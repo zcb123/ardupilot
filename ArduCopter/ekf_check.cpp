@@ -20,8 +20,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 static struct {
     uint8_t fail_count;         // number of iterations ekf or dcm have been out of tolerances
-    uint8_t bad_variance : 1;   // true if ekf should be considered untrusted (fail_count has exceeded EKF_CHECK_ITERATIONS_MAX)
-    bool has_ever_passed;       // true if the ekf checks have ever passed
+    uint8_t bad_variance : 1;   // true if ekf should be considered untrusted (fail_count has exceeded EKF_CHECK_ITERATIONS_MAX) 如果 ekf 应被视为不受信任，则为 true
+    bool has_ever_passed;       // true if the ekf checks have ever passed  如果 ekf 检查已通过，则为 true
     uint32_t last_warn_time;    // system time of last warning in milliseconds.  Used to throttle text warnings sent to GCS
 } ekf_check_state;
 
@@ -60,8 +60,10 @@ void Copter::ekf_check()
     }
 
     // increment or decrement counters and take action
+    // 递增或递减计数器并采取行动
     if (!checks_passed) {
         // if compass is not yet flagged as bad
+        // 如果指南针尚未标记为坏
         if (!ekf_check_state.bad_variance) {
             // increase counter
             ekf_check_state.fail_count++;

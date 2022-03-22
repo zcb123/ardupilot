@@ -715,8 +715,9 @@ void NavEKF3_core::readGpsYawData()
     const auto &gps = dal.gps();
 
     // if the GPS has yaw data then fuse it as an Euler yaw angle
+    // 如果GPS有偏航角数据则作为欧拉偏航角融合它
     float yaw_deg, yaw_accuracy_deg;
-    uint32_t yaw_time_ms;
+    uint32_t yaw_time_ms;   //获取yaw角数据的时间
     if (gps.status(selected_gps) >= AP_DAL_GPS::GPS_OK_FIX_3D &&
         dal.gps().gps_yaw_deg(selected_gps, yaw_deg, yaw_accuracy_deg, yaw_time_ms) &&
         yaw_time_ms != yawMeasTime_ms) {
@@ -724,6 +725,7 @@ void NavEKF3_core::readGpsYawData()
         // accuracy. Set to min of 5 degrees here to prevent
         // the user constantly receiving warnings about high
         // normalised yaw innovations
+        // GPS 模块对其准确性过于乐观。 此处设置为 5 度的最小值，以防止用户不断收到有关高标准化偏航更新的警告
         const ftype min_yaw_accuracy_deg = 5.0f;
         yaw_accuracy_deg = MAX(yaw_accuracy_deg, min_yaw_accuracy_deg);
         writeEulerYawAngle(radians(yaw_deg), radians(yaw_accuracy_deg), yaw_time_ms, 2);
@@ -997,8 +999,8 @@ void NavEKF3_core::readRngBcnData()
 
 void NavEKF3_core::writeEulerYawAngle(float yawAngle, float yawAngleErr, uint32_t timeStamp_ms, uint8_t type)
 {
-    // limit update rate to maximum allowed by sensor buffers and fusion process
-    // don't try to write to buffer until the filter has been initialised
+    // limit update rate to maximum allowed by sensor buffers and fusion process 将更新速率限制为传感器缓冲区和融合过程允许的最大值
+    // don't try to write to buffer until the filter has been initialised 在滤波器初始化之前不要尝试写缓冲区
     if (((timeStamp_ms - yawMeasTime_ms) < frontend->sensorIntervalMin_ms) || !statesInitialised) {
         return;
     }
