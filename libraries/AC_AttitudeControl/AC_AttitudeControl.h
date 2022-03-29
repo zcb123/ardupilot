@@ -17,7 +17,7 @@
 #define AC_ATTITUDE_ACCEL_RP_CONTROLLER_MIN_RADSS       radians(40.0f)   // minimum body-frame acceleration limit for the stability controller (for roll and pitch axis)
 #define AC_ATTITUDE_ACCEL_RP_CONTROLLER_MAX_RADSS       radians(720.0f)  // maximum body-frame acceleration limit for the stability controller (for roll and pitch axis)
 #define AC_ATTITUDE_ACCEL_Y_CONTROLLER_MIN_RADSS        radians(10.0f)   // minimum body-frame acceleration limit for the stability controller (for yaw axis)
-#define AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS        radians(120.0f)  // maximum body-frame acceleration limit for the stability controller (for yaw axis)
+#define AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS        radians(120.0f)  // maximum body-frame acceleration limit for the stability controller (for yaw axis)自稳控制器用机体坐标系下最大偏航加速度
 #define AC_ATTITUDE_CONTROL_SLEW_YAW_DEFAULT_CDS        6000      // constraint on yaw angle error in degrees.  This should lead to maximum turn rate of 10deg/sec * Stab Rate P so by default will be 45deg/sec.
 #define AC_ATTITUDE_CONTROL_ACCEL_RP_MAX_DEFAULT_CDSS   110000.0f // default maximum acceleration for roll/pitch axis in centidegrees/sec/sec
 #define AC_ATTITUDE_CONTROL_ACCEL_Y_MAX_DEFAULT_CDSS    27000.0f  // default maximum acceleration for yaw axis in centidegrees/sec/sec
@@ -409,6 +409,7 @@ protected:
     AP_Float            _angle_limit_tc;
 
     // rate controller input smoothing time constant
+    // 速率控制器输入平滑时间常数
     AP_Float            _input_tc;
 
     // Intersampling period in seconds
@@ -416,14 +417,14 @@ protected:
 
     // This represents a 321-intrinsic rotation in NED frame to the target (setpoint)
     // attitude used in the attitude controller, in radians.
-    // 这个代表了北东地坐标系中，目标(设定点)姿态的321(yaw-pitch-roll)固定旋转
+    // 这个代表了从北东地坐标系向目标(设定点)姿态的321(yaw-pitch-roll)固定旋转
     // 这个姿态在姿态控制器中使用，以弧度为单位
     Vector3f            _euler_angle_target;
 
     // This represents the angular velocity of the target (setpoint) attitude used in
     // the attitude controller as 321-intrinsic euler angle derivatives, in radians per
     // second.
-    // 
+    // 目标(设定值)姿态的角速度。作为321欧拉角微分用于姿态控制。rad/s
     Vector3f            _euler_rate_target;
 
     // This represents a quaternion rotation in NED frame to the target (setpoint)
@@ -456,12 +457,15 @@ protected:
     Vector3f            _actuator_sysid;
 
     // This represents a quaternion attitude error in the body frame, used for inertial frame reset handling.
+    // 代表机体系四元数姿态误差，用于惯性系重置处理
     Quaternion          _attitude_ang_error;
 
     // The angle between the target thrust vector and the current thrust vector.
+    // 目标推力向量与当前推力向量之间的角度
     float               _thrust_angle;
 
-    // The angle between the target thrust vector and the current thrust vector.
+    // The angle error between the target thrust vector and the current thrust vector.
+    // 目标推力向量与当前推力向量之间的角度误差
     float               _thrust_error_angle;
 
     // throttle provided as input to attitude controller.  This does not include angle boost.

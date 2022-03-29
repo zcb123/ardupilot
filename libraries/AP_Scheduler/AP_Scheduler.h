@@ -123,6 +123,7 @@ public:
     float load_average();
 
     // get the active main loop rate
+    // 获取激活的主循环速率
     uint16_t get_loop_rate_hz(void) {
         if (_active_loop_rate_hz == 0) {
             _active_loop_rate_hz = _loop_rate_hz;

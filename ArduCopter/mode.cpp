@@ -774,6 +774,8 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
 
 // transform pilot's yaw input into a desired yaw rate
 // returns desired yaw rate in centi-degrees per second
+// 将驾驶员偏航角输入转换到期望偏航角速率
+// 返回期望角速率以厘度每秒
 float Mode::get_pilot_desired_yaw_rate(int16_t stick_angle)
 {
     // throttle failsafe check

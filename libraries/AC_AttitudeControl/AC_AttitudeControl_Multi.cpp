@@ -285,6 +285,8 @@ void AC_AttitudeControl_Multi::set_throttle_mix_max(float ratio)
 
 // returns a throttle including compensation for roll/pitch angle
 // throttle value should be 0 ~ 1
+// 返回包括横滚/俯仰角的油门补偿
+// 油门值应当在0~1之间
 float AC_AttitudeControl_Multi::get_throttle_boosted(float throttle_in)
 {
     if (!_angle_boost_enabled) {
@@ -331,7 +333,7 @@ void AC_AttitudeControl_Multi::rate_controller_run()
     // move throttle vs attitude mixing towards desired (called from here because this is conveniently called on every iteration)
     update_throttle_rpy_mix();
 
-    _ang_vel_body += _sysid_ang_vel_body;
+    _ang_vel_body += _sysid_ang_vel_body;   //_ang_vel_body在父类中更新，子类中应用
 
     Vector3f gyro_latest = _ahrs.get_gyro_latest();
 

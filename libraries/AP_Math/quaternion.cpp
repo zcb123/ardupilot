@@ -47,6 +47,7 @@ void QuaternionT<T>::rotation_matrix(Matrix3d &m) const
 }
 
 // return the rotation matrix equivalent for this quaternion
+// 返回此四元数的等效旋转矩阵
 template <typename T>
 void QuaternionT<T>::rotation_matrix(Matrix3f &m) const
 {
@@ -92,7 +93,9 @@ void QuaternionT<T>::from_rotation_matrix(const Matrix3<T> &m)
     T &qz = q4;
 
     const T tr = m00 + m11 + m22;
-
+    /*
+        四种转换方法都用是为了计算最大对角项，以获得最小的误差。有些芯片小数点后几位直接丢掉了
+    */
     if (tr > 0) {
         const T S = sqrtF(tr+1) * 2;
         qw = 0.25f * S;
@@ -473,6 +476,8 @@ void QuaternionT<T>::rotate(const Vector3<T> &v)
 
 // convert this quaternion to a rotation vector where the direction of the vector represents
 // the axis of rotation and the length of the vector represents the angle of rotation
+// 将四元数转化成能代表这个旋转方向的向量
+// 旋转轴和向量长度表示旋转角度
 template <typename T>
 void QuaternionT<T>::to_axis_angle(Vector3<T> &v) const
 {
@@ -660,7 +665,7 @@ Vector3<T> QuaternionT<T>::operator*(const Vector3<T> &v) const
 {
     // This uses the formula
     //
-    //    v2 = v1 + 2 q1 * qv x v1 + 2 qv x qv x v1
+    //    v2 = v1 + 2 q1 * qv x v1 + 2 qv x (qv x v1)   modefied by zcb 2022.03.25 13:49
     //
     // where "x" is the cross product (explicitly inlined for performance below), 
     // "q1" is the scalar part and "qv" is the vector part of this quaternion
@@ -669,7 +674,7 @@ Vector3<T> QuaternionT<T>::operator*(const Vector3<T> &v) const
 
     // Compute and cache "qv x v1"
     T uv[] = {q3 * v.z - q4 * v.y, q4 * v.x - q2 * v.z, q2 * v.y - q3 * v.x};
-
+    //2uv[]
     uv[0] += uv[0];
     uv[1] += uv[1];
     uv[2] += uv[2];

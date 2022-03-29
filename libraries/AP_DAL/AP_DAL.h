@@ -96,7 +96,7 @@ public:
     bool ekf_low_time_remaining(EKFType etype, uint8_t core);
     
     // returns armed state for the current frame
-    // 返回当前机架的解锁状态
+    // 返回当前机架的解锁状态 false未解锁 true解锁
     bool get_armed() const { return _RFRN.armed; }
 
     // memory available at start of current frame.  While this could

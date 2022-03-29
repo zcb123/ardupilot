@@ -265,6 +265,8 @@ void NavEKF3_core::setAidingMode()
             // and IMU gyro bias estimates have stabilised
             // If GPS usage has been prohiited then we use flow aiding provided optical flow data is present
             // GPS aiding is the preferred option unless excluded by the user
+            // 不允许滤波器开始位置和速度辅助，除非倾斜和航向角对齐完成并且陀螺仪偏移误差已校正
+            // GPS为首选除非用户不用
             if (readyToUseGPS() || readyToUseRangeBeacon() || readyToUseExtNav()) {
                 PV_AidingMode = AID_ABSOLUTE;
             } else if (readyToUseOptFlow() || readyToUseBodyOdm()) {
@@ -673,6 +675,7 @@ void NavEKF3_core::checkGyroCalStatus(void)
 void  NavEKF3_core::updateFilterStatus(void)
 {
     // init return value
+    /* 前一个如果为false，后面一个不用判断，结果为false */
     filterStatus.value = 0;
     bool doingBodyVelNav = (PV_AidingMode != AID_NONE) && (imuSampleTime_ms - prevBodyVelFuseTime_ms < 5000);
     bool doingFlowNav = (PV_AidingMode != AID_NONE) && flowDataValid;
@@ -717,7 +720,6 @@ void NavEKF3_core::runYawEstimatorPrediction()
     // 确保GPS用于水平位置和速度
     if (frontend->sources.getPosXYSource() != AP_NavEKF_Source::SourceXY::GPS ||
         !frontend->sources.useVelXYSource(AP_NavEKF_Source::SourceXY::GPS)) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "using gps for horizontal position and velocity");
         return;
     }
 

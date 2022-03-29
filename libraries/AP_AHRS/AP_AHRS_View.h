@@ -53,6 +53,7 @@ public:
     }
 
     // return a Quaternion representing our current attitude in this view
+    // 返回代表当前姿态的四元数
     void get_quat_body_to_ned(Quaternion &quat) const {
         quat.from_rotation_matrix(rot_body_to_ned);
     }

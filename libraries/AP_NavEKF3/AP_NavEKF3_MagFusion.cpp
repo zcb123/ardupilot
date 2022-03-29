@@ -223,7 +223,7 @@ void NavEKF3_core::SelectMagFusion()
     }
 
     // if(!send_flag_mag_source){
-    gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw source %u ",(uint8_t)yaw_source);
+    // gcs().send_text(MAV_SEVERITY_CRITICAL, "yaw source %u ",(uint8_t)yaw_source);
 
     //AP::logger().Write("YS","TimeUs,YawS","QH",AP_HAL::micros64(),(uint16_t)yaw_source);
 

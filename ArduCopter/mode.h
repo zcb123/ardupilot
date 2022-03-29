@@ -131,7 +131,7 @@ protected:
     AltHoldModeState get_alt_hold_state(float target_climb_rate_cms);
 
     // convenience references to avoid code churn in conversion:
-    // 方便参考以避免转换中的代码搅动
+    // 为了避免转换中的代码混乱
     Parameters &g;
     ParametersG2 &g2;
     AC_WPNav *&wp_nav;

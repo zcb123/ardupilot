@@ -486,7 +486,7 @@ void Copter::ten_hz_logging_loop()
         AP::ins().Write_Vibration();
     }
     if (should_log(MASK_LOG_CTUN)) {
-        attitude_control->control_monitor_log();    //这个函数在rate_controller_run()中已经运行了，为啥这里还要再运行一次?
+        attitude_control->control_monitor_log();    //这个函数在rate_controller_run()中以400Hz更新，这里以10Hz记录
 #if HAL_PROXIMITY_ENABLED
         logger.Write_Proximity(g2.proximity);  // Write proximity sensor distances
 #endif

@@ -498,7 +498,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
     update_sensor_selection();
 
     // If we are a plane and don't have GPS lock then don't initialise
-    // 我们是一架固定翼飞机并且GPS未定位，则不初始化
+    // 固定翼并且GPS未定位，则不初始化
     if (assume_zero_sideslip() && dal.gps().status(preferred_gps) < AP_DAL_GPS::GPS_OK_FIX_3D) {
         dal.snprintf(prearm_fail_string,
                      sizeof(prearm_fail_string),
@@ -769,6 +769,8 @@ void NavEKF3_core::UpdateFilter(bool predict)
         dal.millis() - last_filter_ok_ms > 5000 &&
         !dal.get_armed()) {
         // we've been unhealthy for 5 seconds after being healthy, reset the filter
+        // 正常了之后又不正常超过5秒,重置滤波器   
+        /* 没解锁状态下才会进入 */
         GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "EKF3 IMU%u forced reset",(unsigned)imu_index); //等遇到这个问题再说了
         last_filter_ok_ms = 0;
         statesInitialised = false;
