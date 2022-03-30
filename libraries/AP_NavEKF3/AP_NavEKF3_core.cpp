@@ -663,7 +663,7 @@ void NavEKF3_core::UpdateFilter(bool predict)
     startPredictEnabled = predict;
 
     // don't run filter updates if states have not been initialised
-    // 不运行状态更新，如果状态未被初始化
+    // 如果内核未被初始化，直接退出，不运行状态更新
     if (!statesInitialised) {
         return;
     }
@@ -715,7 +715,7 @@ void NavEKF3_core::UpdateFilter(bool predict)
 
         // Run the GPS velocity correction step for the GSF yaw estimator algorithm
         // and use the yaw estimate to reset the main EKF yaw if requested
-        // Muat be run after SelectVelPosFusion() so that fresh GPS data is available
+        // Must be run after SelectVelPosFusion() so that fresh GPS data is available
         runYawEstimatorCorrection();
 
         // Update states using range beacon data
@@ -1051,6 +1051,7 @@ void NavEKF3_core::calcOutputStates()
  * Argument rotVarVecPtr is pointer to a vector defining the earth frame uncertainty variance of the quaternion states
  * used to perform a reset of the quaternion state covariances only. Set to null for normal operation.
 */
+// 计算预测状态协方差矩阵
 void NavEKF3_core::CovariancePrediction(Vector3F *rotVarVecPtr)
 {
     ftype daxVar;       // X axis delta angle noise variance rad^2
@@ -1900,6 +1901,8 @@ void NavEKF3_core::ForceSymmetry()
 
 // constrain variances (diagonal terms) in the state covariance matrix to  prevent ill-conditioning
 // if states are inactive, zero the corresponding off-diagonals
+// 限幅状态协方差矩阵的方差(对角线元素)，防止错误情况
+// 如果状态未激活，把所有非对角线元素归零
 void NavEKF3_core::ConstrainVariances()
 {
     for (uint8_t i=0; i<=3; i++) P[i][i] = constrain_ftype(P[i][i],0.0,1.0); // attitude error

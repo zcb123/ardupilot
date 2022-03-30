@@ -436,7 +436,7 @@ private:
     AP_Int8 _gsfUseMask;            // mask controlling which EKF3 instances will use EKF-GSF yaw estimator data to assit with yaw resets
     AP_Int8 _gsfResetMaxCount;      // maximum number of times the EKF3 is allowed to reset it's yaw to the EKF-GSF estimate
     AP_Float _err_thresh;           // lanes have to be consistently better than the primary by at least this threshold to reduce their overall relativeCoreError
-    AP_Int32 _affinity;             // bitmask of sensor affinity options
+    AP_Int32 _affinity;             // bitmask of sensor affinity options   手动选择传感器数据源
     AP_Float _dragObsNoise;         // drag specific force observatoin noise (m/s/s)**2
     AP_Float _ballisticCoef_x;      // ballistic coefficient measured for flow in X body frame directions
     AP_Float _ballisticCoef_y;      // ballistic coefficient measured for flow in Y body frame directions

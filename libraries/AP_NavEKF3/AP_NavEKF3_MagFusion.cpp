@@ -883,7 +883,7 @@ void NavEKF3_core::FuseMagnetometer()
             // update the covariance matrix
             for (uint8_t i= 0; i<=stateIndexLim; i++) {
                 for (uint8_t j= 0; j<=stateIndexLim; j++) {
-                    P[i][j] = P[i][j] - KHP[i][j];
+                    P[i][j] = P[i][j] - KHP[i][j];      //预测协方差矩阵更新
                 }
             }
 
@@ -893,7 +893,7 @@ void NavEKF3_core::FuseMagnetometer()
 
             // correct the state vector
             for (uint8_t j= 0; j<=stateIndexLim; j++) {
-                statesArray[j] = statesArray[j] - Kfusion[j] * innovMag[obsIndex];
+                statesArray[j] = statesArray[j] - Kfusion[j] * innovMag[obsIndex];  //状态更新
             }
 
             // add table constraint here for faster convergence
@@ -1264,7 +1264,7 @@ bool NavEKF3_core::fuseEulerYaw(yawFusionMethod method)
 }
 
 /*
- * Fuse declination angle using explicit algebraic equations generated with Matlab symbolic toolbox.
+ * Fuse declination angle (偏角) using explicit algebraic equations generated with Matlab symbolic toolbox.
  * The script file used to generate these and other equations in this filter can be found here:
  * https://github.com/PX4/ecl/blob/master/matlab/scripts/Inertial%20Nav%20EKF/GenerateNavFilterEquations.m
  * This is used to prevent the declination of the EKF earth field states from drifting during operation without GPS

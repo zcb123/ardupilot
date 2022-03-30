@@ -448,7 +448,7 @@ private:
     uint8_t imu_index; // preferred IMU index
     uint8_t gyro_index_active; // active gyro index (in case preferred fails)
     uint8_t accel_index_active; // active accel index (in case preferred fails)
-    uint8_t core_index;
+    uint8_t core_index;         //启动的时候设置，有几套IMU，对应几个core
     uint8_t imu_buffer_length;
     uint8_t obs_buffer_length;
 

@@ -807,7 +807,7 @@ bool NavEKF3::InitialiseFilter(void)
     for (uint8_t core_index=0; core_index<num_cores; core_index++) {
         if (coreSetupRequired[core_index]) {
             coreSetupRequired[core_index] = !core[core_index].setup_core(coreImuIndex[core_index], core_index);
-            if (coreSetupRequired[core_index]) {
+            if (coreSetupRequired[core_index]) {    //需要重新启动，则当次启动失败
                 core_setup_success = false;
             }
         }

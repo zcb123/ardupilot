@@ -1342,6 +1342,10 @@ ftype NavEKF3_core::MagDeclination(void) const
   Should be called once per IMU update.
   Only updates when on ground and when operating without a magnetometer
 */
+/*
+  更新在地面不动检查
+  每次IMU更新都应当调用一次
+*/
 void NavEKF3_core::updateMovementCheck(void)
 {
     const AP_NavEKF_Source::SourceYaw yaw_source = frontend->sources.getYawSource();
