@@ -1012,7 +1012,7 @@ private:
     EKF_obs_buffer_t<tas_elements> storedTAS;      // TAS data buffer
     EKF_obs_buffer_t<range_elements> storedRange;  // Range finder data buffer
     EKF_IMU_buffer_t<output_elements> storedOutput;// output state buffer
-    Matrix3F prevTnb;               // previous nav to body transformation used for INS earth rotation compensation
+    Matrix3F prevTnb;               // previous nav to body transformation used for INS earth rotation compensation 从地理系到机体系
     ftype accNavMag;                // magnitude of navigation accel - used to adjust GPS obs variance (m/s^2) 导航加速度大小 - 用于调整GPS观测方差
     ftype accNavMagHoriz;           // magnitude of navigation accel in horizontal plane (m/s^2)
     Vector3F earthRateNED;          // earths angular rate vector in NED (rad/s)

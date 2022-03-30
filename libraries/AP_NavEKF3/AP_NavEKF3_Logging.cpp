@@ -421,8 +421,8 @@ void NavEKF3_core::Log_Write_Timing(uint64_t time_us)
 
 void NavEKF3_core::Log_Write_GSF(uint64_t time_us)
 {
-    if (yawEstimator == nullptr) {
-        return;
-    }
+    // if (yawEstimator == nullptr) {
+    //     return;
+    // }
     yawEstimator->Log_Write(time_us, LOG_XKY0_MSG, LOG_XKY1_MSG, DAL_CORE(core_index));
 }

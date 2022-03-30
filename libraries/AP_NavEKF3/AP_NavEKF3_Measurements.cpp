@@ -410,6 +410,8 @@ void NavEKF3_core::readIMUData()
         // bias we have learned from the previously inactive
         // gyro. We don't re-init the bias uncertainty as it should
         // have the same uncertainty as the previously active gyro
+        // 在运行中切换活跃陀螺仪。从先前旧的不活跃陀螺仪中拷贝偏移。
+        // 不重复初始化不确定的偏移，因为这个不确定的偏移与上一次活跃的陀螺仪一样
         stateStruct.gyro_bias = inactiveBias[gyro_active].gyro_bias;
         gyro_index_active = gyro_active;
     }
@@ -432,13 +434,14 @@ void NavEKF3_core::readIMUData()
     
     // Get delta angle data from primary gyro or primary if not available
     readDeltaAngle(gyro_index_active, imuDataNew.delAng, imuDataNew.delAngDT);
-    imuDataNew.delAngDT = MAX(imuDataNew.delAngDT, 1.0e-4f);
+    imuDataNew.delAngDT = MAX(imuDataNew.delAngDT, 1.0e-4f);    //DT最小1.0e-4f
     imuDataNew.gyro_index = gyro_index_active;
 
     // Get current time stamp
     imuDataNew.time_ms = imuSampleTime_ms;
 
     // Accumulate the measurement time interval for the delta velocity and angle data
+    // 累积增量速度和角度数据的测量时间间隔 后面会用到
     imuDataDownSampledNew.delAngDT += imuDataNew.delAngDT;
     imuDataDownSampledNew.delVelDT += imuDataNew.delVelDT;
 
@@ -472,6 +475,7 @@ void NavEKF3_core::readIMUData()
     /*
     如果目标 EKF 时间步长已经累积，并且前端允许开始新的预测周期，则存储累积的 IMU 数据以供状态预测使用，如果超过目标时间的两倍以上，则忽略前端权限。 
     调整目标 EKF 步长时间阈值以允许 IMU 数据中的时序抖动。
+    ekf 24ms 运行一次 或者
     */
     if ((imuDataDownSampledNew.delAngDT >= (EKF_TARGET_DT-(dtIMUavg*0.5f)) && startPredictEnabled) ||
         (imuDataDownSampledNew.delAngDT >= 2.0f*EKF_TARGET_DT)) {

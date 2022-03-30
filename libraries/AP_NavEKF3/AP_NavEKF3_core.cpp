@@ -806,8 +806,9 @@ void NavEKF3_core::UpdateStrapdownEquationsNED()
     // the delta angle rotation quaternion and normalise
     // apply correction for earth's rotation rate
     // % * - and + operators have been overloaded
-    stateStruct.quat.rotate(delAngCorrected - prevTnb * earthRateNED*imuDataDelayed.delAngDT);
-
+    /* 状态转移方程 */
+    stateStruct.quat.rotate(delAngCorrected - prevTnb * earthRateNED*imuDataDelayed.delAngDT);  
+    /* 四元数归一化 */
     stateStruct.quat.normalize();
 
     // transform body delta velocities to delta velocities in the nav frame
@@ -815,10 +816,12 @@ void NavEKF3_core::UpdateStrapdownEquationsNED()
     // have been rotated into that frame
     // * and + operators have been overloaded
     Vector3F delVelNav;  // delta velocity vector in earth axes
-    delVelNav  = prevTnb.mul_transpose(delVelCorrected);
+    /* 从机体系到地理系，在乘以校正向量delVelCorrected */
+    delVelNav  = prevTnb.mul_transpose(delVelCorrected);    
     delVelNav.z += GRAVITY_MSS*imuDataDelayed.delVelDT;
 
     // calculate the nav to body cosine matrix
+    /* 计算prevTnb */
     stateStruct.quat.inverse().rotation_matrix(prevTnb);
 
     // calculate the rate of change of velocity (used for launch detect and other functions)
@@ -927,6 +930,7 @@ void NavEKF3_core::calcOutputStates()
     vertCompFiltState.pos += integ3_input; 
 
     // apply a trapezoidal integration to velocities to calculate position
+    /* 对速度应用梯形积分以计算位置(上顶加下底乘以高除以2) */
     outputDataNew.position += (outputDataNew.velocity + lastVelocity) * (imuDataNew.delVelDT*0.5f);
 
     // If the IMU accelerometer is offset from the body frame origin, then calculate corrections

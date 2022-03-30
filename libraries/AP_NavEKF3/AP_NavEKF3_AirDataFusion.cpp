@@ -222,6 +222,10 @@ void NavEKF3_core::SelectTasFusion()
 // synthetic sidelip fusion only works for fixed wing aircraft and relies on the average sideslip being close to zero
 // body frame drag only works for bluff body multi rotor vehices with thrust forces aligned with the Z axis
 // it requires a stable wind for best results and should not be used for aerobatic flight
+// 选择合成侧滑测量或车身框架阻力的融合
+// 合成侧滑融合仅适用于固定翼飞机，并且依赖于接近于零的平均侧滑
+// 车身框架阻力仅适用于推力与 Z 轴对齐的钝体多转子车辆
+// 它需要稳定的风才能获得最佳效果，不应用于特技飞行
 void NavEKF3_core::SelectBetaDragFusion()
 {
     // Check if the magnetometer has been fused on that time step and the filter is running at faster than 200 Hz

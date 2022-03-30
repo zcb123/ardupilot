@@ -6,9 +6,9 @@
 
 void EKFGSF_yaw::Log_Write(uint64_t time_us, LogMessages id0, LogMessages id1, uint8_t core_index)
 {
-    if (!vel_fuse_running) {
-        return;
-    }
+    // if (!vel_fuse_running) {
+    //     return;
+    // }
 
     static_assert(N_MODELS_EKFGSF >= 5, "Logging will break on <5 EKFGSF models");
 

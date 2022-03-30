@@ -154,6 +154,7 @@ Vector2<T> Matrix3<T>::mulXY(const Vector3<T> &v) const
 }
 
 // multiplication of transpose by a vector
+/* 先把矩阵转置，再乘以向量 */
 template <typename T>
 Vector3<T> Matrix3<T>::mul_transpose(const Vector3<T> &v) const
 {

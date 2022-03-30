@@ -1162,6 +1162,7 @@ bool NavEKF3_core::fuseEulerYaw(yawFusionMethod method)
     }
 
     // Calculate innovation variance and Kalman gains, taking advantage of the fact that only the first 4 elements in H are non zero
+    // 使用H中前四个非零元素计算更新方差与卡尔曼增益
     ftype PH[4];
     ftype varInnov = R_YAW;
     for (uint8_t rowIndex=0; rowIndex<=3; rowIndex++) {
@@ -1246,6 +1247,7 @@ bool NavEKF3_core::fuseEulerYaw(yawFusionMethod method)
         ConstrainVariances();
 
         // correct the state vector
+        /* 这里更新yaw角状态 */
         for (uint8_t i=0; i<=stateIndexLim; i++) {
             statesArray[i] -= Kfusion[i] * constrain_ftype(innovYaw, -0.5f, 0.5f);
         }

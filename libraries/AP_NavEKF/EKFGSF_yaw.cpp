@@ -227,13 +227,14 @@ void EKFGSF_yaw::predictAHRS(const uint8_t mdl_idx)
         if (is_positive(true_airspeed)) {
             // Calculate centripetal acceleration in body frame from cross product of body rate and body frame airspeed vector
             // NOTE: this assumes X axis is aligned with airspeed vector
+            // 通过车身速率和车身框架空速向量的叉积计算车身框架中的向心加速度 
             Vector3F centripetal_accel_vec_bf = Vector3F(0.0f, ang_rate_delayed_raw[2] * true_airspeed, - ang_rate_delayed_raw[1] * true_airspeed);
 
             // Correct measured accel for centripetal acceleration
             accel -= centripetal_accel_vec_bf;
         }
 
-        tilt_error_gyro_correction = (k % accel) * (accel_gain / ahrs_accel_norm);
+        tilt_error_gyro_correction = (k % accel) * (accel_gain / ahrs_accel_norm);  // %是叉乘
 
     }
 
@@ -279,6 +280,7 @@ void EKFGSF_yaw::alignTilt()
     // corresponding earth frame unit vector rotated into the body frame, eg 'north_in_bf' would be the first column.
     // We need the rotation matrix from body frame to earth frame so the earth frame unit vectors rotated into body
     // frame are copied into corresponding rows instead to create the transpose.
+    // 从地球坐标系到身体坐标系的旋转矩阵中的每一列表示旋转到身体坐标系中的相应地球坐标系单位向量的投影，例如“north_in_bf”将是第一列
     Matrix3F R;
     for (uint8_t col=0; col<3; col++) {
         R[0][col] = north_in_bf[col];
@@ -292,12 +294,14 @@ void EKFGSF_yaw::alignTilt()
         AHRS[mdl_idx].aligned = true;
     }
 }
-
+/* 用EKF[mdl_idx].X[2] 更新AHRS[mdl_idx].R */
 void EKFGSF_yaw::alignYaw()
 {
     // Align yaw angle for each model
     for (uint8_t mdl_idx = 0; mdl_idx < N_MODELS_EKFGSF; mdl_idx++) {
         if (fabsF(AHRS[mdl_idx].R[2][0]) < fabsF(AHRS[mdl_idx].R[2][1])) {
+            /*这里为啥要先赋值再覆盖?*/
+            /* 需要 roll 和 pitch 的数值 */
             // get the roll, pitch, yaw estimates from the rotation matrix using a  321 Tait-Bryan rotation sequence
             ftype roll,pitch,yaw;
             AHRS[mdl_idx].R.to_euler(&roll, &pitch, &yaw);

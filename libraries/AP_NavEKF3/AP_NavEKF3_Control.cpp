@@ -574,7 +574,7 @@ bool NavEKF3_core::use_compass(void) const
 }
 
 // are we using a yaw source other than the magnetomer?
-// 我们是否使用除了磁力计以外的航向角数据源?
+// 我们是否使用除了磁力计以外的航向角数据源
 bool NavEKF3_core::using_external_yaw(void) const
 {
     const AP_NavEKF_Source::SourceYaw yaw_source = frontend->sources.getYawSource();
