@@ -116,8 +116,8 @@ bool AP_GPS_NMEA::_decode(char c)
     if (_term_offset < sizeof(_term) - 1)
         _term[_term_offset++] = c;
     if (!_is_checksum_term)
-        _parity ^= c;
-
+        _parity ^= c;   //异或操作_parity = _parity^c; 不包括$和* 直接按ascll码方式计算
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "_parity! %c", _parity);
     return valid_sentence;
 }
 
