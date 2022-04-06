@@ -218,6 +218,7 @@ AP_Notify::AP_Notify()
 }
 
 // static flags, to allow for direct class update from device drivers
+// 静态标志，允许直接从设备驱动更新类
 struct AP_Notify::notify_flags_and_values_type AP_Notify::flags;
 struct AP_Notify::notify_events_type AP_Notify::events;
 

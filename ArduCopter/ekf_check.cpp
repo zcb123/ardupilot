@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 static struct {
     uint8_t fail_count;         // number of iterations ekf or dcm have been out of tolerances
-    uint8_t bad_variance : 1;   // true if ekf should be considered untrusted (fail_count has exceeded EKF_CHECK_ITERATIONS_MAX) 如果 ekf 应被视为不受信任，则为 true
+    uint8_t bad_variance : 1;   // true if ekf should be considered untrusted (fail_count has exceeded EKF_CHECK_ITERATIONS_MAX) :为取uint8_t中第一位的含义，不是初始化为1
     bool has_ever_passed;       // true if the ekf checks have ever passed  如果 ekf 检查已通过，则为 true
     uint32_t last_warn_time;    // system time of last warning in milliseconds.  Used to throttle text warnings sent to GCS
 } ekf_check_state;
@@ -51,7 +51,7 @@ void Copter::ekf_check()
     // if we has a position estimate
     const bool over_threshold = ekf_over_threshold();
     const bool has_position = ekf_has_relative_position() || ekf_has_absolute_position();
-    const bool checks_passed = !over_threshold && has_position;
+    const bool checks_passed = !over_threshold && has_position; 
 
     // return if ekf checks have never passed
     ekf_check_state.has_ever_passed |= checks_passed;
@@ -61,12 +61,14 @@ void Copter::ekf_check()
 
     // increment or decrement counters and take action
     // 递增或递减计数器并采取行动
-    if (!checks_passed) {
+    if (!checks_passed) {       //checks_passed =false
         // if compass is not yet flagged as bad
         // 如果指南针尚未标记为坏
-        if (!ekf_check_state.bad_variance) {
+        /*只要有一次ekf检查未通过，则进入到if语句中*/
+        if (!ekf_check_state.bad_variance) {   //ekf_check_state.bad_variance=false
             // increase counter
             ekf_check_state.fail_count++;
+            /* 如果失败了8次，并且ekf方差超过设定阈值，则请求航向角重置*/
             if (ekf_check_state.fail_count == (EKF_CHECK_ITERATIONS_MAX-2) && over_threshold) {
                 // we are two iterations away from declaring an EKF failsafe, ask the EKF if we can reset
                 // yaw to resolve the issue
@@ -75,6 +77,7 @@ void Copter::ekf_check()
             if (ekf_check_state.fail_count == (EKF_CHECK_ITERATIONS_MAX-1)) {
                 // we are just about to declare a EKF failsafe, ask the EKF if we can
                 // change lanes to resolve the issue
+                // 将要声明EKF故障，检查是否要通过切换EKF通道解决问题
                 ahrs.check_lane_switch();
             }
             // if counter above max then trigger failsafe
@@ -97,7 +100,7 @@ void Copter::ekf_check()
             ekf_check_state.fail_count--;
 
             // if compass is flagged as bad and the counter reaches zero then clear flag
-            if (ekf_check_state.bad_variance && ekf_check_state.fail_count == 0) {
+            if (ekf_check_state.bad_variance && ekf_check_state.fail_count == 0) {  //ekf_check_state.bad_variance=true,
                 ekf_check_state.bad_variance = false;
                 AP::logger().Write_Error(LogErrorSubsystem::EKFCHECK, LogErrorCode::EKFCHECK_VARIANCE_CLEARED);
                 // clear failsafe
@@ -160,6 +163,7 @@ void Copter::failsafe_ekf_event()
     }
 
     // EKF failsafe event has occurred
+    // 出现ekf故障事件
     failsafe.ekf = true;
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_EKFINAV, LogErrorCode::FAILSAFE_OCCURRED);
 

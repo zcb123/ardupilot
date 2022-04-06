@@ -676,6 +676,7 @@ void  NavEKF3_core::updateFilterStatus(void)
 {
     // init return value
     /* 前一个如果为false，后面一个不用判断，结果为false */
+    
     filterStatus.value = 0;
     bool doingBodyVelNav = (PV_AidingMode != AID_NONE) && (imuSampleTime_ms - prevBodyVelFuseTime_ms < 5000);
     bool doingFlowNav = (PV_AidingMode != AID_NONE) && flowDataValid;

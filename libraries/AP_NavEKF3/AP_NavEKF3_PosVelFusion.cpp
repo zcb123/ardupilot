@@ -873,14 +873,13 @@ void NavEKF3_core::FuseVelPosNED()
             // from the measurement un-opposed if test threshold is exceeded.
             // 使用高度数据如果更新检查通过或者超时或者IMU数据不对
             // 如果 IMU 损坏，始终融合数据，以防止出现混叠和削波，如果超过测试阈值，则将状态估计从测量结果中拉开。
-            
             if (hgtCheckPassed || hgtTimeout || badIMUdata) {
                 // Calculate a filtered value to be used by pre-flight health checks
                 // We need to filter because wind gusts can generate significant baro noise and we want to be able to detect bias errors in the inertial solution
                 // 计算一个用于起飞前健康检查的滤波后的值
                 // 我们需要过滤，因为阵风会产生明显的气压噪声，并且我们希望能够检测惯性解中的偏差误差
+                gcs().send_text(MAV_SEVERITY_CRITICAL, "hgtCheck %d hgtTimeout %d badIMUdata %d!", hgtCheckPassed,hgtTimeout,badIMUdata);
                 if(!send_flag_fuse_hgt){
-                    gcs().send_text(MAV_SEVERITY_CRITICAL, "hgtCheck %d hgtTimeout %d badIMUdata %d!", hgtCheckPassed,hgtTimeout,badIMUdata);
                     send_flag_fuse_hgt = true;
                 }
                 if (onGround) {
@@ -903,7 +902,7 @@ void NavEKF3_core::FuseVelPosNED()
                 fuseHgtData = false;
             }
         }
-
+        // 有选择地融合数据
         // set range for sequential fusion of velocity and position measurements depending on which data is available and its health
         if (fuseVelData) {
             fuseData[0] = true;
