@@ -262,6 +262,7 @@ void NavEKF3_core::InitialiseVariables()
     flowGyroBias.y = 0;
     PV_AidingMode = AID_NONE;
     PV_AidingModePrev = AID_NONE;
+    PV_AidingModeLast = AID_NONE;
     posTimeout = true;
     velTimeout = true;
     memset(&faultStatus, 0, sizeof(faultStatus));
@@ -850,6 +851,7 @@ void NavEKF3_core::UpdateStrapdownEquationsNED()
     stateStruct.velocity += delVelNav;
 
     // apply a trapezoidal integration to velocities to calculate position
+    // 由速度积分而来
     stateStruct.position += (stateStruct.velocity + lastVelocity) * (imuDataDelayed.delVelDT*0.5f);
 
     // accumulate the bias delta angle and time since last reset by an OF measurement arrival

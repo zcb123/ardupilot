@@ -878,7 +878,7 @@ void NavEKF3_core::FuseVelPosNED()
                 // We need to filter because wind gusts can generate significant baro noise and we want to be able to detect bias errors in the inertial solution
                 // 计算一个用于起飞前健康检查的滤波后的值
                 // 我们需要过滤，因为阵风会产生明显的气压噪声，并且我们希望能够检测惯性解中的偏差误差
-                gcs().send_text(MAV_SEVERITY_CRITICAL, "hgtCheck %d hgtTimeout %d badIMUdata %d!", hgtCheckPassed,hgtTimeout,badIMUdata);
+                // gcs().send_text(MAV_SEVERITY_CRITICAL, "hgtCheck %d hgtTimeout %d badIMUdata %d!", hgtCheckPassed,hgtTimeout,badIMUdata);
                 if(!send_flag_fuse_hgt){
                     send_flag_fuse_hgt = true;
                 }

@@ -677,6 +677,10 @@ void  NavEKF3_core::updateFilterStatus(void)
     // init return value
     /* 前一个如果为false，后面一个不用判断，结果为false */
     
+    if(PV_AidingModeLast!=PV_AidingMode){
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Aiding mode changed %d", PV_AidingMode);
+    }
+    
     filterStatus.value = 0;
     bool doingBodyVelNav = (PV_AidingMode != AID_NONE) && (imuSampleTime_ms - prevBodyVelFuseTime_ms < 5000);
     bool doingFlowNav = (PV_AidingMode != AID_NONE) && flowDataValid;
@@ -707,6 +711,8 @@ void  NavEKF3_core::updateFilterStatus(void)
     filterStatus.flags.gps_glitching = !gpsAccuracyGood && (PV_AidingMode == AID_ABSOLUTE) && (frontend->sources.getPosXYSource() == AP_NavEKF_Source::SourceXY::GPS); // GPS glitching is affecting navigation accuracy
     filterStatus.flags.gps_quality_good = gpsGoodToAlign;
     filterStatus.flags.initalized = filterStatus.flags.initalized || healthy();
+
+    PV_AidingModeLast = PV_AidingMode;
 }
 
 void NavEKF3_core::runYawEstimatorPrediction()

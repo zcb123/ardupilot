@@ -1225,6 +1225,7 @@ private:
                                     // 只有光流辅助被使用，所以位置估计是相对的
     AidingMode PV_AidingMode;       // Defines the preferred mode for aiding of velocity and position estimates from the INS 为速度和位置估计（INS）定义首选模式 
     AidingMode PV_AidingModePrev;   // Value of PV_AidingMode from the previous frame - used to detect transitions
+    AidingMode PV_AidingModeLast;   // 上一次PV_AidingMode
     bool gndOffsetValid;            // true when the ground offset state can still be considered valid
     Vector3F delAngBodyOF;          // bias corrected delta angle of the vehicle IMU measured summed across the time since the last OF measurement
     ftype delTimeOF;                // time that delAngBodyOF is summed across

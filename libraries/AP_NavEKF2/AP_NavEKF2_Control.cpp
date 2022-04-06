@@ -149,6 +149,7 @@ void NavEKF2_core::setWindMagStateLearningMode()
 }
 
 // Set inertial navigation aiding mode
+// 设置内部导航的辅助模式
 void NavEKF2_core::setAidingMode()
 {
     // Save the previous status so we can detect when it has changed
@@ -159,6 +160,7 @@ void NavEKF2_core::setAidingMode()
     case AID_NONE: {
         // Don't allow filter to start position or velocity aiding until the tilt and yaw alignment is complete
         // and IMU gyro bias estimates have stabilised
+        // 不允许滤波器开始位置个速度辅助，直到倾斜和航向角对齐完成与IMU陀螺仪偏移估计稳定
         bool filterIsStable = tiltAlignComplete && yawAlignComplete && checkGyroCalStatus();
         // If GPS usage has been prohiited then we use flow aiding provided optical flow data is present
         // GPS aiding is the preferred option unless excluded by the user
