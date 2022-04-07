@@ -520,8 +520,7 @@ bool NavEKF3_core::InitialiseFilterBootstrap(void)
         // we are initialised, but we don't return true until the IMU
         // buffer has been filled. This prevents a timing
         // vulnerability with a pause in IMU data during filter startup
-        // 初始化完毕，如果IMU缓冲未填满则不返回true。这防止在IMU数据在滤波器启动阶段时间暂停。
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "EKF3 buffer filled ");
+        // 初始化完毕，等到缓冲区填满再返回真
         return storedIMU.is_filled();
     }
 

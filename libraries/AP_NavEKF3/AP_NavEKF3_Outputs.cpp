@@ -4,12 +4,20 @@
 #include "AP_NavEKF3_core.h"
 #include <AP_DAL/AP_DAL.h>
 
-bool send_flag_core_healthy = false;
+uint32_t send_flag_time = 0;
 // Check basic filter health metrics and return a consolidated health status
 bool NavEKF3_core::healthy(void) const
 {
     uint16_t faultInt;
     getFilterFaults(faultInt);
+    float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
+
+    const uint32_t now = dal.millis();
+    if(now - send_flag_time > 30000){
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "fInt %d velR %lf! posR %lf !  hgtR %lf oG %d AMode %d hESq %lf hgtInSta %lf", faultInt,velTestRatio,posTestRatio,hgtTestRatio,onGround,PV_AidingMode,horizErrSq,hgtInnovFiltState);
+        send_flag_time = now;
+    }
+
     if (faultInt > 0) {
         return false;
     }
@@ -23,15 +31,12 @@ bool NavEKF3_core::healthy(void) const
         return false;
     }
     // position and height innovations must be within limits when on-ground and in a static mode of operation
-    float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
+    
     if (onGround && (PV_AidingMode == AID_NONE) && ((horizErrSq > 1.0f) || (fabsF(hgtInnovFiltState) > 1.0f))) {
         return false;
     }
 
-    if(!send_flag_core_healthy){
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "fInt %d velR %lf! posR %lf !  hgtR %lf oG %d AMode %d hESq %lf hgtInSta %lf", faultInt,velTestRatio,posTestRatio,hgtTestRatio,onGround,PV_AidingMode,horizErrSq,hgtInnovFiltState);
-        send_flag_core_healthy = true;
-    }
+    
 
     // all OK
     return true;
