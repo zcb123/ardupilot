@@ -536,6 +536,8 @@ void NavEKF3_core::send_status_report(mavlink_channel_t chan) const
 {
     // prepare flags
     uint16_t flags = 0;
+    // 若下列对应的位没有置1，在地面站上会显示对应flag为off
+    // 若下列对应的位置1，在地面站上会显示对应flag为on
     if (filterStatus.flags.attitude) {
         flags |= EKF_ATTITUDE;
     }
