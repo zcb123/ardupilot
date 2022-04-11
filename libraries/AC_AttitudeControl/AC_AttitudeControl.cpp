@@ -846,7 +846,7 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
 
     // Normalize the thrust rotation vector
     /* 如果推力矢量长度为零，即当前姿态推力矢量与目标推力矢量平行(这里如果出现姿态推力矢量与目标推力矢量反向，则有极其严重后果)。或者没有
-       或者推力矢量误差角为零，则推力矢量叉乘默认向上，即 thrust_vec_cross = thrust_vector_up 。否则，归一化推力矢量叉乘向量。*/ 
+       或者推力矢量误差角为零(两向量垂直)，则推力矢量叉乘默认向上，即 thrust_vec_cross = thrust_vector_up 。否则，归一化推力矢量叉乘向量。*/ 
     float thrust_vector_length = thrust_vec_cross.length();
     if (is_zero(thrust_vector_length) || is_zero(thrust_error_angle)) {
         thrust_vec_cross = thrust_vector_up;
@@ -1020,7 +1020,7 @@ void AC_AttitudeControl::inertial_frame_reset()
 }
 
 // Convert a 321-intrinsic euler angle derivative to an angular velocity vector
-// 将 321 本征欧拉角导数转换为角速度矢量
+// 将 321 欧拉角速度转换为惯性系角速度矢量
 void AC_AttitudeControl::euler_rate_to_ang_vel(const Vector3f& euler_rad, const Vector3f& euler_rate_rads, Vector3f& ang_vel_rads)
 {
     float sin_theta = sinf(euler_rad.y);

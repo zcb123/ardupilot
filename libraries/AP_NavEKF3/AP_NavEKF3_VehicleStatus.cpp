@@ -43,6 +43,7 @@ void NavEKF3_core::calcGpsGoodToAlign(void)
     
     // If we have good magnetometer consistency and bad innovations for longer than 5 seconds then we reset heading and field states
     // This enables us to handle large changes to the external magnetic field environment that occur before arming
+    /* 当磁力计数据不好或者一致性不好时连续5s，触发航向重置 */
     if ((magTestRatio.x <= 1.0f && magTestRatio.y <= 1.0f && yawTestRatio <= 1.0f) || !consistentMagData) {
         magYawResetTimer_ms = imuSampleTime_ms;
     }

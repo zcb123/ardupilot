@@ -83,7 +83,7 @@ void QuaternionT<T>::from_rotation_matrix(const Matrix3<T> &m)
     const T &m22 = m.c.z;
     const T &m10 = m.b.x;
     const T &m01 = m.a.y;
-    const T &m20 = m.c.x;
+    const T &m20 = m.c.x; 
     const T &m02 = m.a.z;
     const T &m21 = m.c.y;
     const T &m12 = m.b.z;
@@ -168,7 +168,7 @@ void QuaternionT<T>::from_rotation(enum Rotation rotation)
         q4 = 0.92387956f;
         return;
 
-    case ROTATION_YAW_270:
+    case ROTATION_YAW_270:      //这里好像不对，q1应为-HALF_SQRT_2;q4为HALF_SQRT_2
         q1 = HALF_SQRT_2;
         q2 = q3 = 0;
         q4 = -HALF_SQRT_2;

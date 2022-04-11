@@ -1148,7 +1148,7 @@ private:
     Vector3F earthMagFieldVar;      // NED earth mag field variances for last learned field (mGauss^2)
     Vector3F bodyMagFieldVar;       // XYZ body mag field variances for last learned field (mGauss^2)
     bool delAngBiasLearned;         // true when the gyro bias has been learned
-    nav_filter_status filterStatus; // contains the status of various filter outputs
+    nav_filter_status filterStatus; // contains the status of various filter outputs    //滤波器状态输出
     ftype ekfOriginHgtVar;          // Variance of the EKF WGS-84 origin height estimate (m^2)
     double ekfGpsRefHgt;            // floating point representation of the WGS-84 reference height used to convert GPS height to local height (m)
     uint32_t lastOriginHgtTime_ms;  // last time the ekf's WGS-84 origin height was corrected
