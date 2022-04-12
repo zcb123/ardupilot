@@ -729,7 +729,7 @@ void AC_AttitudeControl::attitude_controller_run_quat()
     // 从机体系姿态误差中计算角速度校正量
     /* 角度控制环 */
     _ang_vel_body = update_ang_vel_target_from_att_error(attitude_error);
-
+    AP::logger().Write("ATER","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
     // ensure angular velocity does not go over configured limits
     // 确保角速度不超过设置的限制
     ang_vel_limit(_ang_vel_body, radians(_ang_vel_roll_max), radians(_ang_vel_pitch_max), radians(_ang_vel_yaw_max));
