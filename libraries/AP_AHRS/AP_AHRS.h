@@ -229,6 +229,7 @@ public:
     virtual float get_error_yaw(void) const = 0;
 
     // return a DCM rotation matrix representing our current attitude in NED frame
+    // 返回NED坐标系下代表当前姿态的方向余弦旋转矩阵
     virtual const Matrix3f &get_rotation_body_to_ned(void) const = 0;
 
     // return a Quaternion representing our current attitude in NED frame

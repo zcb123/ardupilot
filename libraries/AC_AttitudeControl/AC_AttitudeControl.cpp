@@ -706,8 +706,7 @@ Quaternion AC_AttitudeControl::attitude_from_thrust_vector(Vector3f thrust_vecto
 // 为了跟随目标姿态，计算机体坐标系角速度
 void AC_AttitudeControl::attitude_controller_run_quat()
 {
-    // This represents a quaternion rotation in NED frame to the body
-    // 地理坐标系到机体坐标系的四元数旋转矩阵
+    // 机体坐标系向地理坐标系的旋转四元数
     // 获取当前飞行器的姿态
     Quaternion attitude_body;
     _ahrs.get_quat_body_to_ned(attitude_body);
@@ -1021,6 +1020,7 @@ void AC_AttitudeControl::inertial_frame_reset()
 
 // Convert a 321-intrinsic euler angle derivative to an angular velocity vector
 // 将 321 欧拉角速度转换为惯性系角速度矢量
+/* 将欧拉角速率正交分解到机体坐标系上 */
 void AC_AttitudeControl::euler_rate_to_ang_vel(const Vector3f& euler_rad, const Vector3f& euler_rate_rads, Vector3f& ang_vel_rads)
 {
     float sin_theta = sinf(euler_rad.y);
@@ -1037,6 +1037,7 @@ void AC_AttitudeControl::euler_rate_to_ang_vel(const Vector3f& euler_rad, const 
 // Returns false if the vehicle is pitched 90 degrees up or down
 // 将角速度向量转化到321欧拉角速度微分
 // 如果飞行器九十度头朝上或者朝下返回false
+/* 将机体角速率分解到欧拉角速率方向上 ，三个轴的欧拉角速率不两两垂直*/
 bool AC_AttitudeControl::ang_vel_to_euler_rate(const Vector3f& euler_rad, const Vector3f& ang_vel_rads, Vector3f& euler_rate_rads)
 {
     float sin_theta = sinf(euler_rad.y);
