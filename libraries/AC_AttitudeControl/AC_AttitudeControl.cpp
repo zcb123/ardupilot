@@ -149,9 +149,11 @@ const AP_Param::GroupInfo AC_AttitudeControl::var_info[] = {
 
 // Ensure attitude controller have zero errors to relax rate controller output
 // 确保姿态控制器具有零误差以释放速率控制器输出
+/* 控制器初始化 */
 void AC_AttitudeControl::relax_attitude_controllers()
 {
     // Initialize the attitude variables to the current attitude
+    /* 将目标姿态设置成当前姿态 */
     _ahrs.get_quat_body_to_ned(_attitude_target);
     _attitude_target.to_euler(_euler_angle_target.x, _euler_angle_target.y, _euler_angle_target.z);
     _attitude_ang_error.initialise();
@@ -225,6 +227,7 @@ void AC_AttitudeControl::reset_rate_controller_I_terms_smoothly()
 
 // Command a Quaternion attitude with feedforward and smoothing
 // 通过前馈和平滑控制四元数姿态
+/* 一般情况下不用 */
 void AC_AttitudeControl::input_quaternion(Quaternion attitude_desired_quat)
 {
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -796,8 +799,10 @@ void AC_AttitudeControl::thrust_heading_rotation_angles(Quaternion& attitude_tar
     /*
     * yaw角控制值不为零，并且z轴误差>AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP()则进入
     */
+    AP::logger().Write("HDRO","TimeUs,AERZ","Qf",AP_HAL::micros64(),attitude_error.z);
     Quaternion yaw_vec_correction_quat;
     if (!is_zero(_p_angle_yaw.kP()) && fabsf(attitude_error.z) > AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP()) {
+        
         attitude_error.z = constrain_float(wrap_PI(attitude_error.z), -AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP(), AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP());
         yaw_vec_correction_quat.from_axis_angle(Vector3f{0.0f, 0.0f, attitude_error.z});
         attitude_target = attitude_body * thrust_vector_correction * yaw_vec_correction_quat;
