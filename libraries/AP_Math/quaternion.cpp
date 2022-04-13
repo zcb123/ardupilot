@@ -436,13 +436,13 @@ void QuaternionT<T>::from_vector312(T roll, T pitch, T yaw)
 template <typename T>
 void QuaternionT<T>::from_axis_angle(Vector3<T> v)
 {
-    const T theta = v.length();
-    if (is_zero(theta)) {
-        q1 = 1.0f;
+    const T theta = v.length();     // 向量的长度即为旋转角度
+    if (is_zero(theta)) {           // 不旋转
+        q1 = 1.0f;  
         q2=q3=q4=0.0f;
-        return;
+        return;                     // 直接返回，以免出现除0的情况
     }
-    v /= theta;
+    v /= theta;                     // 转化成单位向量
     from_axis_angle(v,theta);
 }
 
@@ -466,6 +466,7 @@ void QuaternionT<T>::from_axis_angle(const Vector3<T> &axis, T theta)
 }
 
 // rotate by the provided axis angle
+// 通过提供的轴角旋转
 template <typename T>
 void QuaternionT<T>::rotate(const Vector3<T> &v)
 {
@@ -477,7 +478,7 @@ void QuaternionT<T>::rotate(const Vector3<T> &v)
 // convert this quaternion to a rotation vector where the direction of the vector represents
 // the axis of rotation and the length of the vector represents the angle of rotation
 // 将四元数转化成能代表这个旋转方向的向量
-// 旋转轴和向量长度表示旋转角度
+// 旋转轴的向量长度表示旋转角度
 template <typename T>
 void QuaternionT<T>::to_axis_angle(Vector3<T> &v) const
 {
@@ -485,7 +486,7 @@ void QuaternionT<T>::to_axis_angle(Vector3<T> &v) const
     v = Vector3<T>(q2,q3,q4);
     if (!is_zero(l)) {
         v /= l;
-        v *= wrap_PI(2.0f * atan2F(l,q1));
+        v *= wrap_PI(2.0f * atan2F(l,q1));      //theta = 2*arctan(sqrt(q2^2+q3^2+q4^2)/q1);将单位向量放大theta倍
     }
 }
 
@@ -660,6 +661,7 @@ QuaternionT<T> QuaternionT<T>::operator*(const QuaternionT<T> &v) const
 // (*this) to a rotation matrix then multiplying it to the argument `v`.
 //
 // 15 multiplies and 15 add / subtracts. Caches 3 floats
+/* 这里是四元数旋转矩阵乘以向量的简化表达 */
 template <typename T>
 Vector3<T> QuaternionT<T>::operator*(const Vector3<T> &v) const
 {

@@ -279,6 +279,7 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler
 
     // calculate the attitude target euler angles
     // 从四元数(_attitude_targeet)->欧拉角(_euler_angle_target)
+    /* 上一时刻的欧拉角 */
     _attitude_target.to_euler(_euler_angle_target.x, _euler_angle_target.y, _euler_angle_target.z);
 
     // Add roll trim to compensate tail rotor thrust in heli (will return zero on multirotors)
@@ -755,8 +756,8 @@ void AC_AttitudeControl::attitude_controller_run_quat()
         _feedforward_scalar = (1.0f - (_thrust_error_angle - AC_ATTITUDE_THRUST_ERROR_ANGLE) / AC_ATTITUDE_THRUST_ERROR_ANGLE);
         _ang_vel_body.x += ang_vel_body_feedforward.x * _feedforward_scalar;
         _ang_vel_body.y += ang_vel_body_feedforward.y * _feedforward_scalar;
-        _ang_vel_body.z += ang_vel_body_feedforward.z;
-        _ang_vel_body.z = _ahrs.get_gyro().z * (1.0 - _feedforward_scalar) + _ang_vel_body.z * _feedforward_scalar;
+        _ang_vel_body.z += ang_vel_body_feedforward.z;  
+        _ang_vel_body.z = _ahrs.get_gyro().z * (1.0 - _feedforward_scalar) + _ang_vel_body.z * _feedforward_scalar;     // 一阶低通滤波
     } else {
         _ang_vel_body += ang_vel_body_feedforward;
     }
@@ -765,7 +766,7 @@ void AC_AttitudeControl::attitude_controller_run_quat()
         // rotate target and normalize
         Quaternion attitude_target_update;
         attitude_target_update.from_axis_angle(Vector3f{_ang_vel_target.x * _dt, _ang_vel_target.y * _dt, _ang_vel_target.z * _dt});
-        _attitude_target = _attitude_target * attitude_target_update;
+        _attitude_target = _attitude_target * attitude_target_update;   // 从上一个时刻_attitude_target
         _attitude_target.normalize();
     }
 
@@ -801,10 +802,8 @@ void AC_AttitudeControl::thrust_heading_rotation_angles(Quaternion& attitude_tar
     * yaw角控制值不为零，并且z轴误差>AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP()则进入
     */
     /* 偏航角误差限幅 */
-    AP::logger().Write("HDRO","TimeUs,AERZ","Qf",AP_HAL::micros64(),attitude_error.z);
     Quaternion yaw_vec_correction_quat;
     if (!is_zero(_p_angle_yaw.kP()) && fabsf(attitude_error.z) > AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP()) {
-        
         attitude_error.z = constrain_float(wrap_PI(attitude_error.z), -AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP(), AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP());
         yaw_vec_correction_quat.from_axis_angle(Vector3f{0.0f, 0.0f, attitude_error.z});
         attitude_target = attitude_body * thrust_vector_correction * yaw_vec_correction_quat;
@@ -840,30 +839,35 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
 
     // the dot product is used to calculate the current lean angle for use of external functions
     /* 获取当前姿态下的推力角 */
+    /* 当推力向量与姿态推力向量平行时，thrust_angle = 0 */
+    /* 只打航向时,thrust_angle = 0 */
     thrust_angle = acosf(constrain_float(thrust_vector_up * att_body_thrust_vec,-1.0f,1.0f));
 
     // the cross product of the desired and target thrust vector defines the rotation vector
     /* 这里的 % 是向量叉乘，运算符重载 */
+    /* 只打航向时叉乘为0 */
     Vector3f thrust_vec_cross = att_body_thrust_vec % att_target_thrust_vec;
 
     // the dot product is used to calculate the angle between the target and desired thrust vectors
     /* 获取当前姿态推力矢量与目标姿态推力矢量之间的夹角，即推力矢量误差角*/
+    /* 只打航向角时,thrust_error_angle等于|att_body_thrust_vec|*|att_target_thrust_vec| */
     thrust_error_angle = acosf(constrain_float(att_body_thrust_vec * att_target_thrust_vec, -1.0f, 1.0f));
 
     // Normalize the thrust rotation vector
     /* 如果推力矢量长度为零，即当前姿态推力矢量与目标推力矢量平行(这里如果出现姿态推力矢量与目标推力矢量反向，则有极其严重后果)。或者没有
        或者推力矢量误差角为零(两向量垂直)，则推力矢量叉乘默认向上，即 thrust_vec_cross = thrust_vector_up 。否则，归一化推力矢量叉乘向量。*/ 
+    /* 若目标姿态与当前姿态一致则叉乘向量长度为0，姿态无需校正 */
     float thrust_vector_length = thrust_vec_cross.length();
     if (is_zero(thrust_vector_length) || is_zero(thrust_error_angle)) {
         thrust_vec_cross = thrust_vector_up;
     } else {
-        thrust_vec_cross /= thrust_vector_length;
+        thrust_vec_cross /= thrust_vector_length;   //归一化
     }
 
     // thrust_vector_correction is defined relative to the body frame but its axis `thrust_vec_cross` was computed in
     // the inertial frame. First rotate it by the inverse of attitude_body to express it back in the body frame
     // 推力向量校正是相对于机体坐标系定义的，但它的轴“推力向量交叉”是在惯性系中计算的。 先通过attitude_body的共轭(逆旋转)旋转到
-    /* */
+    /* 转换到机体系 */
     thrust_vec_cross = attitude_body.inverse() * thrust_vec_cross;
     thrust_vector_correction.from_axis_angle(thrust_vec_cross, thrust_error_angle);
 
@@ -879,13 +883,17 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
     // 
     // 计算推力矢量旋转变换到机体坐标系后所需的剩余旋转
     /* 获取航向校正四元数 */
+    // 为啥这里得修一下偏航角? 
     AP::logger().Write("TVRA","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
+
     Quaternion heading_vec_correction_quat = thrust_vector_correction.inverse() * attitude_body.inverse() * attitude_target;
 
     // calculate the angle error in z (x and y should be zero here).
     // 计算z轴角度误差(在这儿x，y应当为0)
     heading_vec_correction_quat.to_axis_angle(rotation);
     attitude_error.z = rotation.z;
+
+    AP::logger().Write("HDRO","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
 }
 
 // calculates the velocity correction from an angle error. The angular velocity has acceleration and
