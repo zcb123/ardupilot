@@ -719,8 +719,9 @@ void AC_AttitudeControl::attitude_controller_run_quat()
     /*
     * 输入: 
     *   attitude_body: 当前机体姿态
+    *   _attitude_target: 没有前馈的情况下，直接来自于遥控器.有前馈时来自于上一时刻机体系目标角速度积分.
     * 输出:
-    *   _attitude_target:没有前馈的情况下，直接来自于遥控器 
+    *   _attitude_target: 当偏航角误差过大时，会被函数限幅
     *   attitude_error: 姿态误差。当前姿态与目标姿态之间的误差
     *   _thrust_angle:推力角。来自于竖直向上推力向量与当前姿态下推力向量的夹角。rad ；-1 ~ +1
     *   _thrust_error_angle:推力角误差。当前姿态下推力向量与目标姿态下推力向量的夹角。rad ; -1 ~ +1
@@ -799,6 +800,7 @@ void AC_AttitudeControl::thrust_heading_rotation_angles(Quaternion& attitude_tar
     /*
     * yaw角控制值不为零，并且z轴误差>AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP()则进入
     */
+    /* 偏航角误差限幅 */
     AP::logger().Write("HDRO","TimeUs,AERZ","Qf",AP_HAL::micros64(),attitude_error.z);
     Quaternion yaw_vec_correction_quat;
     if (!is_zero(_p_angle_yaw.kP()) && fabsf(attitude_error.z) > AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP()) {
@@ -877,6 +879,7 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
     // 
     // 计算推力矢量旋转变换到机体坐标系后所需的剩余旋转
     /* 获取航向校正四元数 */
+    AP::logger().Write("TVRA","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
     Quaternion heading_vec_correction_quat = thrust_vector_correction.inverse() * attitude_body.inverse() * attitude_target;
 
     // calculate the angle error in z (x and y should be zero here).
