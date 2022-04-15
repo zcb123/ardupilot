@@ -734,10 +734,12 @@ void AC_AttitudeControl::attitude_controller_run_quat()
     // 从机体系姿态误差中计算角速度校正量
     /* 角度控制环 */
     _ang_vel_body = update_ang_vel_target_from_att_error(attitude_error);
-    AP::logger().Write("ATER","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
+
     // ensure angular velocity does not go over configured limits
     // 确保角速度不超过设置的限制
     ang_vel_limit(_ang_vel_body, radians(_ang_vel_roll_max), radians(_ang_vel_pitch_max), radians(_ang_vel_yaw_max));
+
+    AP::logger().Write("ANGV","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),_ang_vel_body.x,_ang_vel_body.y,_ang_vel_body.z,_thrust_error_angle);
 
     // rotation from the target frame to the body frame
     // 从目标坐标系(NED坐标系)旋转到机体坐标系
@@ -747,6 +749,7 @@ void AC_AttitudeControl::attitude_controller_run_quat()
     // 在机体坐标系下的目标角速度向量
     Vector3f ang_vel_body_feedforward = rotation_target_to_body * _ang_vel_target;
 
+    AP::logger().Write("AFEW","TimeUs,AERX,AERY,AERZ","Qfff",AP_HAL::micros64(),ang_vel_body_feedforward.x,ang_vel_body_feedforward.y,ang_vel_body_feedforward.z);
     // Correct the thrust vector and smoothly add feedforward and yaw input
     // 校正推力向量，且平滑增加前馈和偏航角输入
     _feedforward_scalar = 1.0f;
@@ -821,6 +824,9 @@ void AC_AttitudeControl::thrust_heading_rotation_angles(Quaternion& attitude_tar
 */
 void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitude_target, const Quaternion& attitude_body, Quaternion& thrust_vector_correction, Vector3f& attitude_error, float& thrust_angle, float& thrust_error_angle) const
 {
+    Vector3f att_body;
+    attitude_body.to_axis_angle(att_body);
+    AP::logger().Write("ATTB","TimeUs,ATBX,ATBY,ATBZ","Qfff",AP_HAL::micros64(),att_body.x,att_body.y,att_body.z);
     // The direction of thrust is [0,0,-1] is any body-fixed frame, inc. body frame and target frame.
     // 在任何机体/目标坐标系下的推力方向
     const Vector3f thrust_vector_up{0.0f, 0.0f, -1.0f};
@@ -851,22 +857,23 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
     // the dot product is used to calculate the angle between the target and desired thrust vectors
     /* 获取当前姿态推力矢量与目标姿态推力矢量之间的夹角，即推力矢量误差角*/
     /* 只打航向角时,thrust_error_angle等于|att_body_thrust_vec|*|att_target_thrust_vec| */
+    /* 地理系下的推力误差角 */
     thrust_error_angle = acosf(constrain_float(att_body_thrust_vec * att_target_thrust_vec, -1.0f, 1.0f));
-
+    
     // Normalize the thrust rotation vector
     /* 如果推力矢量长度为零，即当前姿态推力矢量与目标推力矢量平行(这里如果出现姿态推力矢量与目标推力矢量反向，则有极其严重后果)。或者没有
        或者推力矢量误差角为零(两向量垂直)，则推力矢量叉乘默认向上，即 thrust_vec_cross = thrust_vector_up 。否则，归一化推力矢量叉乘向量。*/ 
     /* 若目标姿态与当前姿态一致则叉乘向量长度为0，姿态无需校正 */
     float thrust_vector_length = thrust_vec_cross.length();
-    if (is_zero(thrust_vector_length) || is_zero(thrust_error_angle)) {
+    if (is_zero(thrust_vector_length) || is_zero(thrust_error_angle)) { //姿态推力向量与目标推力向量同向或者相差180度都会进入
         thrust_vec_cross = thrust_vector_up;
     } else {
-        thrust_vec_cross /= thrust_vector_length;   //归一化
+        thrust_vec_cross /= thrust_vector_length;   //归一化,确保thrust_vec_cross是单位向量，这样可以直接用轴角法转化成四元数
     }
 
     // thrust_vector_correction is defined relative to the body frame but its axis `thrust_vec_cross` was computed in
     // the inertial frame. First rotate it by the inverse of attitude_body to express it back in the body frame
-    // 推力向量校正是相对于机体坐标系定义的，但它的轴“推力向量交叉”是在惯性系中计算的。 先通过attitude_body的共轭(逆旋转)旋转到
+    // 推力向量校正是相对于机体坐标系定义的，但它的轴“推力向量交叉”是在惯性系中计算的。 先通过attitude_body的共轭(逆旋转)旋转到机体系
     /* 转换到机体系 */
     thrust_vec_cross = attitude_body.inverse() * thrust_vec_cross;
     thrust_vector_correction.from_axis_angle(thrust_vec_cross, thrust_error_angle);
@@ -879,8 +886,7 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
     attitude_error.y = rotation.y;
 
     // calculate the remaining rotation required after thrust vector is rotated transformed to the body frame
-    // heading_vector_correction
-    // 
+    // heading_vector_correction 
     // 计算推力矢量旋转变换到机体坐标系后所需的剩余旋转
     /* 获取航向校正四元数 */
     // 为啥这里得修一下偏航角? 
@@ -888,6 +894,10 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
 
     Quaternion heading_vec_correction_quat = thrust_vector_correction.inverse() * attitude_body.inverse() * attitude_target;
 
+    Vector3f hvcq_axis_angle;
+    heading_vec_correction_quat.to_axis_angle(hvcq_axis_angle);
+    AP::logger().Write("HVCQ","TimeUs,AERX,AERY,AERZ","Qfff",AP_HAL::micros64(),hvcq_axis_angle.x,hvcq_axis_angle.y,hvcq_axis_angle.z);
+    
     // calculate the angle error in z (x and y should be zero here).
     // 计算z轴角度误差(在这儿x，y应当为0)
     heading_vec_correction_quat.to_axis_angle(rotation);

@@ -485,7 +485,7 @@ void QuaternionT<T>::to_axis_angle(Vector3<T> &v) const
     const T l = sqrtF(sq(q2)+sq(q3)+sq(q4));
     v = Vector3<T>(q2,q3,q4);
     if (!is_zero(l)) {
-        v /= l;
+        v /= l;                                 //归一化，转化成单位向量
         v *= wrap_PI(2.0f * atan2F(l,q1));      //theta = 2*arctan(sqrt(q2^2+q3^2+q4^2)/q1);将单位向量放大theta倍
     }
 }

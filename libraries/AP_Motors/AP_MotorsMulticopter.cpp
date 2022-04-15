@@ -232,7 +232,7 @@ void AP_MotorsMulticopter::output()
     // update throttle filter
     // 更新油门滤波器; 一阶低通滤波器
     update_throttle_filter();
-
+    
     // calc filtered battery voltage and lift_max
     // 计算滤波电池电压和最大升力(lift_max)
     update_lift_max_from_batt_voltage();

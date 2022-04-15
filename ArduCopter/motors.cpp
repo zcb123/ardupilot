@@ -177,7 +177,6 @@ void Copter::motors_output()
         // send output signals to motors
         motors->output();
     }
-
     // push all channels
     SRV_Channels::push();
 }
