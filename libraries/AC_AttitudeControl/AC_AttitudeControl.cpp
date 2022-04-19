@@ -891,13 +891,22 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
     /* 获取航向校正四元数 */
     // 为啥这里得修一下偏航角? 
     AP::logger().Write("TVRA","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
-
-    Quaternion heading_vec_correction_quat = thrust_vector_correction.inverse() * attitude_body.inverse() * attitude_target;    //表示往目标姿态旋转后再向机体姿态反方向旋转最后向推力校正向量反方向旋转
+    /* attitude_target往反方向旋转attitude_body，再往反方向旋转thrust_vector_correction */
+    Quaternion heading_vec_correction_quat = thrust_vector_correction.inverse() * attitude_body.inverse() * attitude_target;    //表示目标姿态与当前姿态、推力校正向量之间的差
 
     Vector3f hvcq_axis_angle;
     thrust_vector_correction.inverse().to_axis_angle(hvcq_axis_angle);
     AP::logger().Write("TVCQ","TimeUs,AERX,AERY,AERZ","Qfff",AP_HAL::micros64(),hvcq_axis_angle.x,hvcq_axis_angle.y,hvcq_axis_angle.z);
 
+    Vector3f attbody_inverse_axis_angle;
+    attitude_body.inverse().to_axis_angle(attbody_inverse_axis_angle);
+    AP::logger().Write("ATBI","TimeUs,AERX,AERY,AERZ","Qfff",AP_HAL::micros64(),attbody_inverse_axis_angle.x,attbody_inverse_axis_angle.y,attbody_inverse_axis_angle.z);
+   
+    Vector3f att_target_axis_angle;
+    attitude_body.inverse().to_axis_angle(att_target_axis_angle);
+    AP::logger().Write("ATRI","TimeUs,AERX,AERY,AERZ","Qfff",AP_HAL::micros64(),att_target_axis_angle.x,att_target_axis_angle.y,att_target_axis_angle.z);
+    
+    
     // calculate the angle error in z (x and y should be zero here).
     // 计算z轴角度误差(在这儿x，y应当为0)
     heading_vec_correction_quat.to_axis_angle(rotation);
