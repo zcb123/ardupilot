@@ -383,7 +383,7 @@ protected:
     AP_Float            _ang_vel_yaw_max;
 
     // Maximum rotation acceleration for earth-frame roll axis
-    // 地理坐标系横滚轴最大旋转加速度
+    // 地球坐标系横滚轴最大旋转加速度
     AP_Float            _accel_roll_max;
 
     // Maximum rotation acceleration for earth-frame pitch axis

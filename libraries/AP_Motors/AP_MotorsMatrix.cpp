@@ -173,7 +173,8 @@ void AP_MotorsMatrix::output_to_motors()
             }
             break;
     }
-
+    // AP::logger().Write("SRVP","TimeUs,REVR,TRIM,SCLV,SMAX,SMIN","QBffff",AP_HAL::micros64(),reversed,servo_trim,scaled_value,servo_max,servo_min);
+    // AP::logger().Write("ACTR","TimeUs,ATR","Qf",AP_HAL::micros64(),)
     // convert output to PWM and send to each motor
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {

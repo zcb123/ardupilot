@@ -284,6 +284,8 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler
 
     // Add roll trim to compensate tail rotor thrust in heli (will return zero on multirotors)
     euler_roll_angle += get_roll_trim_rad();
+    
+    AP::logger().Write("ACTL","TimeUs,BF","Qf",AP_HAL::micros64(),_rate_bf_ff_enabled);
 
     if (_rate_bf_ff_enabled) {
         // translate the roll pitch and yaw acceleration limits to the euler axis
