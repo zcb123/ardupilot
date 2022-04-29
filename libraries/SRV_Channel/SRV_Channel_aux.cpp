@@ -65,7 +65,7 @@ void SRV_Channel::output_ch(void)
         }
     }
 #endif // HAL_BUILD_AP_PERIPH
-
+    //AP::logger().Write("SRVP","TimeUs,REVR,TRIM,SCLV,SMAX,SMIN","QBffff",AP_HAL::micros64(),reversed,servo_trim,scaled_value,servo_max,servo_min);
     if (!(SRV_Channels::disabled_mask & (1U<<ch_num))) {
         hal.rcout->write(ch_num, output_pwm);
     }

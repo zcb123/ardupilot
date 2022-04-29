@@ -40,7 +40,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-SRV_Channel *SRV_Channels::channels;
+SRV_Channel *SRV_Channels::channels;        //声明SRV_Channels类中的成员变量channels,定义的是指针，怎么通过下标索引？ // 将SRV_Channel指针指向obj_channels[]数组对象
 SRV_Channels *SRV_Channels::_singleton;
 
 #ifndef HAL_BUILD_AP_PERIPH
