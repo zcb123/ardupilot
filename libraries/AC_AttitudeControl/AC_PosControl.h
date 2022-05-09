@@ -136,6 +136,7 @@ public:
     ///     Kinematically consistent target position and desired velocity and accelerations should be provided before calling this function
     void update_xy_controller();
     void update_x_controller();
+    void update_y_controller();
     ///
     /// Vertical position controller
     ///
@@ -348,6 +349,10 @@ public:
     AC_PID_Basic& get_vel_z_pid() { return _pid_vel_z; }
     AC_PID& get_accel_z_pid() { return _pid_accel_z; }
 
+    AC_P_1D& get_pos_x_p()  {return _p_pos_x;}
+    AC_P_1D& get_pos_y_p()  {return _p_pos_y;}
+    AC_PID_Basic& get_vel_x_pid() { return _pid_vel_x; }
+    AC_PID_Basic& get_vel_y_pid() { return _pid_vel_y; }
     /// set_limit_accel_xy - mark that accel has been limited
     ///     this prevents integrator buildup
     void set_externally_limited_xy() { _limit_vector.x = _accel_target.x; _limit_vector.y = _accel_target.y; }
@@ -395,6 +400,8 @@ protected:
         bool pos_xy;        // true if we have hit a horizontal position limit
         bool pos_x_min;
         bool pos_x_max;
+        bool pos_y_min;
+        bool pos_y_max;
         bool pos_up;        // true if we have hit a vertical position limit while going up
         bool pos_down;      // true if we have hit a vertical position limit while going down
     } _limit;
@@ -440,9 +447,11 @@ protected:
     AP_Float        _shaping_jerk_z;    // Jerk limit of the z kinematic path generation in m/s^3 used to determine how quickly the aircraft varies the acceleration target
     AC_P_2D         _p_pos_xy;          // XY axis position controller to convert distance error to desired velocity
     AC_P_1D         _p_pos_x;           // added by zcb 2022.05.09 14:37
+    AC_P_1D         _p_pos_y;           // added by zcb 2022.05.09 16:16
     AC_P_1D         _p_pos_z;           // Z axis position controller to convert altitude error to desired climb rate
     AC_PID_2D       _pid_vel_xy;        // XY axis velocity controller to convert velocity error to desired acceleration
     AC_PID_Basic    _pid_vel_x;         // added by zcb 2022.05.09 14:42
+    AC_PID_Basic    _pid_vel_y;         // added by zcb 2022.05.09 16:17
     AC_PID_Basic    _pid_vel_z;         // Z axis velocity controller to convert climb rate error to desired acceleration
     AC_PID          _pid_accel_z;       // Z axis acceleration controller to convert desired acceleration to throttle output
 

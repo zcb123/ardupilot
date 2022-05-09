@@ -307,6 +307,23 @@ const AP_Param::GroupInfo AC_PosControl::var_info[] = {
     // @User: Advanced
     AP_SUBGROUPINFO(_pid_vel_x, "_VELX_", 13, AC_PosControl, AC_PID_Basic),
 
+    /* added by zcb 2022.05.09 14:51 */
+    // @Param: _POSY_P
+    // @DisplayName: Position (horizontal) controller P gain
+    // @Description: Position controller P gain.  Converts the distance (in the latitude direction) to the target location into a desired speed which is then passed to the loiter latitude rate controller
+    // @Range: 0.500 2.000
+    // @User: Standard
+    AP_SUBGROUPINFO(_p_pos_y, "_POSY_", 14, AC_PosControl, AC_P_1D),
+
+
+    // @Param: _VELX_FLTD
+    // @DisplayName: Velocity (vertical) input filter for D term
+    // @Description: Velocity (vertical) input filter for D term.  This filter (in Hz) is applied to the input for D terms
+    // @Range: 0 100
+    // @Units: Hz
+    // @User: Advanced
+    AP_SUBGROUPINFO(_pid_vel_y, "_VELY_", 15, AC_PosControl, AC_PID_Basic),
+
     AP_GROUPEND
 };
 
@@ -325,8 +342,10 @@ AC_PosControl::AC_PosControl(AP_AHRS_View& ahrs, const AP_InertialNav& inav,
     _pid_accel_z(POSCONTROL_ACC_Z_P, POSCONTROL_ACC_Z_I, POSCONTROL_ACC_Z_D, 0.0f, POSCONTROL_ACC_Z_IMAX, 0.0f, POSCONTROL_ACC_Z_FILT_HZ, 0.0f, dt),
     _p_pos_xy(POSCONTROL_POS_XY_P, dt),
     _p_pos_x(0.8,dt),
+    _p_pos_y(0.8,dt),
     _pid_vel_xy(POSCONTROL_VEL_XY_P, POSCONTROL_VEL_XY_I, POSCONTROL_VEL_XY_D, 0.0f, POSCONTROL_VEL_XY_IMAX, POSCONTROL_VEL_XY_FILT_HZ, POSCONTROL_VEL_XY_FILT_D_HZ, dt),
     _pid_vel_x(0.92,0.05,0.2,0.0,500.0,5.0,5.0,dt),
+    _pid_vel_y(0.92,0.05,0.2,0.0,500.0,5.0,5.0,dt),
     _dt(dt),
     _vel_max_down_cms(POSCONTROL_SPEED_DOWN),
     _vel_max_up_cms(POSCONTROL_SPEED_UP),
@@ -653,9 +672,12 @@ void AC_PosControl::update_xy_controller()
     const Vector3f &curr_pos = _inav.get_position();
     Vector2f _pos_target_alone = {};
     _pos_target_alone.x = (float)_pos_target.x;
+    _pos_target_alone.y = (float)_pos_target.y;
     Vector2f vel_target = _p_pos_xy.update_all(_pos_target.x, _pos_target.y, curr_pos, _limit.pos_xy);
            vel_target.x = _p_pos_x.update_all(_pos_target_alone.x,curr_pos.x,_limit.pos_x_min,_limit.pos_x_max); 
+           vel_target.y = _p_pos_y.update_all(_pos_target_alone.y,curr_pos.y,_limit.pos_y_min,_limit.pos_y_max); 
            _pos_target.x = (double)_pos_target_alone.x;       
+           _pos_target.y = (double)_pos_target_alone.y;
     // add velocity feed-forward scaled to compensate for optical flow measurement induced EKF noise
     vel_target *= ekfNavVelGainScaler;
     _vel_target.x = vel_target.x;
@@ -676,6 +698,7 @@ void AC_PosControl::update_xy_controller()
     Vector2f accel_target = _pid_vel_xy.update_all(Vector2f{_vel_target.x, _vel_target.y}, _vehicle_horiz_vel, Vector2f(_limit_vector.x, _limit_vector.y));
     // acceleration to correct for velocity error and scale PID output to compensate for optical flow measurement induced EKF noise
             accel_target.x = _pid_vel_x.update_all(_vel_target.x,_vehicle_horiz_vel.x);
+            accel_target.y = _pid_vel_y.update_all(_vel_target.y,_vehicle_horiz_vel.y);
     accel_target *= ekfNavVelGainScaler;
 
     // pass the correction acceleration to the target acceleration output
