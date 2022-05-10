@@ -15,7 +15,7 @@ public:
 
     static const struct AP_Param::GroupInfo var_info[];
 
-    float update(float target, float measurement,float flag) WARN_IF_UNUSED;
+    float update(float target, float measurement,bool &limit_min,bool &limit_max,float flag) WARN_IF_UNUSED;
 
 protected:
     float _error;       // time step in seconds

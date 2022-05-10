@@ -350,8 +350,7 @@ public:
     AC_PID_Basic& get_vel_z_pid() { return _pid_vel_z; }
     AC_PID& get_accel_z_pid() { return _pid_accel_z; }
 
-    AC_P_1D& get_pos_x_p()  {return _p_pos_x;}
-    AC_P_1D& get_pos_y_p()  {return _p_pos_y;}
+
     AC_PID_Basic& get_vel_x_pid() { return _pid_vel_x; }
     AC_PID_Basic& get_vel_y_pid() { return _pid_vel_y; }
     /// set_limit_accel_xy - mark that accel has been limited
@@ -447,8 +446,8 @@ protected:
     AP_Float        _shaping_jerk_xy;   // Jerk limit of the xy kinematic path generation in m/s^3 used to determine how quickly the aircraft varies the acceleration target
     AP_Float        _shaping_jerk_z;    // Jerk limit of the z kinematic path generation in m/s^3 used to determine how quickly the aircraft varies the acceleration target
     AC_P_2D         _p_pos_xy;          // XY axis position controller to convert distance error to desired velocity
-    AC_P_1D         _p_pos_x;           // added by zcb 2022.05.09 14:37
-    AC_P_1D         _p_pos_y;           // added by zcb 2022.05.09 16:16
+    AC_PID_Basic_Flag         _p_pos_x;           // modified by zcb 2022.05.10 15:34
+    AC_PID_Basic_Flag         _p_pos_y;           // modified by zcb 2022.05.10 15:34
     AC_P_1D         _p_pos_z;           // Z axis position controller to convert altitude error to desired climb rate
     AC_PID_2D       _pid_vel_xy;        // XY axis velocity controller to convert velocity error to desired acceleration
     AC_PID_Basic    _pid_vel_x;         // added by zcb 2022.05.09 14:42
