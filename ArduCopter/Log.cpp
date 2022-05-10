@@ -79,6 +79,8 @@ void Copter::Log_Write_Attitude()
         if (should_log(MASK_LOG_NTUN) && (flightmode->requires_GPS() || landing_with_GPS())) {
             // logger.Write_PID(LOG_PIDN_MSG, pos_control->get_vel_xy_pid().get_pid_info_x());
             // logger.Write_PID(LOG_PIDE_MSG, pos_control->get_vel_xy_pid().get_pid_info_y());
+            logger.Write_PID(LOG_PIDPX_MSG, pos_control->get_pos_x().get_pid_info());
+            logger.Write_PID(LOG_PIDPY_MSG, pos_control->get_pos_y().get_pid_info());
             logger.Write_PID(LOG_PIDN_MSG, pos_control->get_vel_x_pid().get_pid_info());
             logger.Write_PID(LOG_PIDE_MSG, pos_control->get_vel_y_pid().get_pid_info());
         }

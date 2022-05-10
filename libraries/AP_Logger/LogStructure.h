@@ -1300,6 +1300,10 @@ LOG_STRUCTURE_FROM_ESC_TELEM \
       "PIDN", PID_FMT,  PID_LABELS, PID_UNITS, PID_MULTS }, \
     { LOG_PIDE_MSG, sizeof(log_PID), \
       "PIDE", PID_FMT,  PID_LABELS, PID_UNITS, PID_MULTS }, \
+      { LOG_PIDPX_MSG, sizeof(log_PID), \
+      "PDPX", PID_FMT,  PID_LABELS, PID_UNITS, PID_MULTS }, \
+      { LOG_PIDPY_MSG, sizeof(log_PID), \
+      "PDPY", PID_FMT,  PID_LABELS, PID_UNITS, PID_MULTS }, \
     { LOG_DSTL_MSG, sizeof(log_DSTL), \
       "DSTL", "QBfLLeccfeffff", "TimeUS,Stg,THdg,Lat,Lng,Alt,XT,Travel,L1I,Loiter,Des,P,I,D", "s??DUm--------", "F??000--------" }, \
 LOG_STRUCTURE_FROM_INERTIALSENSOR \
@@ -1413,6 +1417,8 @@ enum LogMessages : uint8_t {
     LOG_PIDS_MSG,
     LOG_PIDN_MSG,
     LOG_PIDE_MSG,
+    LOG_PIDPX_MSG,
+    LOG_PIDPY_MSG,
     LOG_DSTL_MSG,
     LOG_RPM_MSG,
     LOG_RFND_MSG,

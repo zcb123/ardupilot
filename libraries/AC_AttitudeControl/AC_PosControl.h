@@ -350,7 +350,8 @@ public:
     AC_PID_Basic& get_vel_z_pid() { return _pid_vel_z; }
     AC_PID& get_accel_z_pid() { return _pid_accel_z; }
 
-
+    AC_PID_Basic_Flag& get_pos_x(){return _p_pos_x;}
+    AC_PID_Basic_Flag& get_pos_y(){return _p_pos_y;}
     AC_PID_Basic& get_vel_x_pid() { return _pid_vel_x; }
     AC_PID_Basic& get_vel_y_pid() { return _pid_vel_y; }
     /// set_limit_accel_xy - mark that accel has been limited
