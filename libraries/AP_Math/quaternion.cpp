@@ -405,6 +405,7 @@ void QuaternionT<T>::earth_to_body(Vector3<T> &v) const
 }
 
 // create a quaternion from Euler angles
+
 template <typename T>
 void QuaternionT<T>::from_euler(T roll, T pitch, T yaw)
 {
@@ -415,6 +416,7 @@ void QuaternionT<T>::from_euler(T roll, T pitch, T yaw)
     const T sp2 = sinF(pitch*0.5);
     const T sy2 = sinF(yaw*0.5);
 
+    /* 当pitch=90°时会出现奇异性，这里没考虑 */
     q1 = cr2*cp2*cy2 + sr2*sp2*sy2;
     q2 = sr2*cp2*cy2 - cr2*sp2*sy2;
     q3 = cr2*sp2*cy2 + sr2*cp2*sy2;
