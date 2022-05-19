@@ -355,7 +355,7 @@ AC_PosControl::AC_PosControl(AP_AHRS_View& ahrs, const AP_InertialNav& inav,
     _jerk_max_z_cmsss(POSCONTROL_JERK_Z * 100.0)
 {
     AP_Param::setup_object_defaults(this, var_info);
-    
+    one_time = true;
     // initialise flags
     _limit.pos_xy = true;
     _limit.pos_up = true;
@@ -674,12 +674,18 @@ void AC_PosControl::update_xy_controller()
     _pos_target_alone.y = (float)_pos_target.y;
     //Vector2f vel_target = _p_pos_xy.update_all(_pos_target.x, _pos_target.y, curr_pos, _limit.pos_xy);
     Vector2f vel_target = {};
-    gcs().send_text(MAV_SEVERITY_INFO, "kp%f ki%f kd%f  ",_p_pos_x.kP().get(),_p_pos_x.kI().get(),_p_pos_x.kD().get());
+    if(one_time)
+    {
+        one_time = false;
+        gcs().send_text(MAV_SEVERITY_INFO, "kp%f ki%f kd%f  ",_p_pos_x.kP().get(),_p_pos_x.kI().get(),_p_pos_x.kD().get());
+    }
     
-           vel_target.x = _p_pos_x.update(_pos_target_alone.x,curr_pos.x,_limit.pos_x_min,_limit.pos_x_max,_accel_desired.x); 
-           vel_target.y = _p_pos_y.update(_pos_target_alone.y,curr_pos.y,_limit.pos_y_min,_limit.pos_y_max,_accel_desired.y); 
-           _pos_target.x = (double)_pos_target_alone.x;       
-           _pos_target.y = (double)_pos_target_alone.y;
+    
+        vel_target.x = _p_pos_x.update(_pos_target_alone.x,curr_pos.x,_limit.pos_x_min,_limit.pos_x_max,_accel_desired.x); 
+        vel_target.y = _p_pos_y.update(_pos_target_alone.y,curr_pos.y,_limit.pos_y_min,_limit.pos_y_max,_accel_desired.y); 
+        _pos_target.x = (double)_pos_target_alone.x;       
+        _pos_target.y = (double)_pos_target_alone.y;
+
     // add velocity feed-forward scaled to compensate for optical flow measurement induced EKF noise
     vel_target *= ekfNavVelGainScaler;
     _vel_target.x = vel_target.x;

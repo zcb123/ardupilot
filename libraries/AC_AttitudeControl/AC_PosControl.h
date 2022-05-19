@@ -497,4 +497,6 @@ protected:
 
     // return true if on a real vehicle or SITL with lock-step scheduling
     bool has_good_timing(void) const;
+
+    bool one_time;
 };

@@ -24,7 +24,7 @@ const AP_Param::GroupInfo AC_PID_Basic_Flag::var_info[] = {
     // @Param: IMAX
     // @DisplayName: PID Integral Maximum
     // @Description: The maximum/minimum value that the I term can output
-    AP_GROUPINFO("IMAX", 2, AC_PID_Basic_Flag, _kimax, 0),
+    AP_GROUPINFO("IMAX", 2, AC_PID_Basic_Flag, _kimax, 20),
 
     // @Param: FLTE
     // @DisplayName: PID Error filter frequency in Hz
