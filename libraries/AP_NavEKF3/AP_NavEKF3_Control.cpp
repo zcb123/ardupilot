@@ -677,9 +677,9 @@ void  NavEKF3_core::updateFilterStatus(void)
     // init return value
     /* 前一个如果为false，后面一个不用判断，结果为false */
     
-    if(PV_AidingModeLast!=PV_AidingMode){
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Aiding mode changed %d", PV_AidingMode);
-    }
+    // if(PV_AidingModeLast!=PV_AidingMode){
+    //     GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Aiding mode changed %d", PV_AidingMode);
+    // }
     
     filterStatus.value = 0;
     bool doingBodyVelNav = (PV_AidingMode != AID_NONE) && (imuSampleTime_ms - prevBodyVelFuseTime_ms < 5000);

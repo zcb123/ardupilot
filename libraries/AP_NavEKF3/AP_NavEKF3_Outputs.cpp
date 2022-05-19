@@ -12,11 +12,11 @@ bool NavEKF3_core::healthy(void) const
     getFilterFaults(faultInt);
     float horizErrSq = sq(innovVelPos[3]) + sq(innovVelPos[4]);
 
-    const uint32_t now = dal.millis();
-    if(now - send_flag_time > 30000){
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "fInt %d velR %lf! posR %lf !  hgtR %lf oG %d AMode %d hESq %lf hgtInSta %lf", faultInt,velTestRatio,posTestRatio,hgtTestRatio,onGround,PV_AidingMode,horizErrSq,hgtInnovFiltState);
-        send_flag_time = now;
-    }
+    // const uint32_t now = dal.millis();
+    // if(now - send_flag_time > 30000){
+    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "fInt %d velR %lf! posR %lf !  hgtR %lf oG %d AMode %d hESq %lf hgtInSta %lf", faultInt,velTestRatio,posTestRatio,hgtTestRatio,onGround,PV_AidingMode,horizErrSq,hgtInnovFiltState);
+    //     send_flag_time = now;
+    // }
 
     if (faultInt > 0) {
         return false;

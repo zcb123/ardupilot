@@ -85,6 +85,7 @@ float AC_PID_Basic_Flag::update(float target, float measurement,bool &limit_min,
     // MIN(_Dxy_max, _D2xy_max / _kxy_P) limits the max accel to the point where max jerk is exceeded
     // if(is_zero(flag)){
         res = update_all(target,measurement); 
+        
         // AP::logger().Write("PIDF","TimeUs,FLAG,BACH","Qff",AP_HAL::micros64(),flag,1.1f);
     // }
     // else{
