@@ -225,7 +225,7 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
 
     // get loiters desired velocity from the position controller where it is being stored.
     /* 获取上一时刻desired_vel */
-    const Vector3f &desired_vel_3d = _pos_control.get_vel_desired_cms();
+    const Vector3f &desired_vel_3d = _pos_control.get_vel_desired_cms();    //获取个引用
     Vector2f desired_vel{desired_vel_3d.x,desired_vel_3d.y};
 
     // update the desired velocity using our predicted acceleration

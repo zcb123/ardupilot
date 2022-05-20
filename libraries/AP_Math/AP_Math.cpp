@@ -438,3 +438,27 @@ float fixedwing_turn_rate(float bank_angle_deg, float airspeed)
     bank_angle_deg = constrain_float(bank_angle_deg, -80, 80);
     return degrees(GRAVITY_MSS*tanf(radians(bank_angle_deg))/MAX(airspeed,1));
 }
+
+/***********************************************************
+*  说明：防止数值跳变的过渡函数，从x1 过渡到 x2。      *
+*  输入：x为当前数值，x1为上一个数值，x2为目标数值。*
+*  输出：0~1之间的数值			  *
+*  用法：					  *
+*          x = x1 + (x2 - x1)*trans(x,x2,x1);  		  *
+*  作者：zcb				  *
+*  日期：2022.05.20 09:45			  *
+***********************************************************/
+double trans(double x,double x2, double x1)
+{
+	double res;
+	double abs_temp1 = abs(x-x1);		//abs是绝对值函数
+	double abs_temp2 = abs(x2-x1);
+	if(x<x1)
+		res = 0.0;
+	else if(x<x2)
+		res = 0.5*(1+sin(M_PI*(abs_temp1/abs_temp2 - 0.5)));	//PI = 3.141592653
+	else
+		res =1.0;
+	
+	return res;
+}

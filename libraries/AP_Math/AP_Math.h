@@ -322,3 +322,17 @@ uint16_t float2fixed(const float input, const uint8_t fractional_bits = 8);
   fixed wing aircraft
  */
 float fixedwing_turn_rate(float bank_angle_deg, float airspeed);
+
+
+/***********************************************************
+*  说明：防止数值跳变的过渡函数，从x1 过渡到 x2。      *
+*  输入：x为当前数值，x1为上一个数值，x2为目标数值。*
+*  输出：0~1之间的数值			  *
+*  用法：					  *
+*          x = x1 + (x2 - x1)*trans(x,x2,x1);  		  *
+*  作者：zcb				  *
+*  日期：2022.05.20 09:45			  *
+***********************************************************/
+double trans(double x,double x2, double x1);
+
+
