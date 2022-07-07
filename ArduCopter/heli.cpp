@@ -158,7 +158,9 @@ void Copter::heli_update_rotor_speed_targets()
 
     // get rotor control method
     uint8_t rsc_control_mode = motors->get_rsc_mode();
-
+    float rpm = -1;
+    rpm_sensor.get_rpm(0, rpm);
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "speed targets rpm %5.3f control mode %u", (double)rpm,rsc_control_mode);
     switch (rsc_control_mode) {
         case ROTOR_CONTROL_MODE_SPEED_PASSTHROUGH:
             // pass through pilot desired rotor speed from the RC
@@ -179,8 +181,9 @@ void Copter::heli_update_rotor_speed_targets()
             // set rpm from rotor speed sensor
             if (motors->get_interlock()) {
 #if RPM_ENABLED == ENABLED
-                float rpm = -1;
+                //float rpm = -1;
                 rpm_sensor.get_rpm(0, rpm);
+                gcs().send_text(MAV_SEVERITY_CRITICAL, "rpm %5.3f", (double)rpm);
                 motors->set_rpm(rpm);
 #endif
                 motors->set_desired_rotor_speed(motors->get_rsc_setpoint());

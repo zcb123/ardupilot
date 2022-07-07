@@ -40,10 +40,10 @@ void AP_RPM_Pin::irq_handler(uint8_t pin, bool pin_state, uint32_t timestamp)
     // we don't accept pulses less than 100us. Using an irq for such
     // high RPM is too inaccurate, and it is probably just bounce of
     // the signal which we should ignore
-    if (dt > 100 && dt < 1000*1000) {
+    //if (dt > 100 && dt < 1000*1000) {
         irq_state[state.instance].dt_sum += dt;
         irq_state[state.instance].dt_count++;
-    }
+    //}
 }
 
 void AP_RPM_Pin::update(void)
@@ -59,6 +59,7 @@ void AP_RPM_Pin::update(void)
         irq_state[state.instance].dt_sum = 0;
         // attach to new pin
         last_pin = get_pin();
+        gcs().send_text(MAV_SEVERITY_WARNING, "last_pin %d", last_pin);
         if (last_pin) {
             hal.gpio->pinMode(last_pin, HAL_GPIO_INPUT);
             if (!hal.gpio->attach_interrupt(
@@ -69,7 +70,7 @@ void AP_RPM_Pin::update(void)
             }
         }
     }
-
+    gcs().send_text(MAV_SEVERITY_WARNING, "dt_count %lu", irq_state[state.instance].dt_count);
     if (irq_state[state.instance].dt_count > 0) {
         float dt_avg;
 

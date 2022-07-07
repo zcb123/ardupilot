@@ -119,6 +119,7 @@ void AP_RPM::init(void)
         }
         if (type == RPM_TYPE_PIN) {
             drivers[i] = new AP_RPM_Pin(*this, i, state[i]);
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "rpm init %5.3f", (double)i);
         }
 #endif
 #if HAL_EFI_ENABLED
