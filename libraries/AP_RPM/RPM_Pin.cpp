@@ -40,10 +40,11 @@ void AP_RPM_Pin::irq_handler(uint8_t pin, bool pin_state, uint32_t timestamp)
     // we don't accept pulses less than 100us. Using an irq for such
     // high RPM is too inaccurate, and it is probably just bounce of
     // the signal which we should ignore
-    //if (dt > 100 && dt < 1000*1000) {
+    // gcs().send_text(MAV_SEVERITY_WARNING," interrupting !!!!!!!!!!!!!!!!!");
+    if (dt > 100 && dt < 1000*1000) {
         irq_state[state.instance].dt_sum += dt;
         irq_state[state.instance].dt_count++;
-    //}
+    }
 }
 
 void AP_RPM_Pin::update(void)
@@ -59,18 +60,19 @@ void AP_RPM_Pin::update(void)
         irq_state[state.instance].dt_sum = 0;
         // attach to new pin
         last_pin = get_pin();
-        gcs().send_text(MAV_SEVERITY_WARNING, "last_pin %d", last_pin);
-        if (last_pin) {
+        // gcs().send_text(MAV_SEVERITY_WARNING, "last_pin %d", last_pin);
+        if (last_pin>0) {
             hal.gpio->pinMode(last_pin, HAL_GPIO_INPUT);
+            // gcs().send_text(MAV_SEVERITY_WARNING,"attaching interrupt");
             if (!hal.gpio->attach_interrupt(
                     last_pin,
                     FUNCTOR_BIND_MEMBER(&AP_RPM_Pin::irq_handler, void, uint8_t, bool, uint32_t),
-                    AP_HAL::GPIO::INTERRUPT_RISING)) {
+                    AP_HAL::GPIO::INTERRUPT_FALLING)) {
                 gcs().send_text(MAV_SEVERITY_WARNING, "RPM: Failed to attach to pin %u", last_pin);
             }
         }
     }
-    gcs().send_text(MAV_SEVERITY_WARNING, "dt_count %lu", irq_state[state.instance].dt_count);
+    //gcs().send_text(MAV_SEVERITY_WARNING, "last_pin %u dt_count %lu", last_pin,irq_state[state.instance].dt_count);
     if (irq_state[state.instance].dt_count > 0) {
         float dt_avg;
 

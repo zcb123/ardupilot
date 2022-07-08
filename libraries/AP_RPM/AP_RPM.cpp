@@ -94,7 +94,7 @@ const AP_Param::GroupInfo AP_RPM::var_info[] = {
 AP_RPM::AP_RPM(void)
 {
     AP_Param::setup_object_defaults(this, var_info);
-
+ //   hal.console->printf("param init");
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_RPM must be singleton");
     }
@@ -118,7 +118,7 @@ void AP_RPM::init(void)
             type = RPM_TYPE_PIN;
         }
         if (type == RPM_TYPE_PIN) {
-            drivers[i] = new AP_RPM_Pin(*this, i, state[i]);
+            drivers[i] = new AP_RPM_Pin(*this, i, state[i]); 
             gcs().send_text(MAV_SEVERITY_CRITICAL, "rpm init %5.3f", (double)i);
         }
 #endif
