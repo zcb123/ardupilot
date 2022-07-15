@@ -165,6 +165,7 @@ void Copter::motors_output()
     if (ap.motor_test) {
         motor_test_output();
     } else {
+        /* 判断电机是否锁定的条件 */
         bool interlock = motors->armed() && !ap.in_arming_delay && (!ap.using_interlock || ap.motor_interlock_switch) && !SRV_Channels::get_emergency_stop();
         if (!motors->get_interlock() && interlock) {
             motors->set_interlock(true);

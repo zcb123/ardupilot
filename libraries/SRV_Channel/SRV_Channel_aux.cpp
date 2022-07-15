@@ -66,7 +66,7 @@ void SRV_Channel::output_ch(void)
     }
 #endif // HAL_BUILD_AP_PERIPH
 
-    if (!(SRV_Channels::disabled_mask & (1U<<ch_num))) {
+    if (!(SRV_Channels::disabled_mask & (1U<<ch_num))) {        //这类语句的核心在于大括号{}内执行的内容，当大括号{}内的语句没执行再去看条件是否满足
         hal.rcout->write(ch_num, output_pwm);
     }
 }

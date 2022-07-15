@@ -573,6 +573,7 @@ void RCOutput::push_local(void)
                     period_us /= 8;
                 }
                 else if (group.current_mode < MODE_PWM_DSHOT150) {
+                    
                     uint32_t width = (group.pwm_cfg.frequency/1000000U) * period_us;
                     pwmEnableChannel(group.pwm_drv, j, width);
                 }

@@ -357,8 +357,8 @@ void Copter::Log_Write_Heli()
     struct log_Heli pkt_heli = {
         LOG_PACKET_HEADER_INIT(LOG_HELI_MSG),
         time_us                 : AP_HAL::micros64(),
-        desired_rotor_speed     : motors->get_desired_rotor_speed(),
-        main_rotor_speed        : motors->get_main_rotor_speed(),
+        desired_rotor_speed     : motors->get_desired_rotor_speed(),    //返回主电机期望的转速
+        main_rotor_speed        : motors->get_main_rotor_speed(),       //返回主电机实际的转速
         governor_output         : motors->get_governor_output(),
         control_output          : motors->get_control_output(),
     };

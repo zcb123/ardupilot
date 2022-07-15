@@ -63,7 +63,7 @@ void ModeStabilize_Heli::run()
         break;
     case AP_Motors::SpoolState::THROTTLE_UNLIMITED:
         if (copter.ap.land_complete && !motors->using_leaky_integrator()) {
-            attitude_control->reset_rate_controller_I_terms_smoothly();
+            attitude_control->reset_rate_controller_I_terms_smoothly();         //起飞的时候执行这里
         }
         break;
     case AP_Motors::SpoolState::SPOOLING_UP:

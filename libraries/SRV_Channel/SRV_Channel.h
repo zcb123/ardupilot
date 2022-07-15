@@ -175,7 +175,7 @@ public:
         k_max                   = 136,  // always outputs SERVOn_MAX
         k_mast_rotation         = 137,
         k_nr_aux_servo_functions         ///< This must be the last enum value (only add new values _before_ this one)
-    } Aux_servo_function_t;
+    } Aux_servo_function_t;                 //这里的参数对应着地面站SEVOx_FUNCION中的数值
 
     // used to get min/max/trim limit value based on reverse
     enum class Limit {

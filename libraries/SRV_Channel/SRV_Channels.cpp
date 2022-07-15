@@ -290,7 +290,7 @@ void SRV_Channels::calc_pwm(void)
             channels[i].set_override(true);
             override_counter[i]--;
         }
-        channels[i].calc_pwm(functions[channels[i].function].output_scaled);
+        channels[i].calc_pwm(functions[channels[i].function].output_scaled);    //这里的output_scaled数值来自于motors类.
     }
 }
 
