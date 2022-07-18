@@ -225,7 +225,7 @@ void Copter::fast_loop()
     ins.update();
 
     // run low level rate controllers that only require IMU data
-    attitude_control->rate_controller_run();
+    //attitude_control->rate_controller_run();
 
     // send outputs to the motors library immediately
     motors_output();
@@ -420,10 +420,10 @@ void Copter::throttle_loop()
 
 #if FRAME_CONFIG == HELI_FRAME
     // update rotor speed
-    heli_update_rotor_speed_targets();
+    //heli_update_rotor_speed_targets();
 
     // update trad heli swash plate movement
-    heli_update_landing_swash();
+    //heli_update_landing_swash();
 #endif
 
     // compensate for ground effect (if enabled)
