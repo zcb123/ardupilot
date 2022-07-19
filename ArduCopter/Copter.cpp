@@ -502,19 +502,32 @@ void Copter::ten_hz_logging_loop()
         g2.winch.write_log();
     }
 #endif
+
+    if (should_log(MASK_LOG_IMU)) {
+        AP::ins().Write_IMU();
+    }
 }
 
 // twentyfive_hz_logging - should be run at 25hz
 void Copter::twentyfive_hz_logging()
 {
-    if (should_log(MASK_LOG_ATTITUDE_FAST)) {
-        Log_Write_EKF_POS();
-    }
+    // if (should_log(MASK_LOG_ATTITUDE_FAST)) {
+    //     Log_Write_EKF_POS();
+    // }
 
-    if (should_log(MASK_LOG_IMU)) {
-        AP::ins().Write_IMU();
-    }
+    // if (should_log(MASK_LOG_ATTITUDE_MED) && !should_log(MASK_LOG_ATTITUDE_FAST) && !copter.flightmode->logs_attitude()) {
+    //     Log_Write_Attitude();
+    // }
 
+    // if (should_log(MASK_LOG_RCOUT)) {
+    //     logger.Write_RCOUT();
+    // }
+
+   
+
+    // #if FRAME_CONFIG == HELI_FRAME
+    //     Log_Write_Heli();
+    // #endif
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     if (should_log(MASK_LOG_ATTITUDE_MED) || should_log(MASK_LOG_ATTITUDE_FAST)) {
         //update autorotation log
