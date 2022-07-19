@@ -228,8 +228,10 @@ void Copter::fast_loop()
     //attitude_control->rate_controller_run();
 
     // send outputs to the motors library immediately
-    motors_output();
-
+    //motors_output();
+    hal.rcout->write((uint8_t)4, (uint16_t)1460);       //通道从0开始计数,4表示M5
+    hal.rcout->write((uint8_t)5, (uint16_t)1560);       //通道从0开始计数,5表示M6
+    SRV_Channels::push();
     // run EKF state estimator (expensive)
     // --------------------
     read_AHRS();

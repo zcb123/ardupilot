@@ -503,15 +503,15 @@ void RCOutput::write(uint8_t chan, uint16_t period_us)
         return;
     }
 
-    if (safety_state == AP_HAL::Util::SAFETY_DISARMED && !(safety_mask & (1U<<chan))) {
-        // implement safety pwm value
-        period_us = safe_pwm[chan];
-    }
+    // if (safety_state == AP_HAL::Util::SAFETY_DISARMED && !(safety_mask & (1U<<chan))) {
+    //     // implement safety pwm value
+    //     period_us = safe_pwm[chan];
+    // }
 
     chan -= chan_offset;
 
     period[chan] = period_us;
-
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "period chan! %d %d", chan,period[chan]);
     if (chan < num_fmu_channels) {
         active_fmu_channels = MAX(chan+1, active_fmu_channels);
         if (!corked) {
@@ -534,7 +534,8 @@ void RCOutput::push_local(void)
     uint16_t widest_pulse = 0;
     uint8_t need_trigger = 0;
 
-    bool safety_on = hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED;
+    //bool safety_on = hal.util->safety_switch_state() == AP_HAL::Util::SAFETY_DISARMED;
+  
     for (auto &group : pwm_group_list) {
         if (serial_group) {
             continue;
@@ -550,10 +551,10 @@ void RCOutput::push_local(void)
             if (outmask & (1UL<<chan)) {
                 uint32_t period_us = period[chan];
 
-                if (safety_on && !(safety_mask & (1U<<(chan+chan_offset)))) {
-                    // safety is on, overwride pwm
-                    period_us = safe_pwm[chan+chan_offset];
-                }
+                // if (safety_on && !(safety_mask & (1U<<(chan+chan_offset)))) {
+                //     // safety is on, overwride pwm
+                //     period_us = safe_pwm[chan+chan_offset];
+                // }
 
                 if (group.current_mode == MODE_PWM_BRUSHED) {
                     if (period_us <= _esc_pwm_min) {

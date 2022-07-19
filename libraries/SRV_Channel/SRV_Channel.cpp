@@ -124,6 +124,7 @@ void SRV_Channel::calc_pwm(int16_t output_scaled)
     }
 
     uint16_t pwm;
+    // gcs().send_text(MAV_SEVERITY_CRITICAL, "hello type_angle! %d", type_angle);
     if (type_angle) {
         pwm = pwm_from_angle(output_scaled);
     } else {
