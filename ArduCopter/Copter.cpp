@@ -219,6 +219,7 @@ void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
 constexpr int8_t Copter::_failsafe_priorities[7];
 
 // Main loop - 400hz
+unsigned long int cnt = 0;
 void Copter::fast_loop()
 {
     // update INS immediately to get current gyro data populated
@@ -229,9 +230,18 @@ void Copter::fast_loop()
 
     // send outputs to the motors library immediately
     //motors_output();
-    hal.rcout->write((uint8_t)4, (uint16_t)1460);       //通道从0开始计数,4表示M5
-    hal.rcout->write((uint8_t)5, (uint16_t)1560);       //通道从0开始计数,5表示M6
-    SRV_Channels::push();
+    //cnt++;
+    /* armed表示解锁，disarmed表示上锁 */
+    if(!motors->armed()){       
+        motors->output_test_seq(1, motors->get_pwm_output_min());
+    }
+    else{
+        motors->output_test_seq(1,motors->get_pwm_output_max());
+    }
+    
+    // hal.rcout->write((uint8_t)2, (uint16_t)1460);       //通道从0开始计数,4表示M5
+    // hal.rcout->write((uint8_t)3, (uint16_t)1560);       //通道从0开始计数,5表示M6
+    // SRV_Channels::push();
     // run EKF state estimator (expensive)
     // --------------------
     read_AHRS();

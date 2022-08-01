@@ -463,14 +463,15 @@ void AP_MotorsMatrix::check_for_failed_motor(float throttle_thrust_best_plus_adj
 void AP_MotorsMatrix::output_test_seq(uint8_t motor_seq, int16_t pwm)
 {
     // exit immediately if not armed
-    if (!armed()) {
-        return;
-    }
+    // if (!armed()) {
+    //     return;
+    // }
 
     // loop through all the possible orders spinning any motors that match that description
     for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i] && _test_order[i] == motor_seq) {
             // turn on this motor
+            // gcs().send_text(MAV_SEVERITY_CRITICAL, "hello rc_write! %5.3f", (double)3.142f);
             rc_write(i, pwm);
         }
     }

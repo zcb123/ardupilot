@@ -285,6 +285,7 @@ void AP_MotorsMulticopter::output_min()
 // update the throttle input filter
 void AP_MotorsMulticopter::update_throttle_filter()
 {
+    /*解锁之后滤波器置零*/
     if (armed()) {
         _throttle_filter.apply(_throttle_in, 1.0f / _loop_rate);
         // constrain filtered throttle
