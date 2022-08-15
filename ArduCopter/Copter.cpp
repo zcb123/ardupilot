@@ -240,18 +240,19 @@ void Copter::fast_loop()
         motors->output_test_seq(1, motors->get_pwm_output_min());
     }
     else{                       //解锁
-        stop_cnt++;
-        cnt++;
-        if(stop_cnt<=400){          //停止1s
-            motors->output_test_seq(1,motors->get_pwm_output_min());
-        }
-        else{
-            motors->output_test_seq(1,motors->get_pwm_output_min() + 10*multi);
-        }
-        if(cnt%4400 == 0){          //停止1s,运行10s,以11s为周期
-            multi++;
-            stop_cnt = 0;      
-        }
+        motors->output_test_seq(1,motors->get_pwm_output_min() + 100);
+        // stop_cnt++;
+        // cnt++;
+        // if(stop_cnt<=400){          //停止1s
+        //     motors->output_test_seq(1,motors->get_pwm_output_min());
+        // }
+        // else{
+        //     motors->output_test_seq(1,motors->get_pwm_output_min() + 10*multi);
+        // }
+        // if(cnt%4400 == 0){          //停止1s,运行10s,以11s为周期
+        //     multi++;
+        //     stop_cnt = 0;      
+        // }
     }
     
     // hal.rcout->write((uint8_t)2, (uint16_t)1460);       //通道从0开始计数,4表示M5
