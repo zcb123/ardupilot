@@ -16,6 +16,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include "AP_BattMonitor_ESC.h"
+#include <GCS_MAVLink/GCS.h>
 
 #if HAL_WITH_ESC_TELEM
 
@@ -36,7 +37,7 @@ void AP_BattMonitor_ESC::read(void)
     float temperature_sum = 0;
     uint32_t highest_ms = 0;
      _state.consumed_mah = delta_mah;
-
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "hello BattEsc! %5.3f", (double)3.142f);
     for (uint8_t i=0; i<ESC_TELEM_MAX_ESCS; i++) {
         int16_t  temperature_cdeg;
         float voltage;
@@ -70,6 +71,7 @@ void AP_BattMonitor_ESC::read(void)
 
     if (voltage_escs > 0) {
         _state.voltage = voltage_sum / voltage_escs;
+        //_state.voltage = 360.6;
         _state.healthy = true;
     } else {
         _state.voltage = 0;

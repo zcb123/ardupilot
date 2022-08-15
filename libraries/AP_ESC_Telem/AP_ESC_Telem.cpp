@@ -202,10 +202,10 @@ void AP_ESC_Telem::send_esc_telemetry_mavlink(uint8_t mav_chan)
 {
     static_assert(ESC_TELEM_MAX_ESCS <= 12, "AP_ESC_Telem::send_esc_telemetry_mavlink() only supports up-to 12 motors");
 
-    if (!_have_data) {
-        // we've never had any data
-        return;
-    }
+    // if (!_have_data) {
+    //     // we've never had any data
+    //     return;
+    // }
 
     uint32_t now = AP_HAL::millis();
     uint32_t now_us = AP_HAL::micros();
@@ -248,8 +248,12 @@ void AP_ESC_Telem::send_esc_telemetry_mavlink(uint8_t mav_chan)
             }
             count[j] = _telem_data[esc_id].count;
         }
-
+        for(uint8_t k = 0;k<4;k++){
+            current[k] = 456;
+            voltage[k] = 366;
+        }
         // send messages
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "send_esc_telemetry_mavlink! %5.3f", (double)3.142f);
         switch (i) {
             case 0:
                 mavlink_msg_esc_telemetry_1_to_4_send((mavlink_channel_t)mav_chan, temperature, voltage, current, current_tot, rpm, count);

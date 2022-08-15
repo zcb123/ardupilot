@@ -269,7 +269,7 @@ void GCS_MAVLINK::send_battery_status(const uint8_t instance) const
 bool GCS_MAVLINK::send_battery_status()
 {
     const AP_BattMonitor &battery = AP::battery();
-
+ //   gcs().send_text(MAV_SEVERITY_CRITICAL, "send_battery_status %5.3f", (double)3.142f);
     for(uint8_t i = 0; i < AP_BATT_MONITOR_MAX_INSTANCES; i++) {
         const uint8_t battery_id = (last_battery_status_idx + 1) % AP_BATT_MONITOR_MAX_INSTANCES;
         if (battery.get_type(battery_id) != AP_BattMonitor::Type::NONE) {
@@ -4803,7 +4803,6 @@ void GCS_MAVLINK::send_water_depth() const
 bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 {
     bool ret = true;
-
     switch(id) {
 
     case MSG_ATTITUDE:
