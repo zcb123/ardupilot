@@ -240,19 +240,37 @@ void Copter::fast_loop()
         motors->output_test_seq(1, motors->get_pwm_output_min());
     }
     else{                       //解锁
+        // cnt++;
+        uint64_t time_us;
+        time_us = AP_HAL::micros64();
+        uint16_t w;
+        int16_t pwm_max;
+        int16_t pwm_min;
+        int16_t pwm_mid;
+        int16_t pwm_out;
+        pwm_max = motors->get_pwm_output_max(); 
+        pwm_min = motors->get_pwm_output_min();
+        pwm_mid = (pwm_max+pwm_min)/2;
+        w = 1;
+        pwm_out = (int16_t)(pwm_mid + 0.5*sinf(2*M_PI*w*time_us));
+        motors->output_test_seq(1,pwm_out);
        // motors->output_test_seq(1,motors->get_pwm_output_min() + 100);
-        stop_cnt++;
-        cnt++;
-        if(stop_cnt<=2000){          //停止5s
-            motors->output_test_seq(1,motors->get_pwm_output_min());
-        }
-        else{
-            motors->output_test_seq(1,motors->get_pwm_output_min() + 10*multi);
-        }
-        if(cnt%4400 == 0){          //停止1s,运行10s,以11s为周期
-            multi++;
-            stop_cnt = 0;      
-        }
+        // stop_cnt++;
+        // cnt++;
+        // if(stop_cnt<=2000){          //停止5s
+        //     motors->output_test_seq(1,motors->get_pwm_output_min());
+        // }
+        // else{
+        //     //motors->output_test_seq(1,motors->get_pwm_output_min() + 10*multi);
+            
+
+
+        //     motors->output_test_seq(1,motors->get_pwm_output_min() + 600);
+        // }
+        // if(cnt%4400 == 0){          //停止1s,运行10s,以11s为周期
+        //     multi++;
+        //     stop_cnt = 0;      
+        // }
     }
     
     // hal.rcout->write((uint8_t)2, (uint16_t)1460);       //通道从0开始计数,4表示M5

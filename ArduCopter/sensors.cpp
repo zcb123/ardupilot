@@ -155,12 +155,12 @@ void Copter::rpm_update(void)
 #if RPM_ENABLED == ENABLED
     rpm_sensor.update();
     // gcs().send_text(MAV_SEVERITY_CRITICAL, "rpm update! %5.3f", (double)3.142f);
-    if (rpm_sensor.enabled(0) || rpm_sensor.enabled(1)) {
-        if (should_log(MASK_LOG_RCIN)) {
+    // if (rpm_sensor.enabled(0) || rpm_sensor.enabled(1)) {
+    //     if (should_log(MASK_LOG_RCIN)) {
             // gcs().send_text(MAV_SEVERITY_CRITICAL, "write rpm! %5.3f", (double)3.142f);
             logger.Write_RPM(rpm_sensor);
-        }
-    }
+    //     }
+    // }
 #endif
 }
 
