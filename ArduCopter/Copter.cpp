@@ -243,7 +243,9 @@ void Copter::fast_loop()
     //motors_output();
     //cnt++;
     uint16_t pwm_in;
+    uint16_t throttle;
     rc().get_pwm(5,pwm_in);
+    rc().get_pwm(3,throttle);
     // gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world! %d",pwm_in);
     /* armed表示解锁，disarmed表示上锁 */
     if(!motors->armed()){       //锁定
@@ -259,8 +261,9 @@ void Copter::fast_loop()
         pwm_max = motors->get_pwm_output_max(); 
         pwm_min = motors->get_pwm_output_min();
         if(pwm_in<1000){
-            pwm_out = 1705;
+            pwm_out = throttle;
             motors->output_test_seq(1,pwm_out);
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world! %d",pwm_out);
         }
         else if((pwm_in>=1000) && (pwm_in<1600)){
             cnt++;
