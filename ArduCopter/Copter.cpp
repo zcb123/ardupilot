@@ -231,6 +231,8 @@ uint64_t nLastTime;
 double dt;
 double t;
 
+float w = 0.01;
+
 void Copter::fast_loop()
 {
     // update INS immediately to get current gyro data populated
@@ -253,59 +255,44 @@ void Copter::fast_loop()
         stop_cnt = 0;    
         multi = 0;
         pwm_out = pwm_min;
+        w = 0.01;
         motors->output_test_seq(1, motors->get_pwm_output_min());
     }
     else{                       //解锁
-        
-        
-        pwm_max = motors->get_pwm_output_max(); 
-        pwm_min = motors->get_pwm_output_min();
-        if(pwm_in<1000){
-            pwm_out = throttle;
-            motors->output_test_seq(1,pwm_out);
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world! %d",pwm_out);
-        }
-        else if((pwm_in>=1000) && (pwm_in<1600)){
-            cnt++;
-            if(cnt%40==0){
-                multi++;
-                pwm_out = pwm_min + 10*multi;
-            }
-            if(pwm_out >= pwm_max){
-                pwm_out = pwm_max;
-            }
-            motors->output_test_seq(1,pwm_out);
+
+        cnt++;
+        stop_cnt++;
+        if(stop_cnt<=400){          //停止1s
+            motors->output_test_seq(1,motors->get_pwm_output_min());
         }
         else{
+
             uint64_t nNowTime = AP_HAL::micros64();
             dt = (nNowTime - nLastTime)/1e6;
             t = t + dt;
             nLastTime = nNowTime;
-            uint16_t w;
+            
             int16_t delta_pwm;
             int16_t pwm_mid;
             
             delta_pwm = pwm_max - pwm_min;
             pwm_mid = (pwm_max+pwm_min)/2;
-            w = 1;
             pwm_out = (int16_t)(pwm_mid + 0.5*delta_pwm*sinf(2*M_PI*w*t));
-            
+
             motors->output_test_seq(1,pwm_out);
         }
-        // gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world!%d %d",pwm_in,pwm_out);
-        // cnt++;
-        // stop_cnt++;
-        // cnt++;
-        // if(stop_cnt<=2000){          //停止5s
-        //     motors->output_test_seq(1,motors->get_pwm_output_min());
-        // }
-        // else{
-        //      motors->output_test_seq(1,motors->get_pwm_output_min() + 10*multi);
-        // }
-        // if(cnt%4400 == 0){          //停止1s,运行10s,以11s为周期
-        //     multi++;
-        //     stop_cnt = 0;      
-        // }
+        if(cnt%4400 == 0){          //停止1s,运行10s,以15s为周期
+            multi++;
+            stop_cnt = 0;   
+            if(w>=0.1){
+                w = w + 0.1;
+            } 
+            else{
+                w = w + 0.01;
+            }  
+        }
+
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world!%d %d %f",pwm_in,pwm_out,w);
     }
     
     // hal.rcout->write((uint8_t)2, (uint16_t)1460);       //通道从0开始计数,4表示M5
