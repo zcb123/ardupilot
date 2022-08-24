@@ -222,6 +222,9 @@ constexpr int8_t Copter::_failsafe_priorities[7];
 unsigned long int cnt = 0;
 unsigned long int multi = 1;
 unsigned long int stop_cnt = 0;
+uint64_t nLastTime;
+double dt;
+double t;
 void Copter::fast_loop()
 {
     // update INS immediately to get current gyro data populated
@@ -241,18 +244,23 @@ void Copter::fast_loop()
     }
     else{                       //解锁
         // cnt++;
-        uint64_t time_us;
-        time_us = AP_HAL::micros64();
+        uint64_t nNowTime = AP_HAL::micros64();
+        dt = (nNowTime - nLastTime)/1e6;
+        t = t + dt;
+        nLastTime = AP_HAL::micros64();
         uint16_t w;
+        int16_t delta_pwm;
         int16_t pwm_max;
         int16_t pwm_min;
         int16_t pwm_mid;
         int16_t pwm_out;
         pwm_max = motors->get_pwm_output_max(); 
         pwm_min = motors->get_pwm_output_min();
+        delta_pwm = pwm_max - pwm_min;
         pwm_mid = (pwm_max+pwm_min)/2;
         w = 1;
-        pwm_out = (int16_t)(pwm_mid + 0.5*sinf(2*M_PI*w*time_us));
+        pwm_out = (int16_t)(pwm_mid + 0.5*delta_pwm*sinf(2*M_PI*w*t));
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world! %d",pwm_out);
         motors->output_test_seq(1,pwm_out);
        // motors->output_test_seq(1,motors->get_pwm_output_min() + 100);
         // stop_cnt++;
