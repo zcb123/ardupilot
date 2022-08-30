@@ -222,16 +222,20 @@ constexpr int8_t Copter::_failsafe_priorities[7];
 unsigned long int cnt = 0;
 unsigned long int multi = 1;
 unsigned long int stop_cnt = 0;
-
+unsigned long int stop_sum = 0;
+uint64_t run_time;
 int16_t pwm_out = 0;
 int16_t pwm_max;
 int16_t pwm_min;
 
+uint16_t last_pwm_in;
+
 uint64_t nLastTime;
+
 double dt;
 double t;
 
-float w = 0.01;
+float w = 0.1;
 
 void Copter::fast_loop()
 {
@@ -253,46 +257,72 @@ void Copter::fast_loop()
     if(!motors->armed()){       //锁定
         cnt = 0;
         stop_cnt = 0;    
-        multi = 0;
+        multi = 1;
         pwm_out = pwm_min;
-        w = 0.01;
+        if(pwm_in<1000){
+            w = 0.1;
+        }
+        else{
+            w = 1;
+        }
         motors->output_test_seq(1, motors->get_pwm_output_min());
     }
     else{                       //解锁
+        
+        if(last_pwm_in != pwm_in){      //检测到5通道发生变化了 
+            multi = 0;                  //这里为了安全起见
+        }
 
+        last_pwm_in = pwm_in;
+        pwm_max = motors->get_pwm_output_max();
+        pwm_min = motors->get_pwm_output_min();
+        run_time = (10*(1/w) + 1)*400;
+        // run_time = (run_time + 1)*400;
         cnt++;
         stop_cnt++;
-        if(stop_cnt<=400){          //停止1s
-            motors->output_test_seq(1,motors->get_pwm_output_min());
-        }
-        else{
-
-            uint64_t nNowTime = AP_HAL::micros64();
-            dt = (nNowTime - nLastTime)/1e6;
-            t = t + dt;
-            nLastTime = nNowTime;
-            
-            int16_t delta_pwm;
-            int16_t pwm_mid;
-            
-            delta_pwm = pwm_max - pwm_min;
-            pwm_mid = (pwm_max+pwm_min)/2;
-            pwm_out = (int16_t)(pwm_mid + 0.5*delta_pwm*sinf(2*M_PI*w*t));
-
+        if(stop_cnt<=2000){          //停止5s
+            pwm_out = motors->get_pwm_output_min();
             motors->output_test_seq(1,pwm_out);
         }
-        if(cnt%4400 == 0){          //停止1s,运行10s,以15s为周期
-            multi++;
-            stop_cnt = 0;   
-            if(w>=0.1){
-                w = w + 0.1;
-            } 
+        else{
+            if(pwm_in<1000){    
+                uint64_t nNowTime = AP_HAL::micros64();
+                dt = (nNowTime - nLastTime)/1e6;
+                t = t + dt;
+                nLastTime = nNowTime;
+                
+                int16_t delta_pwm;
+                int16_t pwm_mid;
+                
+                delta_pwm = pwm_max - pwm_min;
+                pwm_mid = (pwm_max+pwm_min)/2;
+                pwm_out = (int16_t)(pwm_mid + 0.5*delta_pwm*sinf(2*M_PI*w*t));
+            }
             else{
-                w = w + 0.01;
-            }  
+                pwm_out = motors->get_pwm_output_min() + 10*multi;
+            }
+            motors->output_test_seq(1,pwm_out);
         }
+        if(cnt%run_time == 0){          //停止1s,运行10s,以run_time为周期
+            cnt = 0;
+            multi++;                    //一定要先上锁再切换模式
+            stop_cnt = 0;   
 
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "hello world!%d %d %f",pwm_in,pwm_out,w);
+            if(pwm_in<1000){
+                if(w>=0.1){
+                    w = w + 0.1;
+                } 
+                else{
+                    w = w + 0.01;
+                } 
+            }
+            else{
+                w = 1;
+            }
+             
+        }
+        
+        // gcs().send_text(MAV_SEVERITY_CRITICAL, "%d %d %lu %f %lld",pwm_in,pwm_out,multi,w,run_time);
     }
     
     // hal.rcout->write((uint8_t)2, (uint16_t)1460);       //通道从0开始计数,4表示M5
