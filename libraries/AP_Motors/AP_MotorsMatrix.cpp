@@ -177,7 +177,7 @@ void AP_MotorsMatrix::output_to_motors()
     // convert output to PWM and send to each motor
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "_actuator[%d]: %f", i,_actuator[i]);
+            //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "_actuator[%d]: %f", i,_actuator[i]);
             rc_write(i, output_to_pwm(_actuator[i]));
         }
     }
@@ -270,10 +270,97 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     /* 这里是映射机架类型的地方 */
     float rp_low = 1.0f;    // lowest thrust value
     float rp_high = -1.0f;  // highest thrust value
+    /* added by zcb */
+    
+    float roll_amend[AP_MOTORS_MAX_NUM_MOTORS] = {1.0};
+    float pitch_amend[AP_MOTORS_MAX_NUM_MOTORS] = {1.0};
+    /*
+    *   1.判断是否要航向电机输出优化
+    *   2.根据航向角的变化以及俯仰横滚的变化情况调整电机转速
+    */
+    /* 这个方式十分不优雅，只对Dodeca Hexacopter 有效 */
+    if(_yaw_rotated_fac != 0){
+        /* 须满足amend_temp_d*amend_temp_d + amend_temp_i*amend_temp_i = 1; */
+        float amend_temp_d = sqrt((float)_yaw_rotated_fac)/_yaw_rotated_fac;
+        float amend_temp_i = sqrt(1 - amend_temp_d*amend_temp_d);
+        //中间一段小航向误差也不考虑
+        if(yaw_thrust<-0.2){                    //须向逆时针方向修正
+            if(roll_thrust<0.0){
+                roll_amend[1] -= amend_temp_d;
+                roll_amend[4] -= amend_temp_d;
+                roll_amend[5] -= amend_temp_d;
+                roll_amend[2] += amend_temp_i;
+                roll_amend[3] += amend_temp_i;
+                roll_amend[6] += amend_temp_i;
+
+            }
+            else{
+                roll_amend[8] -= amend_temp_d;
+                roll_amend[9] -= amend_temp_d;
+                roll_amend[12] -= amend_temp_d;
+                roll_amend[7] += amend_temp_i;
+                roll_amend[10] += amend_temp_i;
+                roll_amend[11] += amend_temp_i;
+
+            }
+            if(pitch_thrust<0.0){
+                pitch_amend[1] -= amend_temp_d;
+                pitch_amend[12] -= amend_temp_d;
+                pitch_amend[2] += amend_temp_i;
+                pitch_amend[11] += amend_temp_i;
+
+            }
+            else{
+                pitch_amend[5] -= amend_temp_d;
+                pitch_amend[8] -= amend_temp_d;
+                pitch_amend[6] += amend_temp_i;
+                pitch_amend[7] += amend_temp_i;
+
+            }
+        }
+        else if(yaw_thrust>0.2){               //须向顺时针方向修正
+                if(roll_thrust<0.0){
+                roll_amend[2] -= amend_temp_d;
+                roll_amend[3] -= amend_temp_d;
+                roll_amend[5] -= amend_temp_d;
+                roll_amend[1] += amend_temp_i;
+                roll_amend[4] += amend_temp_i;
+                roll_amend[5] += amend_temp_i;
+
+            }
+            else{
+                roll_amend[7] -= amend_temp_d;
+                roll_amend[10] -= amend_temp_d;
+                roll_amend[11] -= amend_temp_d;
+                roll_amend[8] += amend_temp_i;
+                roll_amend[9] += amend_temp_i;
+                roll_amend[12] += amend_temp_i;
+
+            }
+            if(pitch_thrust<0.0){
+                pitch_amend[2] -= amend_temp_d;
+                pitch_amend[11] -= amend_temp_d;
+                pitch_amend[1] += amend_temp_i;
+                pitch_amend[12] += amend_temp_i;
+            }
+            else{
+                pitch_amend[7] -= amend_temp_d;
+                pitch_amend[6] -= amend_temp_d;
+                pitch_amend[5] += amend_temp_i;
+                pitch_amend[8] += amend_temp_i;
+            }   
+        }
+        //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "yaw_thrust: %f", yaw_thrust);
+    }
+
+
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
             // calculate the thrust outputs for roll and pitch
-            _thrust_rpyt_out[i] = roll_thrust * _roll_factor[i] + pitch_thrust * _pitch_factor[i];
+            /* 使用之前限幅 */
+            constrain_float(roll_amend[i],0.0,2.0);
+            constrain_float(pitch_amend[i],0.0,2.0);
+            _thrust_rpyt_out[i] = roll_thrust * _roll_factor[i] * roll_amend[i] + pitch_thrust * _pitch_factor[i] * pitch_amend[i];
             // record lowest roll + pitch command
             if (_thrust_rpyt_out[i] < rp_low) {
                 rp_low = _thrust_rpyt_out[i];

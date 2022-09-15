@@ -174,6 +174,8 @@ protected:
     AP_Int8             _throttle_hover_learn;  // enable/disabled hover thrust learning
     AP_Int8             _disarm_disable_pwm;    // disable PWM output while disarmed
 
+    AP_Int8             _yaw_rotated_fac;       // 用于飞碟航向控制中的俯仰横滚控制量的修正系数
+
     // Maximum lean angle of yaw servo in degrees. This is specific to tricopter
     AP_Float            _yaw_servo_angle_max_deg;
 

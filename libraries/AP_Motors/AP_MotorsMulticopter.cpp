@@ -206,6 +206,8 @@ const AP_Param::GroupInfo AP_MotorsMulticopter::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("SAFE_TIME", 42, AP_MotorsMulticopter, _safe_time, AP_MOTORS_SAFE_TIME_DEFAULT),
 
+    AP_GROUPINFO("YAW_ROT_FAC", 43, AP_MotorsMulticopter, _yaw_rotated_fac, 0),
+
     AP_GROUPEND
 };
 
