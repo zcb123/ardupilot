@@ -285,14 +285,13 @@ void AP_MotorsMatrix::output_armed_stabilizing()
         float amend_temp_i = sqrt(1 - amend_temp_d*amend_temp_d);
         //中间一段小航向误差也不考虑
         if(yaw_thrust<-0.2){                    //须向逆时针方向修正
-            if(roll_thrust<0.0){
+            if(roll_thrust<0.0){                //飞机右倾,须向左边修正
                 roll_amend[1] -= amend_temp_d;
                 roll_amend[4] -= amend_temp_d;
                 roll_amend[5] -= amend_temp_d;
                 roll_amend[2] += amend_temp_i;
                 roll_amend[3] += amend_temp_i;
                 roll_amend[6] += amend_temp_i;
-
             }
             else{
                 roll_amend[8] -= amend_temp_d;
@@ -301,21 +300,18 @@ void AP_MotorsMatrix::output_armed_stabilizing()
                 roll_amend[7] += amend_temp_i;
                 roll_amend[10] += amend_temp_i;
                 roll_amend[11] += amend_temp_i;
-
             }
-            if(pitch_thrust<0.0){
-                pitch_amend[1] -= amend_temp_d;
-                pitch_amend[12] -= amend_temp_d;
-                pitch_amend[2] += amend_temp_i;
-                pitch_amend[11] += amend_temp_i;
-
-            }
-            else{
+            if(pitch_thrust<0.0){               //飞机抬头,须向低头方向修正
                 pitch_amend[5] -= amend_temp_d;
                 pitch_amend[8] -= amend_temp_d;
                 pitch_amend[6] += amend_temp_i;
                 pitch_amend[7] += amend_temp_i;
-
+            }
+            else{
+                pitch_amend[1] -= amend_temp_d;
+                pitch_amend[12] -= amend_temp_d;
+                pitch_amend[2] += amend_temp_i;
+                pitch_amend[11] += amend_temp_i;
             }
         }
         else if(yaw_thrust>0.2){               //须向顺时针方向修正
@@ -326,7 +322,6 @@ void AP_MotorsMatrix::output_armed_stabilizing()
                 roll_amend[1] += amend_temp_i;
                 roll_amend[4] += amend_temp_i;
                 roll_amend[5] += amend_temp_i;
-
             }
             else{
                 roll_amend[7] -= amend_temp_d;
@@ -335,19 +330,18 @@ void AP_MotorsMatrix::output_armed_stabilizing()
                 roll_amend[8] += amend_temp_i;
                 roll_amend[9] += amend_temp_i;
                 roll_amend[12] += amend_temp_i;
-
             }
             if(pitch_thrust<0.0){
-                pitch_amend[2] -= amend_temp_d;
-                pitch_amend[11] -= amend_temp_d;
-                pitch_amend[1] += amend_temp_i;
-                pitch_amend[12] += amend_temp_i;
-            }
-            else{
                 pitch_amend[7] -= amend_temp_d;
                 pitch_amend[6] -= amend_temp_d;
                 pitch_amend[5] += amend_temp_i;
                 pitch_amend[8] += amend_temp_i;
+            }
+            else{
+                pitch_amend[2] -= amend_temp_d;
+                pitch_amend[11] -= amend_temp_d;
+                pitch_amend[1] += amend_temp_i;
+                pitch_amend[12] += amend_temp_i;
             }   
         }
         //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "yaw_thrust: %f", yaw_thrust);
