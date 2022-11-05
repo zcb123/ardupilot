@@ -22,6 +22,7 @@
 // auto_init - initialise auto controller
 bool ModeAuto::init(bool ignore_checks)
 {
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto Fly Mode");
     if (mission.num_commands() > 1 || ignore_checks) {
         _mode = SubMode::LOITER;
 
@@ -823,14 +824,14 @@ void ModeAuto::wp_run()
     motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
     // run waypoint controller
-    copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
+    copter.failsafe_terrain_set_status(wp_nav->update_wpnav());     //这里控制x,y
 
     // WP_Nav has set the vertical position control targets
     // run the vertical position controller and set output throttle
-    pos_control->update_z_controller();
+    pos_control->update_z_controller();                             //这里控制z
 
     // call attitude controller
-    if (auto_yaw.mode() == AUTO_YAW_HOLD) {
+    if (auto_yaw.mode() == AUTO_YAW_HOLD) {                         //这里控制航向
         // roll & pitch from waypoint controller, yaw rate from pilot
         attitude_control->input_thrust_vector_rate_heading(wp_nav->get_thrust_vector(), target_yaw_rate);
     } else {
@@ -1576,6 +1577,7 @@ bool ModeAuto::verify_takeoff()
     // if we have reached our destination
     if (reached_wp_dest) {
         // retract the landing gear
+        // 收起落架
         copter.landinggear.retract_after_takeoff();
     }
 #endif
@@ -1638,7 +1640,7 @@ bool ModeAuto::verify_land()
 #define debug(fmt, args ...)
 #endif
 
-// verify_payload_place - returns true if placing has been completed
+// verify_payload_place - returns true if placing has been completed(载荷如果已经放置了，返回true)
 bool ModeAuto::verify_payload_place()
 {
     const uint16_t hover_throttle_calibrate_time = 2000; // milliseconds

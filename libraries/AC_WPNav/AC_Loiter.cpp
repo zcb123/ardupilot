@@ -262,7 +262,7 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
         desired_speed = MAX(desired_speed-(drag_decel+_brake_accel)*nav_dt,0.0f);
         desired_vel = desired_vel_norm*desired_speed;
     }
-
+    AP::logger().Write("BRAK","TimeUs,brk","Qf",AP_HAL::micros64(),_brake_accel);
     // add braking to the desired acceleration
     _desired_accel -= loiter_accel_brake;
 

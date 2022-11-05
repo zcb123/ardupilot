@@ -131,7 +131,7 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
         return false;
     }
 }
-
+//降落伞相关指令
 bool AP_Mission::start_command_parachute(const AP_Mission::Mission_Command& cmd)
 {
 #if HAL_PARACHUTE_ENABLED

@@ -268,6 +268,7 @@ void Copter::fast_loop()
     }
 
     AP_Vehicle::fast_loop();
+    
 }
 
 #ifdef ENABLE_SCRIPTING
