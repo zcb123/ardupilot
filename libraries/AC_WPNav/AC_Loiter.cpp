@@ -168,7 +168,7 @@ void AC_Loiter::set_pilot_desired_acceleration(float euler_roll_angle_cd, float 
     // convert our predicted attitude to an acceleration vector assuming we are not accelerating vertically
     const Vector3f predicted_euler {_predicted_euler_angle.x, _predicted_euler_angle.y, _ahrs.yaw};
     const Vector3f predicted_accel = _pos_control.lean_angles_to_accel(predicted_euler);
-
+    //通过PID预测下一时刻的加速度
     _predicted_accel.x = predicted_accel.x;
     _predicted_accel.y = predicted_accel.y;
 }
@@ -243,9 +243,11 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
         // we could add a expo function here to fine tune it
 
         // calculate a drag acceleration based on the desired speed.
+        // 基于期望速度计算阻力加速度
         float drag_decel = pilot_acceleration_max*desired_speed/gnd_speed_limit_cms;
 
         // calculate a braking acceleration if sticks are at zero
+        // 计算刹车加速度,如果控制杆在零位
         float loiter_brake_accel = 0.0f;
         if (_desired_accel.is_zero()) {
             if ((AP_HAL::millis()-_brake_timer) > _brake_delay * 1000.0f) {

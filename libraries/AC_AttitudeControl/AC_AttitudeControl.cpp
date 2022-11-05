@@ -917,7 +917,7 @@ void AC_AttitudeControl::thrust_vector_rotation_angles(const Quaternion& attitud
     AP::logger().Write("HDRO","TimeUs,AERX,AERY,AERZ,TRUS","Qffff",AP_HAL::micros64(),attitude_error.x,attitude_error.y,attitude_error.z,_thrust_error_angle);
 }
 
-// calculates the velocity correction from an angle error. The angular velocity has acceleration and
+// calculates the velocity correction(速度校正) from an angle error. The angular velocity(角速度) has acceleration and
 // deceleration limits including basic jerk limiting using _input_tc
 // 默认 desired_ang_vel = 0 ; max_ang_vel = 0;
 float AC_AttitudeControl::input_shaping_angle(float error_angle, float input_tc, float accel_max, float target_ang_vel, float desired_ang_vel, float max_ang_vel, float dt)

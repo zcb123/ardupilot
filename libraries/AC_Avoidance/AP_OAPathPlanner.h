@@ -9,7 +9,7 @@
 #include "AP_OADatabase.h"
 
 /*
- * This class provides path planning around fence, stay-out zones and moving obstacles
+ * This class provides path planning around fence(围绕地理围栏), stay-out(远离) zones and moving obstacles(移动障碍物)
  */
 class AP_OAPathPlanner {
 
