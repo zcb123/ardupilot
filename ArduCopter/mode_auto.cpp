@@ -22,7 +22,7 @@
 // auto_init - initialise auto controller
 bool ModeAuto::init(bool ignore_checks)
 {
-    gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto Fly Mode");
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto Fly Mode");
     if (mission.num_commands() > 1 || ignore_checks) {
         _mode = SubMode::LOITER;
 
@@ -182,6 +182,7 @@ void ModeAuto::rtl_start()
 }
 
 // auto_takeoff_start - initialises waypoint controller to implement take-off
+// 这里指定了起飞的经纬高,在执行起飞命令的时候执行一次,之后都执行auto_takeoff_run函数
 void ModeAuto::takeoff_start(const Location& dest_loc)
 {
     _mode = SubMode::TAKEOFF;
@@ -211,6 +212,7 @@ void ModeAuto::takeoff_start(const Location& dest_loc)
     if (alt_target < copter.current_loc.alt) {
         dest.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
     }
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "tar_alt %ld  cur_alt %ld", alt_target,copter.current_loc.alt);
     // Note: if taking off from below home this could cause a climb to an unexpectedly high altitude
     if (alt_target < 100) {
         dest.set_alt_cm(100, Location::AltFrame::ABOVE_HOME);
@@ -227,6 +229,7 @@ void ModeAuto::takeoff_start(const Location& dest_loc)
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
     // clear i term when we're taking off
+    // 这里初始化起飞油门
     set_throttle_takeoff();
 
     // get initial alt for WP_NAVALT_MIN
@@ -407,6 +410,7 @@ bool ModeAuto::use_pilot_yaw(void) const
 }
 
 // start_command - this function will be called when the ap_mission lib wishes to start a new command
+// 每次新的指令执行一次
 bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
 {
     // To-Do: logging when new commands start/end
@@ -1875,6 +1879,7 @@ bool ModeAuto::verify_yaw()
 }
 
 // verify_nav_wp - check if we have reached the next way point
+// 检查是否到达了导航点
 bool ModeAuto::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
 {
     // check if we have reached the waypoint

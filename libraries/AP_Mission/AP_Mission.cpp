@@ -253,8 +253,11 @@ void AP_Mission::update()
     hal.util->persistent_data.waypoint_num = _nav_cmd.index;
 
     // check if we have an active nav command
+    // 如果没有装载导航指令，则装载
+    // 如果装载了导航指令，则检查是否执行完成
     if (!_flags.nav_cmd_loaded || _nav_cmd.index == AP_MISSION_CMD_INDEX_NONE) {
         // advance in mission if no active nav command
+        // 进行下一个导航任务
         if (!advance_current_nav_cmd()) {
             // failure to advance nav command means mission has completed
             complete();
