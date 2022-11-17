@@ -615,9 +615,9 @@ struct PACKED Packed_Location_Option_Flags {
     uint8_t relative_alt : 1;           // 1 if altitude is relative to home
     uint8_t unused1      : 1;           // unused flag (defined so that loiter_ccw uses the correct bit)
     uint8_t loiter_ccw   : 1;           // 0 if clockwise, 1 if counter clockwise
-    uint8_t terrain_alt  : 1;           // this altitude is above terrain
+    uint8_t terrain_alt  : 1;           // this altitude is above terrain(地形)
     uint8_t origin_alt   : 1;           // this altitude is above ekf origin
-    uint8_t loiter_xtrack : 1;          // 0 to crosstrack from center of waypoint, 1 to crosstrack from tangent exit location
+    uint8_t loiter_xtrack : 1;          // 0 to crosstrack from center of waypoint, 1 to crosstrack from tangent exit location(从切线出口位置交叉跟踪)
 };
 
 struct PACKED PackedLocation {
@@ -1691,7 +1691,7 @@ bool AP_Mission::advance_current_nav_cmd(uint16_t starting_index)
     // avoid endless loops
     uint8_t max_loops = 255;
 
-    // search until we find next nav command or reach end of command list
+    // search until we find next nav command or reach end of command list(搜索到导航指令或者遍历完指令列表后退出)
     while (!_flags.nav_cmd_loaded) {
         // get next command
         Mission_Command cmd;

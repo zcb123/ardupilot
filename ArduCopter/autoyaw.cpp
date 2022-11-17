@@ -33,7 +33,7 @@ autopilot_yaw_mode Mode::AutoYaw::default_mode(bool rtl) const
     case WP_YAW_BEHAVIOR_NONE:
         return AUTO_YAW_HOLD;
 
-    case WP_YAW_BEHAVIOR_LOOK_AT_NEXT_WP_EXCEPT_RTL:
+    case WP_YAW_BEHAVIOR_LOOK_AT_NEXT_WP_EXCEPT_RTL:    //大飞机设置的是这个值
         if (rtl) {
             return AUTO_YAW_HOLD;
         } else {

@@ -142,7 +142,7 @@ void ModeAuto::run()
         payload_place_run();
         break;
     }
-    AP::logger().Write("YAWM","TimeUs,yawm","QB",AP_HAL::micros64(),(uint8_t)auto_yaw.mode());
+    AP::logger().Write("AUTO","TimeUs,yawm,ap","QBI",AP_HAL::micros64(),(uint8_t)auto_yaw.mode(),(uint32_t)copter.ap.value);
 }
 
 bool ModeAuto::allows_arming(AP_Arming::Method method) const
@@ -851,6 +851,7 @@ void ModeAuto::land_run()
 {
 
     // if not armed set throttle to zero and exit immediately
+    // 如果没有解锁，则将油门置零并立即退出
     if (is_disarmed_or_landed()) {
         make_safe_ground_handling();
         loiter_nav->clear_pilot_desired_acceleration();
