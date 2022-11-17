@@ -87,6 +87,7 @@ void Mode::_TakeOff::do_pilot_takeoff(float& pilot_climb_rate_cm)
     copter.pos_control->input_pos_vel_accel_z(pos_z, vel_z, 0);
 
     // stop take off early and return if negative climb rate is commanded or we are within 0.1% of our take off altitude
+    // 
     if (is_negative(pilot_climb_rate_cm) ||
         (take_off_complete_alt  - take_off_start_alt) * 0.999f < copter.pos_control->get_pos_target_z_cm() - take_off_start_alt) {
         stop();
@@ -96,6 +97,7 @@ void Mode::_TakeOff::do_pilot_takeoff(float& pilot_climb_rate_cm)
 void Mode::auto_takeoff_run()
 {
     // if not armed set throttle to zero and exit immediately
+    // 如果没解锁则将油门置零，并立即退出
     if (!motors->armed() || !copter.ap.auto_armed) {
         // do not spool down tradheli when on the ground with motor interlock enabled
         make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());

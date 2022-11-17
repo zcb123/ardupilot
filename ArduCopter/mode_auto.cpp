@@ -142,6 +142,7 @@ void ModeAuto::run()
         payload_place_run();
         break;
     }
+    AP::logger().Write("YAWM","TimeUs,yawm","QB",AP_HAL::micros64(),(uint8_t)auto_yaw.mode());
 }
 
 bool ModeAuto::allows_arming(AP_Arming::Method method) const
@@ -795,8 +796,8 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
 //      called by auto_run at 100hz or more
 void ModeAuto::takeoff_run()
 {
-    // if the user doesn't want to raise the throttle we can set it automatically
-    // note that this can defeat the disarm check on takeoff
+    // if the user doesn't want to raise the throttle we can set it automatically   如果飞手没有推油门，则飞控自动设置
+    // note that this can defeat the disarm check on takeoff    
     if ((copter.g2.auto_options & (int32_t)Options::AllowTakeOffWithoutRaisingThrottle) != 0) {
         copter.set_auto_armed(true);
     }

@@ -292,4 +292,12 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
 
     // send adjusted feed forward acceleration and velocity back to the Position Controller
     _pos_control.set_pos_vel_accel_xy(target_pos, desired_vel, _desired_accel);
+
+    // struct log_BARK pkt1 = {
+    //     LOG_PACKET_HEADER_INIT(LOG_BARK_MSG),
+    //     time_us     :AP_HAL::micros64(),
+    //     lbac        :loiter_brake_accel,
+    //     cmss        :_brake_accel_cmss.
+    //     brk         :_brake_accel
+    // };
 }

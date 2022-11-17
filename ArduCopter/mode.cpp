@@ -204,7 +204,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
         return false;
     }
 
-    bool ignore_checks = !motors->armed();   // allow switching to any mode if disarmed.  We rely on the arming check to perform
+    bool ignore_checks = !motors->armed();   // allow switching to any mode if disarmed(锁定).  We rely on the arming check to perform
 
 #if FRAME_CONFIG == HELI_FRAME
     // do not allow helis to enter a non-manual throttle mode if the
@@ -254,8 +254,10 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
         return false;
     }
 
-    // check for valid altitude if old mode did not require it but new one does
+    // check for valid altitude(高度) if old mode did not require it but new one does// 检查有效的高度
     // we only want to stop changing modes if it could make things worse
+    // 旧模式通过手动油门控制高度，而新模式由飞控自动控制高度
+    // 在高度数据不满足要求时，拒绝切换
     if (!ignore_checks &&
         !copter.ekf_alt_ok() &&
         flightmode->has_manual_throttle() &&
@@ -319,7 +321,7 @@ bool Copter::set_mode(const uint8_t new_mode, const ModeReason reason)
 // called at 100hz or more
 void Copter::update_flight_mode()
 {
-    surface_tracking.invalidate_for_logging();  // invalidate surface tracking alt, flight mode will set to true if used
+    surface_tracking.invalidate_for_logging();  // invalidate(废止) surface tracking alt, flight mode will set to true if used
 
     flightmode->run();
 }

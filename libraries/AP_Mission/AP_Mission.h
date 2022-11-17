@@ -130,7 +130,7 @@ public:
         float engine_cutoff_time;   // seconds
     };
 
-    // digicam control command structure
+    // digicam(数码相机) control command structure
     struct PACKED Digicam_Control {
         uint8_t session;        // 1 = on, 0 = off
         uint8_t zoom_pos;

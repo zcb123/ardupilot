@@ -141,13 +141,13 @@ void AP_LandingGear::deploy()
     AP::logger().Write_Event(LogEvent::LANDING_GEAR_DEPLOYED);
 }
 
-/// retract - retract landing gear
+/// retract - retract landing gear(收回起落架)
 void AP_LandingGear::retract()
 {
     // set servo PWM to retracted position
     SRV_Channels::set_output_limit(SRV_Channel::k_landing_gear_control, SRV_Channel::Limit::MIN);
 
-    // reset deployed flag
+    // reset deployed(已部署) flag
     _deployed = false;
     _have_changed = true;
     AP::logger().Write_Event(LogEvent::LANDING_GEAR_RETRACTED);

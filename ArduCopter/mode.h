@@ -55,7 +55,7 @@ public:
     virtual void exit() {};
     virtual void run() = 0;
     virtual bool requires_GPS() const = 0;
-    virtual bool has_manual_throttle() const = 0;
+    virtual bool has_manual_throttle() const = 0;   //该模式是否有手动油门
     virtual bool allows_arming(AP_Arming::Method method) const = 0;
     virtual bool is_autopilot() const { return false; }
     virtual bool has_user_takeoff(bool must_navigate) const { return false; }

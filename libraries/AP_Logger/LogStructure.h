@@ -1452,6 +1452,7 @@ enum LogMessages : uint8_t {
     LOG_RAW_PROXIMITY_MSG,
     LOG_IDS_FROM_PRECLAND,
 
+    // LOG_BARK_MSG,
     _LOG_LAST_MSG_
 };
 

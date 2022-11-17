@@ -1770,7 +1770,9 @@ bool NavEKF3::getHeightControlLimit(float &height) const
 }
 
 // Returns the amount of yaw angle change (in radians) due to the last yaw angle reset or core selection switch
+// 返回航向角改变的大小(以弧度为单位),航向的改变可能是航向角重置或者EKF内核切换
 // Returns the time of the last yaw angle reset or 0 if no reset or core switch has ever occurred
+// 返回航向角最新重置的时间，如果没有重置或者内核曾经发生过切换则返回0
 // Where there are multiple consumers, they must access this function on the same frame as each other
 uint32_t NavEKF3::getLastYawResetAngle(float &yawAngDelta)
 {
