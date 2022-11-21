@@ -241,6 +241,7 @@ void ModeAuto::takeoff_start(const Location& dest_loc)
 void ModeAuto::wp_start(const Location& dest_loc)
 {
     // send target to waypoint controller
+    // 将目标高度送入航点控制器
     if (!wp_nav->set_wp_destination_loc(dest_loc)) {
         // failure to set destination can only be because of missing terrain data
         copter.failsafe_terrain_on_event();
@@ -1094,12 +1095,13 @@ Location ModeAuto::terrain_adjusted_location(const AP_Mission::Mission_Command& 
     // convert to location class
     Location target_loc(cmd.content.location);
 
-    // decide if we will use terrain following
+    // decide if we will use terrain(地形) following
     int32_t curr_terr_alt_cm, target_terr_alt_cm;
     if (copter.current_loc.get_alt_cm(Location::AltFrame::ABOVE_TERRAIN, curr_terr_alt_cm) &&
         target_loc.get_alt_cm(Location::AltFrame::ABOVE_TERRAIN, target_terr_alt_cm)) {
         curr_terr_alt_cm = MAX(curr_terr_alt_cm,200);
         // if using terrain, set target altitude to current altitude above terrain
+        // 如果考虑地形，则将目标高度设置到相对于地形的高度
         target_loc.set_alt_cm(curr_terr_alt_cm, Location::AltFrame::ABOVE_TERRAIN);
     } else {
         // set target altitude to current altitude above home
@@ -1243,7 +1245,7 @@ void ModeAuto::do_land(const AP_Mission::Mission_Command& cmd)
         state = State::FlyToLocation;
 
         const Location target_loc = terrain_adjusted_location(cmd);
-
+        // 向着降落点飞去
         wp_start(target_loc);
     } else {
         // set landing state

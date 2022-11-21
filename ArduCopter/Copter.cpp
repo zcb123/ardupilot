@@ -218,6 +218,13 @@ void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
 
 constexpr int8_t Copter::_failsafe_priorities[7];
 
+// struct PACKED log_BARK {
+//     LOG_PACKET_HEADER;
+//     uint64_t time_us;
+//     float lbac;
+//     float cmss;
+//     float brk;
+// };
 // Main loop - 400hz
 void Copter::fast_loop()
 {
@@ -267,6 +274,8 @@ void Copter::fast_loop()
         Log_Sensor_Health();
     }
     AP_Vehicle::fast_loop();
+    
+
     
 }
 
@@ -459,6 +468,15 @@ void Copter::fourhundred_hz_logging()
 // should be run at 10hz
 void Copter::ten_hz_logging_loop()
 {
+    // struct log_BARK pkt1 = {
+    //     LOG_PACKET_HEADER_INIT(LOG_BARK_MSG),
+    //     time_us     :AP_HAL::micros64(),
+    //     lbac        :6.6,
+    //     cmss        :3.3,
+    //     brk         :123.12
+    // };
+    // logger.WriteBlock(&pkt1,sizeof(pkt1));
+
     // log attitude data if we're not already logging at the higher rate
     if (should_log(MASK_LOG_ATTITUDE_MED) && !should_log(MASK_LOG_ATTITUDE_FAST) && !copter.flightmode->logs_attitude()) {
         Log_Write_Attitude();

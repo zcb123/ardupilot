@@ -37,7 +37,7 @@ autopilot_yaw_mode Mode::AutoYaw::default_mode(bool rtl) const
         if (rtl) {
             return AUTO_YAW_HOLD;
         } else {
-            return AUTO_YAW_LOOK_AT_NEXT_WP;
+            return AUTO_YAW_LOOK_AT_NEXT_WP;            //航向指向下一个导航点,航向角期望值用的pos_controller计算值
         }
 
     case WP_YAW_BEHAVIOR_LOOK_AHEAD:
@@ -188,6 +188,7 @@ void Mode::AutoYaw::set_rate(float turn_rate_cds)
 // yaw - returns target heading depending upon auto_yaw.mode()
 float Mode::AutoYaw::yaw()
 {
+    // 根据yaw mode设置航向角期望值
     switch (_mode) {
 
     case AUTO_YAW_ROI:

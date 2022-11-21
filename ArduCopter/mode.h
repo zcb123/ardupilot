@@ -428,9 +428,9 @@ protected:
 private:
 
     enum class Options : int32_t {
-        AllowArming                        = (1 << 0U),
-        AllowTakeOffWithoutRaisingThrottle = (1 << 1U),
-        IgnorePilotYaw                     = (1 << 2U),
+        AllowArming                        = (1 << 0U),     //1
+        AllowTakeOffWithoutRaisingThrottle = (1 << 1U),     //2
+        IgnorePilotYaw                     = (1 << 2U),     //4
     };
 
     bool start_command(const AP_Mission::Mission_Command& cmd);

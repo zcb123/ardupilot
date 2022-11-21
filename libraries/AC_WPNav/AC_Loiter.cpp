@@ -233,6 +233,7 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
 
     Vector2f loiter_accel_brake;
     float desired_speed = desired_vel.length();
+    float loiter_brake_accel = 0.0f;
     if (!is_zero(desired_speed)) {
         Vector2f desired_vel_norm = desired_vel/desired_speed;
 
@@ -245,7 +246,7 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
         float drag_decel = pilot_acceleration_max*desired_speed/gnd_speed_limit_cms;
 
         // calculate a braking acceleration if sticks are at zero
-        float loiter_brake_accel = 0.0f;
+        
         if (_desired_accel.is_zero()) {
             if ((AP_HAL::millis()-_brake_timer) > _brake_delay * 1000.0f) {
                 float brake_gain = _pos_control.get_vel_xy_pid().kP() * 0.5f;
@@ -261,9 +262,10 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
         // update the desired velocity using the drag and braking accelerations
         desired_speed = MAX(desired_speed-(drag_decel+_brake_accel)*nav_dt,0.0f);
         desired_vel = desired_vel_norm*desired_speed;
-        AP::logger().Write("BRAK","TimeUs,lbac,cmss,brk","Qff",AP_HAL::micros64(),loiter_brake_accel,_brake_accel_cmss,_brake_accel);
+        
     }
     // add braking to the desired acceleration
+    AP::logger().Write("BRAK","TimeUs,lbac,cmss,brk","Qff",AP_HAL::micros64(),loiter_brake_accel,_brake_accel_cmss,_brake_accel);
     _desired_accel -= loiter_accel_brake;
 
     // Apply EKF limit to desired velocity -  this limit is calculated by the EKF and adjusted as required to ensure certain sensor limits are respected (eg optical flow sensing)
@@ -293,11 +295,5 @@ void AC_Loiter::calc_desired_velocity(float nav_dt, bool avoidance_on)
     // send adjusted feed forward acceleration and velocity back to the Position Controller
     _pos_control.set_pos_vel_accel_xy(target_pos, desired_vel, _desired_accel);
 
-    // struct log_BARK pkt1 = {
-    //     LOG_PACKET_HEADER_INIT(LOG_BARK_MSG),
-    //     time_us     :AP_HAL::micros64(),
-    //     lbac        :loiter_brake_accel,
-    //     cmss        :_brake_accel_cmss.
-    //     brk         :_brake_accel
-    // };
+    
 }
