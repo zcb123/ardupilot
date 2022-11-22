@@ -314,7 +314,8 @@ private:
     // used by DO_SET_SERVO commands
     bool ign_small_rcin_changes;
 
-    // if true we should ignore all imputs on this channel
+    // if true we should ignore all inputs on this channel
+    // override_active = true,忽略所有的输入
     bool override_active;
 
     void set_override(bool b) {override_active = b;};
@@ -573,13 +574,15 @@ private:
     // mask of outputs which are digitally reversible (eg. DShot-3D)
     static uint16_t reversible_mask;
 
-    SRV_Channel obj_channels[NUM_SERVO_CHANNELS];
+    SRV_Channel obj_channels[NUM_SERVO_CHANNELS];       //SRV_Channel是SRV_Channels的成员类
 
     // override loop counter
     static uint16_t override_counter[NUM_SERVO_CHANNELS];
 
+    //  静态结构体数组
     static struct srv_function {
         // mask of what channels this applies to
+        // 用来指示哪个通道被屏蔽
         SRV_Channel::servo_mask_t channel_mask;
 
         // scaled output for this function

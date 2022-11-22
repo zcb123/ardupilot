@@ -63,7 +63,7 @@ bool SRV_Channels::disabled_passthrough;
 bool SRV_Channels::initialised;
 bool SRV_Channels::emergency_stop;
 Bitmask<SRV_Channel::k_nr_aux_servo_functions> SRV_Channels::function_mask;
-SRV_Channels::srv_function SRV_Channels::functions[SRV_Channel::k_nr_aux_servo_functions];
+SRV_Channels::srv_function SRV_Channels::functions[SRV_Channel::k_nr_aux_servo_functions];  //静态结构体数组初始化
 
 const AP_Param::GroupInfo SRV_Channels::var_info[] = {
 #if (NUM_SERVO_CHANNELS >= 1)
@@ -276,13 +276,14 @@ void SRV_Channels::setup_failsafe_trim_all_non_motors(void)
 
 /*
   run calc_pwm for all channels
+  SRV_Channels的静态成员函数
  */
 void SRV_Channels::calc_pwm(void)
 {
     WITH_SEMAPHORE(_singleton->override_counter_sem);
 
     for (uint8_t i=0; i<NUM_SERVO_CHANNELS; i++) {
-        // check if channel has been locked out for this loop
+        // check if channel has been locked out(被锁在外面) for this loop
         // if it has, decrement the loop count for that channel
         if (override_counter[i] == 0) {
             channels[i].set_override(false);
@@ -290,6 +291,7 @@ void SRV_Channels::calc_pwm(void)
             channels[i].set_override(true);
             override_counter[i]--;
         }
+        // 这里调用了SRV_Channel类中的成员函数calc_pwm()
         channels[i].calc_pwm(functions[channels[i].function].output_scaled);
     }
 }

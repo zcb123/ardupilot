@@ -153,6 +153,7 @@ void Copter::motors_output()
     }
 
     // output any servo channels
+    // 计算所有通道的电机输出
     SRV_Channels::calc_pwm();
 
     // cork now, so that all channel outputs happen at once

@@ -136,6 +136,7 @@ void SRV_Channel::calc_pwm(int16_t output_scaled)
 
 void SRV_Channel::set_output_pwm(uint16_t pwm, bool force)
 {
+    // 如果没有被忽略则输出,或者强制输出
     if (!override_active || force) {
         output_pwm = pwm;
         have_pwm_mask |= (1U<<ch_num);
