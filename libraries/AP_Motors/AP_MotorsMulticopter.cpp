@@ -234,11 +234,10 @@ void AP_MotorsMulticopter::output()
     update_throttle_filter();
     
     // calc filtered battery voltage and lift_max
-    // 计算滤波电池电压和最大升力(lift_max)
+    // 计算滤波后电池电压和最大升力(_lift_max)
     update_lift_max_from_batt_voltage();
 
     // run spool logic
-    
     output_logic();
 
     // calculate thrust
@@ -250,7 +249,7 @@ void AP_MotorsMulticopter::output()
     thrust_compensation();
 
     // convert rpy_thrust values to pwm
-    // 
+    // 将output_armed_stabilizing()函数计算的rpy_thrust(0~1)转化成pwm(1000~2000)
     output_to_motors();
 
     // output any booster throttle
@@ -258,7 +257,7 @@ void AP_MotorsMulticopter::output()
     output_boost_throttle();
 
     // output raw roll/pitch/yaw/thrust
-    // 输出原始的roll/pitch/yaw/thrust
+    // 设置roll/pitch/yaw/thrust的output_scaled 
     output_rpyt();
 };
 
@@ -276,9 +275,9 @@ void AP_MotorsMulticopter::output_boost_throttle(void)
 // output roll/pitch/yaw/thrust
 void AP_MotorsMulticopter::output_rpyt(void)
 {
-    SRV_Channels::set_output_scaled(SRV_Channel::k_roll_out, _roll_in_ff * 4500);
-    SRV_Channels::set_output_scaled(SRV_Channel::k_pitch_out, _pitch_in_ff * 4500);
-    SRV_Channels::set_output_scaled(SRV_Channel::k_yaw_out, _yaw_in_ff * 4500);
+    SRV_Channels::set_output_scaled(SRV_Channel::k_roll_out, _roll_in_ff * 4500);       //前馈目前都是0
+    SRV_Channels::set_output_scaled(SRV_Channel::k_pitch_out, _pitch_in_ff * 4500);     //前馈目前都是0
+    SRV_Channels::set_output_scaled(SRV_Channel::k_yaw_out, _yaw_in_ff * 4500);         //前馈目前都是0
     SRV_Channels::set_output_scaled(SRV_Channel::k_thrust_out, get_throttle() * 1000);
 }
 
@@ -369,7 +368,7 @@ void AP_MotorsMulticopter::update_lift_max_from_batt_voltage()
 {
     // sanity check battery_voltage_min is not too small
     // if disabled or misconfigured exit immediately
-    // 完整性检查battery_voltage_min不会太小
+    // 一致性检查，确保battery_voltage_min不会太小
     // 如果禁用或配置错误立即退出
     float _batt_voltage_resting_estimate = AP::battery().voltage_resting_estimate(_batt_idx);
     if ((_batt_voltage_max <= 0) || (_batt_voltage_min >= _batt_voltage_max) || (_batt_voltage_resting_estimate < 0.25f * _batt_voltage_min)) {
@@ -424,6 +423,8 @@ int16_t AP_MotorsMulticopter::output_to_pwm(float actuator)
         }
     } else {
         // in all other spool modes, covert to desired PWM
+        // 油门的最小值加上油门最大最小值之差乘以系数actuator
+        // 注:当MOT_PWM_MIN参数为零的时候,get_pwm_output_min()函数返回油门的最小值;当MOT_PWM_MAX参数为零的时候,get_pwm_output_max()函数返回油门的最大值
         pwm_output = get_pwm_output_min() + (get_pwm_output_max() - get_pwm_output_min()) * actuator;
     }
 

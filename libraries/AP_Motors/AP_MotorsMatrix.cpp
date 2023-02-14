@@ -202,7 +202,7 @@ uint16_t AP_MotorsMatrix::get_motor_mask()
 }
 
 // output_armed - sends commands to the motors
-// includes new scaling stability patch
+// includes new scaling stability(稳定性) patch
 void AP_MotorsMatrix::output_armed_stabilizing()
 {
     uint8_t i;                          // general purpose counter
@@ -212,16 +212,16 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     float   throttle_thrust;            // throttle thrust input value, 0.0 - 1.0
     float   throttle_avg_max;           // throttle thrust average maximum value, 0.0 - 1.0
     float   throttle_thrust_max;        // throttle thrust maximum value, 0.0 - 1.0
-    float   throttle_thrust_best_rpy;   // throttle providing maximum roll, pitch and yaw range without climbing
+    float   throttle_thrust_best_rpy;   // throttle providing maximum roll, pitch and yaw range without climbing    平飞情况下俯仰横滚偏航所允许的最大油门
     float   rpy_scale = 1.0f;           // this is used to scale the roll, pitch and yaw to fit within the motor limits
     float   yaw_allowed = 1.0f;         // amount of yaw we can fit in
     float   thr_adj;                    // the difference between the pilot's desired throttle and throttle_thrust_best_rpy
 
     // apply voltage and air pressure compensation
     const float compensation_gain = get_compensation_gain(); // compensation for battery voltage and altitude
-    roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;
-    pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;
-    yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;
+    roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;     //前馈目前都是0
+    pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;      //前馈目前都是0
+    yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;    //航向控制器计算得出，再乘以油门增益；前馈目前都是0
     throttle_thrust = get_throttle() * compensation_gain;
     throttle_avg_max = _throttle_avg_max * compensation_gain;
 
@@ -239,9 +239,11 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     }
 
     // ensure that throttle_avg_max is between the input throttle and the maximum throttle
+    // 油门平均值的最大情况限幅
     throttle_avg_max = constrain_float(throttle_avg_max, throttle_thrust, throttle_thrust_max);
 
     // calculate the highest allowed average thrust that will provide maximum control range
+    // 这个油门的最大值不会超过0.5f
     throttle_thrust_best_rpy = MIN(0.5f, throttle_avg_max);
 
     // calculate throttle that gives most possible room for yaw which is the lower of:
@@ -284,6 +286,7 @@ void AP_MotorsMatrix::output_armed_stabilizing()
 
             // Check the maximum yaw control that can be used on this channel
             // Exclude any lost motors if thrust boost is enabled
+            // 在动力有限的情况下，优先保证俯仰和偏航，其次才是偏航
             if (!is_zero(_yaw_factor[i]) && (!_thrust_boost || i != _motor_lost_index)){
                 if (is_positive(yaw_thrust * _yaw_factor[i])) {
                     yaw_allowed = MIN(yaw_allowed, fabsf(MAX(1.0f - (throttle_thrust_best_rpy + _thrust_rpyt_out[i]), 0.0f)/_yaw_factor[i]));
@@ -333,14 +336,17 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     float rpy_high = -1.0f; // highest thrust value
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
+            // 在动力有限的情况下，优先保证俯仰和偏航，其次才是偏航
             _thrust_rpyt_out[i] = _thrust_rpyt_out[i] + yaw_thrust * _yaw_factor[i];
 
             // record lowest roll + pitch + yaw command
+            // 计算所有电机输出中的最小值
             if (_thrust_rpyt_out[i] < rpy_low) {
                 rpy_low = _thrust_rpyt_out[i];
             }
             // record highest roll + pitch + yaw command
             // Exclude any lost motors if thrust boost is enabled
+            // 计算所有电机中的最大值
             if (_thrust_rpyt_out[i] > rpy_high && (!_thrust_boost || i != _motor_lost_index)) {
                 rpy_high = _thrust_rpyt_out[i];
             }
@@ -392,7 +398,7 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     const float throttle_thrust_best_plus_adj = throttle_thrust_best_rpy + thr_adj;
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
-            _thrust_rpyt_out[i] = (throttle_thrust_best_plus_adj * _throttle_factor[i]) + (rpy_scale * _thrust_rpyt_out[i]);
+            _thrust_rpyt_out[i] = (throttle_thrust_best_plus_adj * _throttle_factor[i]) + (rpy_scale * _thrust_rpyt_out[i]);        //最后的电机输出
         }
     }
 
@@ -517,15 +523,18 @@ void AP_MotorsMatrix::add_motor_raw(int8_t motor_num, float roll_fac, float pitc
         motor_enabled[motor_num] = true;
 
         // set roll, pitch, yaw and throttle factors
+        // 这里的roll_fac,pitch_fac是电机与机体坐标系x轴的夹角，逆时针方向夹角为正，顺时针为负
+        // yaw_fac 取值为+-1，指示电机旋转方向。逆时针为+1，顺时针为-1
         _roll_factor[motor_num] = roll_fac;
         _pitch_factor[motor_num] = pitch_fac;
         _yaw_factor[motor_num] = yaw_fac;
-        _throttle_factor[motor_num] = throttle_factor;
+        _throttle_factor[motor_num] = throttle_factor;      //这里油门因素全都默认为1.0
 
         // set order that motor appears in test
         _test_order[motor_num] = testing_order;
 
         // call parent class method
+        // motor_num从零开始递增
         add_motor_num(motor_num);
     }
 }
@@ -948,7 +957,7 @@ void AP_MotorsMatrix::setup_motors(motor_frame_class frame_class, motor_frame_ty
                     add_motor(AP_MOTORS_MOT_11,  -60, AP_MOTORS_MATRIX_YAW_FACTOR_CW,  11); // forward-left-top
                     add_motor(AP_MOTORS_MOT_12,  -60, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 12); // forward-left-bottom
                     break;
-                case MOTOR_FRAME_TYPE_X:
+                case MOTOR_FRAME_TYPE_X:                                                    // 飞碟用的是这个
                     _frame_type_string = "X";
                     add_motor(AP_MOTORS_MOT_1,    30, AP_MOTORS_MATRIX_YAW_FACTOR_CCW,  1); // forward-right-top
                     add_motor(AP_MOTORS_MOT_2,    30, AP_MOTORS_MATRIX_YAW_FACTOR_CW,   2); // forward-right-bottom

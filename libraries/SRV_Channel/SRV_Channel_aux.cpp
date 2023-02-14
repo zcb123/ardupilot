@@ -43,6 +43,7 @@ void SRV_Channel::output_ch(void)
         passthrough_from = int8_t(function - k_rcin1);
         break;
     }
+
     if (passthrough_from != -1) {
         // we are doing passthrough from input to output for this channel
         RC_Channel *c = rc().channel(passthrough_from);
@@ -65,9 +66,8 @@ void SRV_Channel::output_ch(void)
         }
     }
 #endif // HAL_BUILD_AP_PERIPH
-    //AP::logger().Write("SRVP","TimeUs,REVR,TRIM,SCLV,SMAX,SMIN","QBffff",AP_HAL::micros64(),reversed,servo_trim,scaled_value,servo_max,servo_min);
     if (!(SRV_Channels::disabled_mask & (1U<<ch_num))) {
-        hal.rcout->write(ch_num, output_pwm);
+        hal.rcout->write(ch_num, output_pwm);               //将要输出的PWM数值写入ch_num对应的通道，通过push()函数控制硬件输出
     }
 }
 

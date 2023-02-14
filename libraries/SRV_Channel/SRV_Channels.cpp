@@ -281,7 +281,7 @@ void SRV_Channels::setup_failsafe_trim_all_non_motors(void)
 void SRV_Channels::calc_pwm(void)
 {
     WITH_SEMAPHORE(_singleton->override_counter_sem);
-
+    //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "calc_pwm: %f", 42.4242424242);
     for (uint8_t i=0; i<NUM_SERVO_CHANNELS; i++) {
         // check if channel has been locked out(被锁在外面) for this loop
         // if it has, decrement the loop count for that channel

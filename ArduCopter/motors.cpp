@@ -153,10 +153,12 @@ void Copter::motors_output()
     }
 
     // output any servo channels
-    // 计算所有通道的电机输出
+    // 根据功能(function)计算各个通道应输出的pwm数值
+    // 将 (motor->output()函数中output_rpyt()函数设置的) output_scaled 数值转化成真正输出到电调上的pwm
     SRV_Channels::calc_pwm();
 
     // cork now, so that all channel outputs happen at once
+    // 暂时先锁住所有输出通道
     SRV_Channels::cork();
 
     // update output on any aux channels, for manual passthru

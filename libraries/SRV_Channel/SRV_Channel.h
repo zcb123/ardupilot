@@ -175,7 +175,7 @@ public:
         k_max                   = 136,  // always outputs SERVOn_MAX
         k_mast_rotation         = 137,
         k_nr_aux_servo_functions         ///< This must be the last enum value (only add new values _before_ this one)
-    } Aux_servo_function_t;
+    } Aux_servo_function_t;             // 没有申明数值，作为内部变量类型使用
 
     // used to get min/max/trim limit value based on reverse
     enum class Limit {
@@ -225,6 +225,7 @@ public:
     }
 
     // return true if function is for a multicopter motor
+    // 根据function返回的数值判断是否为电机
     static bool is_motor(SRV_Channel::Aux_servo_function_t function);
 
     // return true if function is for anything that should be stopped in a e-stop situation, ie is dangerous
@@ -262,9 +263,9 @@ private:
     AP_Int16 servo_trim;
     // reversal, following convention that 1 means reversed, 0 means normal
     AP_Int8 reversed;
-    AP_Int16 function;
+    AP_Int16 function;              // 这个参数由地面站设置
 
-    // a pending output value as PWM
+    // a pending output value as PWM    一个将要输出的PWM数值
     uint16_t output_pwm;
 
     // true for angle output type
@@ -491,6 +492,7 @@ public:
     static void upgrade_parameters(void);
 
     // given a zero-based motor channel, return the k_motor function for that channel
+    // 这个函数根据机架类型，机架布局中电机的个数，分配对应的function 枚举号，不用担心servox_function参数的设置。
     static SRV_Channel::Aux_servo_function_t get_motor_function(uint8_t channel) {
         if (channel < 8) {
             return SRV_Channel::Aux_servo_function_t(SRV_Channel::k_motor1+channel);

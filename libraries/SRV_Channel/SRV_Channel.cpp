@@ -90,7 +90,6 @@ uint16_t SRV_Channel::pwm_from_range(int16_t scaled_value) const
         return servo_min;
     }
     scaled_value = constrain_int16(scaled_value, 0, high_out);
-    AP::logger().Write("PMRG","TimeUs,REVR,HIOU,SCLV,SMAX,SMIN","QBffff",AP_HAL::micros64(),reversed,high_out,scaled_value,servo_max,servo_min);
     if (reversed) {
         scaled_value = high_out - scaled_value;
     }
@@ -104,7 +103,6 @@ uint16_t SRV_Channel::pwm_from_angle(int16_t scaled_value) const
         scaled_value = -scaled_value;
     }
     scaled_value = constrain_int16(scaled_value, -high_out, high_out);
-    AP::logger().Write("SRVP","TimeUs,REVR,TRIM,SCLV,SMAX,SMIN","QBffff",AP_HAL::micros64(),reversed,servo_trim,scaled_value,servo_max,servo_min);
     if (scaled_value > 0) {
         return servo_trim + ((int32_t)scaled_value * (int32_t)(servo_max - servo_trim)) / (int32_t)high_out;
     } else {
@@ -117,8 +115,8 @@ void SRV_Channel::calc_pwm(int16_t output_scaled)
     if (have_pwm_mask & (1U<<ch_num)) {
         return;
     }
-
-    // check for E - stop
+    // GCS_SEND_TEXT(MAV_SEVERITY_WARNING, " SRV_Channel calc_pwm: %f", 42.4242424242);
+    // check for E - stop 是否紧急停止检查
     bool force = false;
     if (SRV_Channel::should_e_stop(get_function()) && SRV_Channels::emergency_stop) {
         output_scaled = 0;

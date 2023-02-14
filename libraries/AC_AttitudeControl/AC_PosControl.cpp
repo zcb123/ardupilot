@@ -1004,10 +1004,11 @@ bool AC_PosControl::is_active_z() const
     return ((AP_HAL::micros64() - _last_update_z_us) <= _dt * 5000000.0);
 }
 
-/// update_z_controller - runs the vertical position controller correcting position, velocity and acceleration errors.
-///     Position and velocity errors are converted to velocity and acceleration targets using PID objects
-///     Desired velocity and accelerations are added to these corrections as they are calculated
-///     Kinematically consistent target position and desired velocity and accelerations should be provided before calling this function
+/// update_z_controller - runs the vertical position controller correcting position, velocity and acceleration errors.运行垂直位置控制器，用于校正位置、速度、加速度
+///     Position and velocity errors are converted to velocity and acceleration targets using PID objects.使用PID控制器分别将位置、速度误差值转化成速度、加速度目标值
+///     Desired velocity and accelerations are added to these corrections as they are calculated.在速度、加速度目标值被计算时，加入想要的速度、想要的加速度
+///     Kinematically consistent target position and desired velocity and accelerations should be provided before calling this function.
+///     动力学目标位置、想要的速度、想要的加速度应当在调用这个函数之前计算完成
 void AC_PosControl::update_z_controller()
 {
     // check for ekf z-axis position reset

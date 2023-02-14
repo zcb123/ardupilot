@@ -133,7 +133,9 @@ bool RC_Channel::get_reverse(void) const
 }
 
 // read input from hal.rcin or overrides
-bool RC_Channel::update(void)
+// 当前通道的输入control_in 从这里更新
+// 根据一开始初始化的type_in的方式选择转化的方式
+bool RC_Channel::update(void)       
 {
     if (has_override() && !rc().ignore_overrides()) {
         radio_in = override_value;
@@ -232,16 +234,18 @@ int16_t RC_Channel::pwm_to_angle() const
 /*
   convert a pulse width modulation value to a value in the configured
   range, using the specified deadzone
+  使用指定的死区，将pwm脉宽数值转化到配置的范围
  */
 int16_t RC_Channel::pwm_to_range_dz(uint16_t _dead_zone) const
 {
+    //radio_min = 1100, radio_max = 1900 参数设置
     int16_t r_in = constrain_int16(radio_in, radio_min.get(), radio_max.get());
 
     if (reversed) {
 	    r_in = radio_max.get() - (r_in - radio_min.get());
     }
 
-    int16_t radio_trim_low  = radio_min + _dead_zone;
+    int16_t radio_trim_low  = radio_min + _dead_zone;       //死区 参数设置，设置为30
 
     if (r_in > radio_trim_low) {
         return (((int32_t)(high_in) * (int32_t)(r_in - radio_trim_low)) / (int32_t)(radio_max - radio_trim_low));

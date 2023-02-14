@@ -312,7 +312,7 @@ private:
     // pwm is stored here
     int16_t     radio_in;
 
-    // value generated from PWM normalised to configured scale
+    // value generated from PWM Normalized to configured scale
     int16_t    control_in;
 
     AP_Int16    radio_min;
@@ -392,6 +392,7 @@ public:
 
     // this function is implemented in the child class in the vehicle
     // code
+    // 这是一个纯虚函数，返回RC_Channel数据类型
     virtual RC_Channel *channel(uint8_t chan) = 0;
 
     uint8_t get_radio_in(uint16_t *chans, const uint8_t num_channels); // reads a block of chanel radio_in values starting from channel 0
@@ -527,11 +528,12 @@ public:
     virtual int8_t flight_mode_channel_number() const = 0;
 
 protected:
-
-    enum class Option {
-        IGNORE_RECEIVER         = (1U << 0), // RC receiver modules
-        IGNORE_OVERRIDES        = (1U << 1), // MAVLink overrides
-        IGNORE_FAILSAFE         = (1U << 2), // ignore RC failsafe bits
+    // 作用域限定的枚举类型,在使用这种枚举类型的时候要加Option::
+    // 枚举定义将被限制在枚举作用域内，并且不能隐式转换为整数类型，但是可以显式转化为整数类型
+    enum class Option {     
+        IGNORE_RECEIVER         = (1U << 0), // RC receiver modules     //1
+        IGNORE_OVERRIDES        = (1U << 1), // MAVLink overrides       //2
+        IGNORE_FAILSAFE         = (1U << 2), // ignore RC failsafe bits //4
         FPORT_PAD               = (1U << 3), // pad fport telem output
         LOG_DATA                = (1U << 4), // log rc input bytes
         ARMING_CHECK_THROTTLE   = (1U << 5), // run an arming check for neutral throttle

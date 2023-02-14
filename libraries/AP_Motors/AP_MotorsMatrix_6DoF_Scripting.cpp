@@ -84,9 +84,9 @@ void AP_MotorsMatrix_6DoF_Scripting::output_armed_stabilizing()
 
     // apply voltage and air pressure compensation
     const float compensation_gain = get_compensation_gain(); // compensation for battery voltage and altitude
-    roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;
-    pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;
-    yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;
+    roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;     //前馈目前都是0
+    pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;      //前馈目前都是0
+    yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;        //前馈目前都是0
     throttle_thrust = get_throttle() * compensation_gain;
 
     // scale horizontal thrust with throttle, this mimics a normal copter

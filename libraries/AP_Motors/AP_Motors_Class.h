@@ -104,7 +104,7 @@ public:
     void                set_pitch_ff(float pitch_in) { _pitch_in_ff = pitch_in; };  // range -1 ~ +1
     void                set_yaw(float yaw_in) { _yaw_in = yaw_in; };            // range -1 ~ +1
     void                set_yaw_ff(float yaw_in) { _yaw_in_ff = yaw_in; };      // range -1 ~ +1
-    void                set_throttle(float throttle_in) { _throttle_in = throttle_in; };   // range 0 ~ 1
+    void                set_throttle(float throttle_in) { _throttle_in = throttle_in; };   // range 0 ~ 1   这里便是归一化后的油门数值 在姿态控制类中调用
     void                set_throttle_avg_max(float throttle_avg_max) { _throttle_avg_max = constrain_float(throttle_avg_max, 0.0f, 1.0f); };   // range 0 ~ 1
     void                set_throttle_filter_cutoff(float filt_hz) { _throttle_filter.set_cutoff_frequency(filt_hz); }
     void                set_forward(float forward_in) { _forward_in = forward_in; }; // range -1 ~ +1
@@ -248,11 +248,11 @@ protected:
     // save parameters as part of disarming
     virtual void save_params_on_disarm() {}
 
-    // internal variables
+    // internal variables 内部变量，都带下划线"_"
     uint16_t            _loop_rate;                 // rate in Hz at which output() function is called (normally 400hz)
     uint16_t            _speed_hz;                  // speed in hz to send updates to motors
     float               _roll_in;                   // desired roll control from attitude controllers, -1 ~ +1
-    float               _roll_in_ff;                // desired roll feed forward control from attitude controllers, -1 ~ +1
+    float               _roll_in_ff;                // desired roll feed forward control from attitude controllers, -1 ~ +1 来自于PID控制器的前馈参数
     float               _pitch_in;                  // desired pitch control from attitude controller, -1 ~ +1
     float               _pitch_in_ff;               // desired pitch feed forward control from attitude controller, -1 ~ +1
     float               _yaw_in;                    // desired yaw control from attitude controller, -1 ~ +1
@@ -263,8 +263,8 @@ protected:
     float               _lateral_in;                // last lateral input from set_lateral caller
     float               _throttle_avg_max;          // last throttle input from set_throttle_avg_max
     LowPassFilterFloat  _throttle_filter;           // throttle input filter
-    DesiredSpoolState   _spool_desired;             // desired spool state
-    SpoolState          _spool_state;               // current spool mode
+    DesiredSpoolState   _spool_desired;             // desired spool state  期望旋转模式
+    SpoolState          _spool_state;               // current spool mode   当前旋转模式
 
     // air pressure compensation variables
     float               _air_density_ratio;     // air density / sea level density - decreases in altitude
@@ -289,7 +289,7 @@ protected:
 
 private:
 
-    bool _armed;             // 0 if disarmed, 1 if armed
+    bool _armed;             // 0 if disarmed, 1 if armed   0是上锁 1是解锁
     bool _interlock;         // 1 if the motor interlock is enabled (i.e. motors run), 0 if disabled (motors don't run)
     bool _initialised_ok;    // 1 if initialisation was successful
 
